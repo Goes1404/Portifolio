@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* shadcn-compatible CSS variables (HSL channel values) — blue system */
+    --background: 225 50% 4%;
+    --foreground: 222 40% 94%;
+    --muted-foreground: 220 16% 62%;
+    --primary: 223 100% 59%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 222 32% 14%;
+    --secondary-foreground: 222 40% 94%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --accent: 222 32% 18%;
+    --accent-foreground: 222 40% 94%;
+    --input: 222 32% 18%;
+    --ring: 223 100% 59%;
+    --ring-offset-background: 225 50% 4%;
+
+    /* Brand palette (used directly by the shell + effects) */
+    --bg: #05070f;
+    --bg-soft: #0a0e1c;
+    --ink: #e9edf7;
+    --brand: #2f6bff;
+    --brand-bright: #6f97ff;
+    --brand-cyan: #38e0ff;
+    --brand-deep: #0a1f6b;
+    --color-primary: #05070f;
+    --color-secondary: #0a0e1c;
+    --color-accent: #2f6bff;
+    --color-text: #e9edf7;
+    --color-text-muted: rgba(245, 245, 245, 0.7);
+    --color-border: rgba(255, 255, 255, 0.05);
+    --color-overlay: rgba(0, 0, 0, 0.5);
+    --font-primary: "Inter", sans-serif;
+    --font-display: "Boldonse", serif;
+    --font-serif: "EB Garamond", serif;
+    --text-xs: 0.7rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.2rem;
+    --text-xl: 1.5rem;
+    --text-2xl: 2rem;
+    --text-3xl: 3rem;
+    --text-mega: clamp(7rem, 15vw, 12rem);
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-8: 3rem;
+    --space-10: 4rem;
+    --space-12: 6rem;
+    --panel-padding: 5%;
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  html {
+    /* Lenis drives smoothing; native smooth-scroll would double up. */
+    scroll-behavior: auto;
+    background-color: #05070f;
+    color: #e9edf7;
+    /* Stop iOS/Safari from inflating font sizes in landscape */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    overflow-x: hidden;
+    /* Belt-and-suspenders: never allow a stray element to widen the page on mobile */
+    max-width: 100%;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Kill the grey tap flash on touch — we provide our own active states */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Media never overflows its container on small screens */
+  img,
+  video,
+  svg {
+    max-width: 100%;
+  }
+
+  /* Comfortable touch targets: anything tappable is at least 44px on coarse
+     (touch) pointers — the iOS/Android human-interface minimum. Desktop is
+     untouched so dense mouse UIs keep their compact sizing. */
+  @media (pointer: coarse) {
+    a[href],
+    button,
+    [role="button"] {
+      min-height: 44px;
+    }
+    /* Inline text links inside prose shouldn't be force-stretched */
+    p a[href],
+    li a[href],
+    span a[href] {
+      min-height: 0;
+    }
+  }
+
+  /* Respect users who ask for less motion: freeze the decorative loops.
+     Scroll-driven storytelling still works (it follows the finger), but the
+     auto-playing marquee / pulses / glows stop competing for attention. */
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee,
+    .thread-dot,
+    .animate-pulse,
+    .animate-bounce,
+    .animate-ping {
+      animation: none !important;
+    }
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  ::selection {
+    background-color: #2f6bff;
+    color: #fff;
+  }
+
+  /* Lenis smooth-scroll recommended styles */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+}
+
+@layer utilities {
+  /* Display font (Boldonse) — used for big editorial headings */
+  .font-display {
+    font-family: 'Boldonse', 'Inter', system-ui, sans-serif;
+  }
+  /* Serif (EB Garamond) — narrative/body editorial text */
+  .font-editorial {
+    font-family: 'EB Garamond', Georgia, serif;
+  }
+  /* Mono (Space Mono) — metadata, labels, nav, index numerals */
+  .font-code {
+    font-family: 'Space Mono', 'Courier New', monospace;
+  }
+
+  /* Brand accent helpers (named -brand to avoid clashing with Tailwind's
+     `accent` color token, which is a dark blue-gray surface) */
+  .text-brand {
+    color: #2f6bff;
+  }
+  .bg-brand {
+    background-color: #2f6bff;
+  }
+
+  /* Vertical metadata rail */
+  .vertical-rl {
+    writing-mode: vertical-rl;
+  }
+
+  /* Layered radial atmosphere (blue horizon + cyan corner) */
+  .bg-grain {
+    background-image:
+      radial-gradient(1200px 620px at 50% -10%, rgba(47, 107, 255, 0.16), transparent 62%),
+      radial-gradient(900px 600px at 100% 110%, rgba(56, 224, 255, 0.08), transparent 60%);
+  }
+
+  /* Real film grain via SVG turbulence — fixed full-screen overlay */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Hairline rule helper */
+  .rule {
+    border-color: rgba(236, 233, 226, 0.12);
+  }
+
+  /* Safe-area helpers — keep fixed UI clear of the notch / Dynamic Island.
+     These set ONLY top/bottom (the axes a notch or home-indicator touch in
+     portrait) and are meant for elements with no competing padding on that
+     axis, so they never collapse a content gutter. Pairs with
+     viewport-fit=cover (index.html). On devices without insets, env() is 0. */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Marquee */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 28s linear infinite;
+  }
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  /* Soft blue aurora mesh — atmospheric depth behind seams/markers */
+  .bg-aurora {
+    background-image:
+      radial-gradient(60% 120% at 15% 0%, rgba(47, 107, 255, 0.12), transparent 60%),
+      radial-gradient(50% 120% at 85% 100%, rgba(56, 224, 255, 0.08), transparent 60%);
+  }
+
+  /* Pulsing connector dot used on section bridges */
+  @keyframes thread-pulse {
+    0%, 100% { opacity: 0.5; box-shadow: 0 0 0 0 rgba(47, 107, 255, 0.5); }
+    50% { opacity: 1; box-shadow: 0 0 0 6px rgba(47, 107, 255, 0); }
+  }
+  .thread-dot {
+    animation: thread-pulse 2.4s ease-in-out infinite;
+  }
+}
