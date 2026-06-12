@@ -2,7 +2,6 @@ import { useRef, useEffect, ReactNode } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import DarkSnow from './dark-snow';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,13 +11,17 @@ interface ScrollExpandMediaProps {
   posterSrc?: string;
   bgImageSrc: string;
   title?: string;
+  /** Explicit two-line title. When given, overrides the naive first-word split
+   *  so the headline stays balanced. titleTop renders white, titleBottom accent. */
+  titleTop?: string;
+  titleBottom?: string;
   date?: string;
   scrollToExpand?: string;
   textBlend?: boolean;
   children?: ReactNode;
 }
 
-const FRAMES = Array.from({ length: 144 }, (_, i) => `frame_${String(i + 1).padStart(3, '0')}.png`);
+const FRAMES = Array.from({ length: 144 }, (_, i) => `frame_${String(i + 1).padStart(3, '0')}.webp`);
 
 
 export default function ScrollExpandMedia({
@@ -27,6 +30,8 @@ export default function ScrollExpandMedia({
   posterSrc,
   bgImageSrc,
   title,
+  titleTop,
+  titleBottom,
   date,
   scrollToExpand = 'scroll para expandir',
   textBlend,
@@ -166,12 +171,22 @@ export default function ScrollExpandMedia({
   // Text slides: both values in vw (same unit = smooth interpolation).
   const xLeft       = useTransform(p, [0, 1], ['0vw', '-160vw']);
   const xRight      = useTransform(p, [0, 1], ['0vw',  '160vw']);
+
+  // Parallax EXIT — once the card is fully expanded (~0.75) and held, the last
+  // stretch of the track lifts it away: it drifts up, pushes in slightly and
+  // dissolves, so the media "exits" the frame before the next section arrives.
+  const exitY       = useTransform(rawProgress, [0.86, 1], ['0vh', '-26vh'], { clamp: true });
+  const exitScale   = useTransform(rawProgress, [0.86, 1], [1, 1.08], { clamp: true });
+  const exitOpacity = useTransform(rawProgress, [0.9, 1], [1, 0], { clamp: true });
+
   // Content below fades in after expansion
   const contentAlpha = useTransform(rawProgress, [0.73, 0.86], [0, 1], { clamp: true });
 
-  const words  = title?.split(' ') ?? [];
-  const firstW = words[0] ?? '';
-  const restW  = words.slice(1).join(' ');
+  // Prefer the explicit two-line title; otherwise fall back to splitting the
+  // single `title` on its first word (legacy behaviour).
+  const words    = title?.split(' ') ?? [];
+  const topLine    = titleTop    ?? words[0] ?? '';
+  const bottomLine = titleBottom ?? words.slice(1).join(' ');
 
   return (
     // No overflow-x here — that breaks position:sticky in Chromium.
@@ -181,21 +196,54 @@ export default function ScrollExpandMedia({
       {/* ── Pinned viewport ─────────────────────────────────── */}
       <div className="sticky top-0 h-screen overflow-hidden">
 
-        {/* WebGL realistic dark snow background fades out as media expands */}
+        {/* Static atmospheric backdrop — a blurred frame of the video itself,
+            so it carries the exact cold/blue mood with ZERO per-frame GPU cost
+            (no WebGL). It just fades out as the media card expands. */}
         <motion.div style={{ opacity: bgOpacity }} className="absolute inset-0 z-0">
-          <DarkSnow progress={rawProgress} className="h-full w-full" />
+          {/* Blurred, darkened still — composited once, then cached by the GPU */}
+          <div
+            aria-hidden
+            className="absolute inset-0 scale-110 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${bgImageSrc})`,
+              filter: 'blur(28px) brightness(0.42) saturate(1.15)',
+            }}
+          />
+          {/* Cold blue glow rising from the centre — echoes the ice sculpture */}
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(60% 55% at 50% 45%, rgba(47,107,255,0.30) 0%, rgba(56,224,255,0.10) 35%, transparent 70%)',
+            }}
+          />
+          {/* Vignette + base tint to keep the centred text legible */}
+          <div
+            aria-hidden
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(120% 120% at 50% 50%, transparent 35%, rgba(5,7,15,0.85) 100%)',
+            }}
+          />
           <div className="absolute inset-0 bg-[#05070f]/35" />
         </motion.div>
 
-        {/* Expanding media card */}
+        {/* Expanding media card — centred via flexbox so the parallax-exit
+            `y`/`scale` transforms never collide with a translate-based centring. */}
+        <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
         <motion.div
-          className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl"
+          className="overflow-hidden rounded-2xl will-change-transform"
           style={{
             width:     mediaW,
             height:    mediaH,
             maxWidth:  '96vw',
             maxHeight: '88vh',
             boxShadow,
+            y:         exitY,
+            scale:     exitScale,
+            opacity:   exitOpacity,
           }}
         >
           {mediaType === 'sequence' ? (
@@ -217,44 +265,51 @@ export default function ScrollExpandMedia({
           {/* Overlay clears as the card grows to reveal the media */}
           <motion.div className="absolute inset-0 bg-[#05070f]" style={{ opacity: veilOpacity }} />
         </motion.div>
+        </div>
 
-        {/* ── Text layers ── all slide apart to make room for the expanding media */}
+        {/* ── Text layers ── two balanced lines that slide apart to clear the
+            expanding media. Top line drifts left, bottom line drifts right. */}
         <div
-          className={`absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 pointer-events-none ${
+          className={`absolute inset-0 z-20 flex flex-col items-center justify-center px-6 text-center pointer-events-none ${
             textBlend ? 'mix-blend-difference' : ''
           }`}
         >
           {date && (
             <motion.p
               style={{ x: xLeft }}
-              className="font-code text-xs uppercase tracking-[0.38em] text-white/55"
+              className="mb-5 flex items-center gap-3 font-code text-[10px] uppercase tracking-[0.42em] text-white/60 sm:text-xs"
             >
+              <span className="h-px w-6 bg-brand/70" />
               {date}
+              <span className="h-px w-6 bg-brand/70" />
             </motion.p>
           )}
 
-          {firstW && (
-            <motion.h2
-              style={{ x: xLeft }}
-              className="font-display text-[9vw] leading-[0.88] text-[#e9edf7] sm:text-6xl lg:text-7xl"
-            >
-              {firstW}
-            </motion.h2>
-          )}
-          {restW && (
-            <motion.h2
-              style={{ x: xRight }}
-              className="font-display text-[9vw] leading-[0.88] text-brand sm:text-6xl lg:text-7xl"
-            >
-              {restW}
-            </motion.h2>
-          )}
+          <h2 className="font-display leading-[0.92] tracking-tight" style={{ fontSize: 'clamp(2.4rem, 7.5vw, 6rem)' }}>
+            {topLine && (
+              <motion.span
+                style={{ x: xLeft }}
+                className="block text-[#e9edf7]"
+              >
+                {topLine}
+              </motion.span>
+            )}
+            {bottomLine && (
+              <motion.span
+                style={{ x: xRight }}
+                className="block bg-gradient-to-r from-[#2f6bff] via-[#6f97ff] to-[#38e0ff] bg-clip-text text-transparent"
+              >
+                {bottomLine}
+              </motion.span>
+            )}
+          </h2>
 
           {scrollToExpand && (
             <motion.p
               style={{ x: xRight }}
-              className="font-code text-[10px] uppercase tracking-[0.3em] text-[#6f97ff]"
+              className="mt-7 flex items-center gap-2 font-code text-[10px] uppercase tracking-[0.32em] text-[#6f97ff]"
             >
+              <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-[#38e0ff]" />
               {scrollToExpand}
             </motion.p>
           )}

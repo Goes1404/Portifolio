@@ -390,8 +390,8 @@ function App() {
 
             {/* Tagline — sits at a mid-depth between meta and name */}
             <div data-hero-layer="tagline" className="will-change-transform">
-              <motion.div variants={rise} className="mt-10 flex flex-col gap-5 md:ml-auto md:max-w-md md:text-right">
-                <p className="font-editorial text-2xl italic leading-snug text-white/65 md:text-3xl">
+              <motion.div variants={rise} className="mt-7 flex flex-col gap-4 sm:mt-10 sm:gap-5 md:ml-auto md:max-w-md md:text-right">
+                <p className="font-editorial text-lg italic leading-snug text-white/65 sm:text-2xl md:text-3xl">
                   Desenvolvedor Full Stack — transformo ideias em produtos
                   digitais que as pessoas gostam de usar.
                 </p>
@@ -485,7 +485,7 @@ function App() {
               href="mailto:sq1matheusgsilva@gmail.com"
               className="group inline-flex max-w-full items-center gap-2 border-b-2 border-[#2f6bff] pb-2 font-editorial text-lg italic text-[#e9edf7] transition-colors hover:text-brand sm:gap-3 sm:text-2xl md:text-4xl"
             >
-              <span className="break-all">sq1matheusgsilva@gmail.com</span>
+              <span className="break-words">sq1matheusgsilva@gmail.com</span>
               <ArrowUpRight className="h-5 w-5 shrink-0 text-brand transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-6 sm:w-6" />
             </a>
 

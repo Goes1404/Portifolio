@@ -132,8 +132,9 @@ export default function ExperienciaSection() {
                   style={{ background: exp.accent, opacity: 0.5 }}
                 />
 
-                {/* Top row: period + company + status */}
-                <div className="flex flex-wrap items-start justify-between gap-3 mb-5">
+                {/* Top row: period + status on one side, company on the other.
+                    Stacks left-aligned on mobile, splits to a row from sm up. */}
+                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-code text-[11px] tracking-[0.4em] text-white/35 tabular-nums">
                       {exp.period}
@@ -152,7 +153,7 @@ export default function ExperienciaSection() {
                       </span>
                     )}
                   </div>
-                  <div className="text-right">
+                  <div className="sm:text-right">
                     <div className="font-code text-[11px] tracking-widest text-white/55">{exp.company}</div>
                     <div className="font-code text-[10px] tracking-widest text-white/25 mt-0.5">{exp.type}</div>
                   </div>

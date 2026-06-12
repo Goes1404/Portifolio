@@ -181,12 +181,15 @@ export function ScrollPortraitWall({
       </div>
 
       {/* Sticky centred title — inverts against whatever portrait is behind it */}
-      <div className="pointer-events-none sticky top-1/2 z-20 -translate-y-1/2 text-center text-white mix-blend-exclusion">
-        <h2 className="text-5xl font-semibold tracking-tighter sm:text-7xl md:text-8xl lg:text-9xl">
+      <div className="pointer-events-none sticky top-1/2 z-20 -translate-y-1/2 px-4 text-center text-white mix-blend-exclusion">
+        <h2
+          className="font-display leading-[0.9] tracking-tight"
+          style={{ fontSize: "clamp(2.5rem, 12vw, 7rem)" }}
+        >
           {title}
         </h2>
         {date && (
-          <p className="mt-1 text-xs uppercase tracking-wide text-white/60 sm:text-sm">
+          <p className="mt-2 font-code text-[10px] uppercase tracking-[0.3em] text-white/60 sm:text-xs">
             {date}
           </p>
         )}
@@ -218,9 +221,9 @@ export function ScrollPortraitWall({
                       className="h-full w-full object-cover grayscale contrast-[1.15] filter transition-transform duration-500 ease-in-out hover:scale-95"
                     />
                     {showCaptions && (
-                      <div className="absolute -bottom-2 left-0 flex w-full translate-y-full justify-between gap-2 text-[11px] uppercase leading-tight text-muted-foreground sm:text-sm">
-                        <span className="truncate">{s.name}</span>
-                        <span className="shrink-0">({s.role})</span>
+                      <div className="absolute -bottom-1 left-0 flex w-full translate-y-full flex-col gap-0 font-code text-[10px] uppercase leading-tight tracking-wide sm:flex-row sm:items-baseline sm:justify-between sm:gap-2 sm:text-xs">
+                        <span className="truncate text-white/75">{s.name}</span>
+                        <span className="shrink-0 text-[#6f97ff]/70">{s.role}</span>
                       </div>
                     )}
                   </div>

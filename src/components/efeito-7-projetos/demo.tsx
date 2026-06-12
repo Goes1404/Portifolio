@@ -515,7 +515,7 @@ export default function ProjetosHeroScrub() {
   };
 
   return (
-    <section className="w-full bg-[#05070f] py-20 px-4">
+    <section className="w-full bg-[#05070f] px-5 py-16 sm:px-6 sm:py-20">
       {/* Notificador de Transição de Rota (Simulação local) */}
       <AnimatePresence>
         {fallbackProject && (

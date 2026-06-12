@@ -51,7 +51,7 @@ export function HomePage() {
 
   return (
     <div ref={containerRef} className="min-h-[300vh] bg-[#05070f] relative">
-      <div ref={viewportRef} className="h-screen flex items-center justify-center p-4 sm:p-8 w-full overflow-hidden">
+      <div ref={viewportRef} className="relative h-screen flex items-center justify-center p-4 sm:p-8 w-full overflow-hidden">
         {/* Scale wrapper: shrinks the whole orbit on narrow viewports */}
         <div className="relative" style={{ transform: `scale(${scale})` }}>
           <div
@@ -172,21 +172,40 @@ export function HomePage() {
                     />
                   </div>
 
-                  <div
-                    className={`flex flex-col items-center justify-center relative z-20 transition-opacity duration-500 ${
-                      progress > 0.5 ? "opacity-100" : "opacity-0"
-                    }`}
-                  >
-                    <h1 className="font-display text-3xl text-[#e9edf7] text-center mb-2">Full</h1>
-                    <h1 className="font-display text-3xl text-[#38e0ff] text-center mb-4">Stack</h1>
-
-                    <p className="text-white/55 text-center max-w-xs font-editorial text-lg italic">
-                      Do front ao back, da UI ao deploy — um ecossistema de ferramentas trabalhando junto.
-                    </p>
-                  </div>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Center message — rendered OUTSIDE the scaled orbit so it stays fully
+            legible on mobile (the rig shrinks to fit, the copy must not). A soft
+            radial halo keeps it readable over whichever profiles sit behind. */}
+        <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center px-8">
+          <div
+            className={`relative flex flex-col items-center text-center transition-all duration-700 ease-out ${
+              progress > 0.5 ? "opacity-100 translate-y-0" : "translate-y-3 opacity-0"
+            }`}
+          >
+            {/* Dark halo so the copy reads against the orbiting thumbnails */}
+            <div
+              aria-hidden
+              className="absolute left-1/2 top-1/2 -z-10 h-[150%] w-[180%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{
+                background:
+                  "radial-gradient(closest-side, rgba(5,7,15,0.92) 40%, rgba(5,7,15,0.55) 65%, transparent 100%)",
+              }}
+            />
+            <h2
+              className="font-display leading-[0.92] text-[#e9edf7]"
+              style={{ fontSize: "clamp(1.9rem, 8vw, 3rem)" }}
+            >
+              Full <span className="text-[#38e0ff]">Stack</span>
+            </h2>
+            <p className="mt-3 max-w-[15rem] font-editorial text-base italic leading-snug text-white/60 sm:max-w-xs sm:text-lg">
+              Do front ao back, da UI ao deploy — um ecossistema de ferramentas
+              trabalhando junto.
+            </p>
           </div>
         </div>
       </div>
