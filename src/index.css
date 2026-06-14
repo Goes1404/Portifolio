@@ -231,4 +231,108 @@
   .thread-dot {
     animation: thread-pulse 2.4s ease-in-out infinite;
   }
+
+  /* ─────────────────────────────────────────────────────────────
+     Custom magnetic cursor (CustomCursor.jsx)
+     ───────────────────────────────────────────────────────────── */
+  .cursor-dot,
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    pointer-events: none;
+    opacity: 0;
+    will-change: transform;
+  }
+  .cursor-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 9999px;
+    background: #38e0ff;
+    box-shadow: 0 0 12px rgba(56, 224, 255, 0.8);
+    transition: opacity 0.25s ease, width 0.2s ease, height 0.2s ease;
+  }
+  .cursor-dot.is-hidden {
+    width: 0;
+    height: 0;
+  }
+  .cursor-ring {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1.5px solid rgba(233, 237, 247, 0.8);
+    border-radius: 9999px;
+    mix-blend-mode: difference;
+    transition: opacity 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+  }
+  .cursor-ring.is-active {
+    border-color: rgba(47, 107, 255, 0.9);
+    background-color: rgba(47, 107, 255, 0.12);
+    mix-blend-mode: normal;
+  }
+  .cursor-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #e9edf7;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    transform: scale(0.42);
+    white-space: nowrap;
+  }
+  /* Hide the native cursor only on devices using the custom one */
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     Split-text reveal (SplitReveal.jsx)
+     ───────────────────────────────────────────────────────────── */
+  .sr-root {
+    /* mask edges so descenders/ascenders don't peek above the line */
+  }
+  .sr-word {
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .sr-mask {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding: 0.08em 0; /* room for blur + rotation without clipping glyphs */
+    margin: -0.08em 0;
+  }
+  .sr-char {
+    display: inline-block;
+    will-change: transform, opacity, filter;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     Animated gradient text + neon glow (text micro-interactions)
+     ───────────────────────────────────────────────────────────── */
+  @keyframes text-shimmer {
+    to { background-position: 200% center; }
+  }
+  .text-gradient-anim {
+    background: linear-gradient(90deg, #2f6bff, #38e0ff, #6f97ff, #2f6bff);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: text-shimmer 5s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .text-gradient-anim { animation: none; }
+  }
+
+  /* Tilt card surface helper */
+  .tilt-3d {
+    position: relative;
+  }
 }

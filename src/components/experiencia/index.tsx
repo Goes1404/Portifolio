@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import Tilt3D from '@/components/effects/Tilt3D';
 
 const EXPERIENCES = [
   {
@@ -111,8 +112,11 @@ export default function ExperienciaSection() {
               viewport={inView}
               className="group relative"
             >
-              {/* Entry card */}
-              <div className="relative rounded-2xl border px-5 py-7 md:px-10 md:py-9 transition-colors duration-500"
+              {/* Entry card — 3D tilt on pointer with moving specular glare */}
+              <Tilt3D
+                max={6}
+                scale={1.01}
+                className="relative rounded-2xl border px-5 py-7 md:px-10 md:py-9"
                 style={{
                   borderColor: 'rgba(255,255,255,0.07)',
                   background: 'rgba(255,255,255,0.018)',
@@ -198,7 +202,7 @@ export default function ExperienciaSection() {
                     </span>
                   ))}
                 </div>
-              </div>
+              </Tilt3D>
 
               {/* Connector line between entries */}
               {i < EXPERIENCES.length - 1 && (

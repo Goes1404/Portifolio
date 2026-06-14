@@ -5,6 +5,14 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from '@studio-freight/lenis'
 import { ArrowDown, ArrowUpRight, Code2, Globe, Mail, Menu, X } from 'lucide-react'
 import WebGLHero from '@/components/webgl-hero'
+import {
+  CustomCursor,
+  ParticleField,
+  Magnetic,
+  SplitReveal,
+  ScrollVelocity,
+  LiquidText,
+} from '@/components/effects'
 import ScrollingAnimationDemo from '@/components/efeito-2-perfis/demo'
 import ScrollPortraitWallDemo from '@/components/efeito-3-portrait-wall/demo'
 import HeroScrollDemo from '@/components/efeito-4-container-scroll/demo'
@@ -199,6 +207,9 @@ function App() {
 
   return (
     <div className="relative min-h-screen bg-[#05070f] text-[#e9edf7] selection:bg-[#2f6bff] selection:text-white">
+      {/* Custom magnetic cursor (desktop / fine-pointer only) */}
+      <CustomCursor />
+
       {/* Scroll-progress thread */}
       <motion.div
         style={{ scaleX: scrollYProgress }}
@@ -325,6 +336,10 @@ function App() {
           {/* WebGL blob layer (z-0) */}
           <WebGLHero className="pointer-events-none absolute inset-0 z-0" />
 
+          {/* Interactive particle constellation (z-[2]) — drifts, links nearby
+              nodes and is repelled by the pointer (light physics) */}
+          <ParticleField className="pointer-events-none absolute inset-0 z-[2]" />
+
           {/* Readability veil (z-1) — also fades via GSAP as you scroll in */}
           <div
             data-hero-layer="veil"
@@ -374,7 +389,7 @@ function App() {
                 variants={rise}
                 className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.88] text-[#e9edf7] md:ml-[16%]"
               >
-                Goes <span className="text-brand">da</span>
+                Goes <span className="text-gradient-anim">da</span>
               </motion.h1>
             </div>
 
@@ -384,7 +399,8 @@ function App() {
                 variants={rise}
                 className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.88] text-[#e9edf7] md:ml-[5%]"
               >
-                Silva
+                {/* Hover to ripple the type with an SVG liquid-distortion filter */}
+                <LiquidText data-cursor="liquid">Silva</LiquidText>
               </motion.h1>
             </div>
 
@@ -395,21 +411,27 @@ function App() {
                   Desenvolvedor Full Stack — transformo ideias em produtos
                   digitais que as pessoas gostam de usar.
                 </p>
-                <a
-                  href="#historia"
-                  onClick={(e) => handleNav(e, '#historia')}
-                  className="group inline-flex items-center justify-start gap-2 font-code text-sm tracking-widest text-brand md:justify-end"
-                >
-                  CONHEÇA A HISTÓRIA
-                  <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
-                </a>
+                <Magnetic strength={0.5} className="md:self-end">
+                  <a
+                    href="#historia"
+                    onClick={(e) => handleNav(e, '#historia')}
+                    data-cursor="rolar"
+                    className="group inline-flex items-center justify-start gap-2 font-code text-sm tracking-widest text-brand md:justify-end"
+                  >
+                    CONHEÇA A HISTÓRIA
+                    <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
+                  </a>
+                </Magnetic>
               </motion.div>
             </div>
           </motion.div>
 
-          {/* Marquee pinned at the bottom of the sticky viewport */}
+          {/* Marquee pinned at the bottom of the sticky viewport.
+              ScrollVelocity shears it proportionally to scroll speed. */}
           <div className="absolute bottom-0 left-0 right-0 z-20">
-            <Marquee />
+            <ScrollVelocity maxSkew={9}>
+              <Marquee />
+            </ScrollVelocity>
           </div>
           {/* Bottom-edge fade — blends the hero into the next section */}
           <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-36 z-[19] bg-gradient-to-t from-[#05070f] to-transparent" />
@@ -467,27 +489,26 @@ function App() {
             <span className="font-code text-xs uppercase tracking-[0.35em] text-white/50">05 — Contato</span>
           </motion.div>
 
-          {/* Footer heading — word-by-word surge */}
-          <motion.h2
-            variants={wordStagger}
+          {/* Footer heading — GSAP per-character mask reveal (SplitReveal) */}
+          <h2
             className="mt-8 font-display text-[13vw] leading-[0.9] text-[#e9edf7] sm:text-6xl md:text-8xl"
             aria-label="Vamos construir algo juntos?"
           >
-            <motion.span variants={rise} className="mr-[0.22em] inline-block">Vamos</motion.span>
-            <motion.span variants={rise} className="mr-[0.22em] inline-block">construir</motion.span>
-            <br />
-            <motion.span variants={rise} className="mr-[0.22em] inline-block">algo</motion.span>
-            <motion.span variants={rise} className="inline-block text-brand">juntos?</motion.span>
-          </motion.h2>
+            <SplitReveal as="span" className="block">Vamos construir</SplitReveal>
+            <SplitReveal as="span" className="block text-brand" start="top 90%">algo juntos?</SplitReveal>
+          </h2>
 
           <motion.div variants={rise} className="mt-14 flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
-            <a
-              href="mailto:sq1matheusgsilva@gmail.com"
-              className="group inline-flex max-w-full items-center gap-2 border-b-2 border-[#2f6bff] pb-2 font-editorial text-lg italic text-[#e9edf7] transition-colors hover:text-brand sm:gap-3 sm:text-2xl md:text-4xl"
-            >
-              <span className="break-words">sq1matheusgsilva@gmail.com</span>
-              <ArrowUpRight className="h-5 w-5 shrink-0 text-brand transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-6 sm:w-6" />
-            </a>
+            <Magnetic strength={0.3}>
+              <a
+                href="mailto:sq1matheusgsilva@gmail.com"
+                data-cursor="escrever"
+                className="group inline-flex max-w-full items-center gap-2 border-b-2 border-[#2f6bff] pb-2 font-editorial text-lg italic text-[#e9edf7] transition-colors hover:text-brand sm:gap-3 sm:text-2xl md:text-4xl"
+              >
+                <LiquidText as="span" className="break-words">sq1matheusgsilva@gmail.com</LiquidText>
+                <ArrowUpRight className="h-5 w-5 shrink-0 text-brand transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-6 sm:w-6" />
+              </a>
+            </Magnetic>
 
             <div className="flex items-center gap-3">
               {[
@@ -495,14 +516,16 @@ function App() {
                 { icon: Globe,  label: 'LinkedIn',  href: '#' },
                 { icon: Mail,   label: 'E-mail',    href: 'mailto:sq1matheusgsilva@gmail.com' },
               ].map(({ icon: Icon, label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  className="flex h-12 w-12 items-center justify-center rounded-full border rule text-white/60 transition-colors hover:border-[#2f6bff] hover:text-brand"
-                >
-                  <Icon className="h-5 w-5" />
-                </a>
+                <Magnetic key={label} strength={0.45}>
+                  <a
+                    href={href}
+                    aria-label={label}
+                    data-cursor={label}
+                    className="flex h-12 w-12 items-center justify-center rounded-full border rule text-white/60 transition-colors hover:border-[#2f6bff] hover:text-brand"
+                  >
+                    <Icon className="h-5 w-5" />
+                  </a>
+                </Magnetic>
               ))}
             </div>
           </motion.div>
