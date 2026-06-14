@@ -39,20 +39,23 @@ export default function LiquidText({
 
     const enter = () => {
       gsap.killTweensOf(state)
-      gsap.timeline()
+      // Attach the filter only while rippling — an always-on SVG filter forces
+      // an extra layer and softens the text at rest.
+      wrap.style.filter = `url(#${filterId})`
+      gsap.timeline({ onComplete: () => { wrap.style.filter = 'none' } })
         .to(state, { scale: intensity, f: freq, duration: 0.45, ease: 'power2.out', onUpdate: apply })
         .to(state, { scale: 0, f: 0.001, duration: 1.1, ease: 'elastic.out(1, 0.4)', onUpdate: apply })
     }
 
     wrap.addEventListener('pointerenter', enter)
     return () => wrap.removeEventListener('pointerenter', enter)
-  }, [intensity, freq])
+  }, [intensity, freq, filterId])
 
   return (
     <Tag
       ref={wrapRef}
       className={className}
-      style={{ filter: `url(#${filterId})`, display: 'inline-block' }}
+      style={{ display: 'inline-block' }}
       {...rest}
     >
       <svg width="0" height="0" aria-hidden style={{ position: 'absolute' }}>

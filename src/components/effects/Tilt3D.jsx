@@ -34,6 +34,9 @@ export default function Tilt3D({
       const py = (e.clientY - rect.top) / rect.height
       const rx = (0.5 - py) * max * 2
       const ry = (px - 0.5) * max * 2
+      // Track the pointer 1:1 while moving — the eased transition is only for
+      // the spring-back on leave, otherwise it lags behind the cursor.
+      el.style.transition = 'transform 0s'
       el.style.transform =
         `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) scale(${scale})`
       if (glare && glareRef.current) {
@@ -48,6 +51,7 @@ export default function Tilt3D({
     const el = ref.current
     if (!el) return
     cancelAnimationFrame(raf.current)
+    el.style.transition = 'transform 0.5s cubic-bezier(0.16,1,0.3,1)'
     el.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)'
     if (glareRef.current) glareRef.current.style.opacity = '0'
   }
@@ -58,7 +62,7 @@ export default function Tilt3D({
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className={`tilt-3d ${className}`}
-      style={{ transformStyle: 'preserve-3d', transition: 'transform 0.4s cubic-bezier(0.16,1,0.3,1)' }}
+      style={{ transformStyle: 'preserve-3d', transition: 'transform 0.5s cubic-bezier(0.16,1,0.3,1)' }}
       {...rest}
     >
       {children}

@@ -33,6 +33,7 @@ export default function CustomCursor() {
     const ringPos = { ...pointer }
     let ringScale = 1
     let ringScaleTarget = 1
+    let activeScale = 1 // scale while hovering an interactive element (or its data value)
     let visible = false
     let raf = 0
 
@@ -56,7 +57,8 @@ export default function CustomCursor() {
     const onOver = (e) => {
       const t = e.target.closest('a, button, [role="button"], [data-cursor]')
       if (t) {
-        ringScaleTarget = t.dataset.cursorScale ? Number(t.dataset.cursorScale) : 2.4
+        activeScale = t.dataset.cursorScale ? Number(t.dataset.cursorScale) : 2.4
+        ringScaleTarget = activeScale
         ring.classList.add('is-active')
         dot.classList.add('is-hidden')
         const text = t.dataset.cursor
@@ -69,6 +71,7 @@ export default function CustomCursor() {
     const onOut = (e) => {
       const t = e.target.closest('a, button, [role="button"], [data-cursor]')
       if (t) {
+        activeScale = 1
         ringScaleTarget = 1
         ring.classList.remove('is-active')
         dot.classList.remove('is-hidden')
@@ -78,7 +81,7 @@ export default function CustomCursor() {
 
     // Press feedback
     const onDown = () => { ringScaleTarget *= 0.7 }
-    const onUp = () => { ringScaleTarget = ring.classList.contains('is-active') ? 2.4 : 1 }
+    const onUp = () => { ringScaleTarget = ring.classList.contains('is-active') ? activeScale : 1 }
 
     window.addEventListener('pointermove', onMove, { passive: true })
     window.addEventListener('pointerover', onOver, { passive: true })

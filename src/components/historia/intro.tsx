@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import ScrollReveal from '@/components/effects/ScrollReveal';
 
 const STATS = [
   { value: 'FIAP',        label: 'Engenharia de Software',  sub: 'formação em andamento' },
@@ -115,33 +116,40 @@ export default function HistoriaIntro() {
             </motion.div>
           </div>
 
-          {/* ── RIGHT: stats ── */}
-          <motion.div variants={stagger} className="grid grid-cols-2 lg:grid-cols-1 gap-4">
-            {STATS.map((s) => (
-              <motion.div
+          {/* ── RIGHT: stats — each card unmasks with a clip-path curtain ── */}
+          <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+            {STATS.map((s, i) => (
+              <ScrollReveal
                 key={s.value}
-                variants={rise}
-                className="rounded-2xl border px-6 py-5"
-                style={{
-                  borderColor: 'rgba(255,255,255,0.07)',
-                  background: 'rgba(255,255,255,0.025)',
-                }}
+                direction="up"
+                duration={1}
+                lift={28}
+                start={`top ${88 - i * 2}%`}
+                className="rounded-2xl"
               >
                 <div
-                  className="font-display leading-none mb-1.5"
-                  style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', color: '#e9edf7' }}
+                  className="rounded-2xl border px-6 py-5"
+                  style={{
+                    borderColor: 'rgba(255,255,255,0.07)',
+                    background: 'rgba(255,255,255,0.025)',
+                  }}
                 >
-                  {s.value}
+                  <div
+                    className="font-display leading-none mb-1.5"
+                    style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', color: '#e9edf7' }}
+                  >
+                    {s.value}
+                  </div>
+                  <div className="font-code text-[11px] tracking-[0.18em] uppercase text-white/50 mb-0.5">
+                    {s.label}
+                  </div>
+                  <div className="font-code text-[10px] tracking-widest text-white/25">
+                    {s.sub}
+                  </div>
                 </div>
-                <div className="font-code text-[11px] tracking-[0.18em] uppercase text-white/50 mb-0.5">
-                  {s.label}
-                </div>
-                <div className="font-code text-[10px] tracking-widest text-white/25">
-                  {s.sub}
-                </div>
-              </motion.div>
+              </ScrollReveal>
             ))}
-          </motion.div>
+          </div>
         </div>
       </motion.div>
 

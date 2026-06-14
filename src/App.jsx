@@ -1,10 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, Suspense, lazy } from 'react'
 import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from '@studio-freight/lenis'
 import { ArrowDown, ArrowUpRight, Code2, Globe, Mail, Menu, X } from 'lucide-react'
-import WebGLHero from '@/components/webgl-hero'
 import {
   CustomCursor,
   ParticleField,
@@ -35,6 +34,10 @@ const STACK = [
 ]
 
 gsap.registerPlugin(ScrollTrigger)
+
+// Three.js is the heaviest dependency — load it lazily so the hero shell paints
+// first and the WebGL bundle streams in afterwards.
+const WebGLHero = lazy(() => import('@/components/webgl-hero'))
 
 const stagger = {
   hidden: {},
@@ -333,18 +336,21 @@ function App() {
         {/* Sticky viewport — pinned, always fills the screen */}
         <div className="sticky top-0 h-screen overflow-hidden">
 
-          {/* WebGL blob layer (z-0) */}
-          <WebGLHero className="pointer-events-none absolute inset-0 z-0" />
+          {/* WebGL blob layer (z-0) — lazily loaded */}
+          <Suspense fallback={null}>
+            <WebGLHero className="pointer-events-none absolute inset-0 z-0" />
+          </Suspense>
 
-          {/* Interactive particle constellation (z-[2]) — drifts, links nearby
-              nodes and is repelled by the pointer (light physics) */}
-          <ParticleField className="pointer-events-none absolute inset-0 z-[2]" />
+          {/* Interactive particle constellation (z-[1]) — drifts, links nearby
+              nodes and is repelled by the pointer (light physics). Sits below the
+              readability veil so it never cuts contrast under the headline. */}
+          <ParticleField className="pointer-events-none absolute inset-0 z-[1]" />
 
-          {/* Readability veil (z-1) — also fades via GSAP as you scroll in */}
+          {/* Readability veil (z-2) — also fades via GSAP as you scroll in */}
           <div
             data-hero-layer="veil"
             aria-hidden
-            className="pointer-events-none absolute inset-0 z-[1]"
+            className="pointer-events-none absolute inset-0 z-[2]"
             style={{
               background:
                 'radial-gradient(130% 120% at 28% 42%, rgba(5,7,15,0.88) 0%, rgba(5,7,15,0.4) 48%, rgba(5,7,15,0) 72%)',

@@ -19,7 +19,6 @@ export default function SplitReveal({
   className = '',
   stagger = 0.022,
   duration = 0.9,
-  y = '110%',
   start = 'top 85%',
   once = true,
 }) {
@@ -31,13 +30,22 @@ export default function SplitReveal({
     const text = el.textContent || ''
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-    // Build word > char structure inside masks
+    // Reset, then build an accessible full-text copy (read by assistive tech)
+    // plus a visual split structure that is hidden from the accessibility tree
+    // so screen readers don't announce the text letter-by-letter.
     el.textContent = ''
+    const srText = document.createElement('span')
+    srText.className = 'sr-only'
+    srText.textContent = text
+    el.appendChild(srText)
+
+    const visual = document.createElement('span')
+    visual.setAttribute('aria-hidden', 'true')
     const chars = []
     const words = text.split(/(\s+)/) // keep whitespace tokens
     for (const token of words) {
       if (/^\s+$/.test(token)) {
-        el.appendChild(document.createTextNode(' '))
+        visual.appendChild(document.createTextNode(' '))
         continue
       }
       const wordWrap = document.createElement('span')
@@ -52,8 +60,9 @@ export default function SplitReveal({
         wordWrap.appendChild(mask)
         chars.push(inner)
       }
-      el.appendChild(wordWrap)
+      visual.appendChild(wordWrap)
     }
+    el.appendChild(visual)
 
     if (reduced) {
       gsap.set(chars, { yPercent: 0, opacity: 1, filter: 'blur(0px)', rotate: 0 })
@@ -78,7 +87,7 @@ export default function SplitReveal({
       ctx.revert()
       el.textContent = text // restore plain text for accessibility/re-runs
     }
-  }, [children, stagger, duration, y, start, once])
+  }, [children, stagger, duration, start, once])
 
   return (
     <Tag ref={ref} className={`sr-root ${className}`}>

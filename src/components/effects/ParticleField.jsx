@@ -26,6 +26,7 @@ export default function ParticleField({
     if (!ctx) return
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const coarse = window.matchMedia('(pointer: coarse)').matches
     const dpr = Math.min(window.devicePixelRatio || 1, 2)
 
     let w = 0
@@ -34,7 +35,10 @@ export default function ParticleField({
     const pointer = { x: -9999, y: -9999, active: false }
 
     const spawn = () => {
-      const count = Math.min(maxParticles, Math.floor(w * h * density))
+      // Thin out the field on small / touch screens to save CPU and battery —
+      // the O(n²) link pass dominates, so fewer nodes matters most there.
+      const cap = window.innerWidth < 768 ? Math.round(maxParticles * 0.45) : maxParticles
+      const count = Math.min(cap, Math.floor(w * h * density))
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -63,8 +67,12 @@ export default function ParticleField({
       pointer.active = true
     }
     const onLeave = () => { pointer.active = false; pointer.x = pointer.y = -9999 }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    window.addEventListener('pointerleave', onLeave, { passive: true })
+    // Pointer repulsion is a fine-pointer affordance; skip the listeners on
+    // touch devices where there's no hovering cursor to react to.
+    if (!coarse) {
+      window.addEventListener('pointermove', onMove, { passive: true })
+      window.addEventListener('pointerleave', onLeave, { passive: true })
+    }
 
     let visible = true
     const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting }, { threshold: 0 })
