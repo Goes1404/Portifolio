@@ -33,6 +33,13 @@ const STACK = [
   'Prisma', 'GraphQL', 'Docker', 'Kubernetes', 'AWS', 'Redis', 'Tailwind',
 ]
 
+// ── PREENCHA COM SEUS LINKS REAIS ──────────────────────────────────────────
+// Deixe '' (vazio) para esconder o item — assim nenhum link quebrado vai ao ar.
+const GITHUB_URL = 'https://github.com/Goes1404'
+const REPO_URL = 'https://github.com/Goes1404/Portifolio' // código-fonte deste site
+const LINKEDIN_URL = '' // ex.: 'https://www.linkedin.com/in/seu-usuario'
+const CV_URL = ''       // ex.: '/cv.pdf' — coloque o arquivo em public/cv.pdf
+
 gsap.registerPlugin(ScrollTrigger)
 
 // Three.js is the heaviest dependency — load it lazily so the hero shell paints
@@ -370,7 +377,7 @@ function App() {
               <motion.div variants={rise} className="flex flex-wrap items-center gap-x-6 gap-y-2 font-code text-xs tracking-[0.3em] text-white/45">
                 <span className="flex items-center gap-2">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
-                  DISPONÍVEL P/ PROJETOS
+                  ABERTO A VAGAS JÚNIOR · ESTÁGIO
                 </span>
                 <span className="hidden sm:inline">·</span>
                 <span>PORTFÓLIO — ED. 2026</span>
@@ -518,10 +525,10 @@ function App() {
 
             <div className="flex items-center gap-3">
               {[
-                { icon: Code2,  label: 'GitHub',   href: 'https://github.com/Goes1404' },
-                { icon: Globe,  label: 'LinkedIn',  href: '#' },
+                { icon: Code2,  label: 'GitHub',   href: GITHUB_URL },
+                { icon: Globe,  label: 'LinkedIn',  href: LINKEDIN_URL },
                 { icon: Mail,   label: 'E-mail',    href: 'mailto:sq1matheusgsilva@gmail.com' },
-              ].map(({ icon: Icon, label, href }) => (
+              ].filter((s) => s.href).map(({ icon: Icon, label, href }) => (
                 <Magnetic key={label} strength={0.45}>
                   <a
                     href={href}
@@ -536,9 +543,35 @@ function App() {
             </div>
           </motion.div>
 
+          {/* Baixar CV — só aparece quando CV_URL está preenchido */}
+          {CV_URL && (
+            <motion.div variants={rise} className="mt-10">
+              <Magnetic strength={0.4}>
+                <a
+                  href={CV_URL}
+                  download
+                  data-cursor="baixar"
+                  className="inline-flex items-center gap-2.5 rounded-full border border-[#2f6bff]/40 bg-[#2f6bff]/10 px-6 py-3.5 font-code text-xs tracking-[0.2em] text-[#6f97ff] transition-colors hover:bg-[#2f6bff]/20 hover:text-white"
+                >
+                  BAIXAR CV (PDF)
+                  <ArrowDown className="h-4 w-4" />
+                </a>
+              </Magnetic>
+            </motion.div>
+          )}
+
           <motion.div variants={rise} className="mt-20 flex flex-col items-start justify-between gap-3 border-t rule pt-6 font-code text-[11px] tracking-[0.25em] text-white/30 sm:flex-row sm:items-center">
             <span>© {new Date().getFullYear()} MATHEUS GOES DA SILVA</span>
-            <span>FEITO COM CÓDIGO &amp; CAFÉ</span>
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-cursor="ver código"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-brand"
+            >
+              CÓDIGO-FONTE DESTE SITE
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </a>
           </motion.div>
         </motion.div>
       </footer>
