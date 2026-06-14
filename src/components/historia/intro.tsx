@@ -3,9 +3,9 @@ import ScrollReveal from '@/components/effects/ScrollReveal';
 
 const STATS = [
   { value: 'FIAP',        label: 'Engenharia de Software',  sub: 'formação em andamento' },
-  { value: 'Full Stack',  label: 'front · back · infra',    sub: 'end-to-end' },
-  { value: 'Freelancer',  label: 'projetos ativos',          sub: 'nicho imobiliário' },
-  { value: 'IoT + Web',   label: 'software & hardware',      sub: 'automação residencial' },
+  { value: 'Thales',      label: 'multinacional de tech',   sub: 'base em infra de TI' },
+  { value: 'Freelancer',  label: 'projetos reais no ar',    sub: 'setor imobiliário' },
+  { value: 'Dev + Dados', label: 'web · tráfego · Power BI', sub: 'performance & análise' },
 ];
 
 const inView = { once: true, margin: '-10% 0px -10% 0px' };
@@ -79,10 +79,11 @@ export default function HistoriaIntro() {
               variants={rise}
               className="font-editorial text-xl italic leading-relaxed text-white/42 max-w-xl mb-12 md:text-[1.25rem]"
             >
-              Hoje concilio a atuação como freelancer com minha formação em
-              Engenharia de Software pela FIAP. Do nicho imobiliário a plataformas
-              educacionais — e da web à integração com hardware via IoT —
-              meu foco é sempre entregar código limpo e impacto real.
+              Hoje concilio a atuação como freelancer e analista de tráfego com
+              minha formação em Engenharia de Software pela FIAP. Do setor
+              imobiliário a uma plataforma educacional própria — e do código à
+              análise de dados e performance — meu foco é entregar interfaces
+              limpas e resultado real.
             </motion.p>
 
             {/* Availability pill */}

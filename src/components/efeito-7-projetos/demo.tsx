@@ -22,12 +22,14 @@ const PROJECTS: Project[] = [
   {
     id: 1,
     title: "Compromisso",
-    subtitle: "EdTech · Plataforma Educacional",
+    subtitle: "EdTech · Meu principal projeto",
+    // Dica: se houver um link ao vivo da Compromisso, preencha liveUrl para abrir
+    // direto da seção. Um print real da plataforma como `cover` deixa o card muito mais forte.
     description:
-      "Plataforma educacional projetada para suportar centenas de alunos simultâneos. Arquitetura escalável com Next.js + Node.js, autenticação robusta, painel do aluno e CI/CD automatizado em ambiente cloud.",
+      "Meu principal projeto. Desenvolvi a Compromisso — plataforma educacional completa — ao lado de um parceiro e à frente de todo o desenvolvimento, da concepção à entrega. Front-end em React/Next.js, back-end em Node.js, autenticação e painel do aluno. Ownership de ponta a ponta.",
     cover:
       "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=80",
-    tags: ["Next.js", "React", "Node.js", "PostgreSQL", "TypeScript", "Docker"],
+    tags: ["Next.js", "React", "Node.js", "TypeScript", "PostgreSQL"],
     accentHex: "#2f6bff",
     scrubTitle: { top: "Compromisso", bottom: "EdTech" },
     frameCount: 300,
@@ -616,8 +618,8 @@ export default function ProjetosHeroScrub() {
             className="font-display tracking-tight text-white"
             style={{ fontSize: "clamp(1.35rem, 4.6vw, 2.5rem)", lineHeight: 1.06 }}
           >
-            Dominando a stack completa{" "}
-            <span className="text-[#38e0ff]">para criar produtos que escalam.</span>
+            Projetos reais — de clientes{" "}
+            <span className="text-[#38e0ff]">a desafios da faculdade.</span>
           </h2>
         </motion.div>
       </div>
