@@ -29,16 +29,16 @@ const NAV = [
 ]
 
 const STACK = [
-  'React', 'TypeScript', 'Node.js', 'Next.js', 'Go', 'PostgreSQL',
-  'Prisma', 'GraphQL', 'Docker', 'Kubernetes', 'AWS', 'Redis', 'Tailwind',
+  'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Next.js',
+  'Node.js', 'Tailwind', 'Python', 'C++', 'SQL', 'Power BI', 'Git',
 ]
 
 // ── PREENCHA COM SEUS LINKS REAIS ──────────────────────────────────────────
 // Deixe '' (vazio) para esconder o item — assim nenhum link quebrado vai ao ar.
 const GITHUB_URL = 'https://github.com/Goes1404'
 const REPO_URL = 'https://github.com/Goes1404/Portifolio' // código-fonte deste site
-const LINKEDIN_URL = '' // ex.: 'https://www.linkedin.com/in/seu-usuario'
-const CV_URL = ''       // ex.: '/cv.pdf' — coloque o arquivo em public/cv.pdf
+const LINKEDIN_URL = 'https://www.linkedin.com/in/matheus-goes-da-silva'
+const CV_URL = '/cv.pdf' // arquivo em public/cv.pdf
 
 gsap.registerPlugin(ScrollTrigger)
 
