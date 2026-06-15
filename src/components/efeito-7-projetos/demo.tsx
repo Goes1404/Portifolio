@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { X, ExternalLink, Code2, Play } from "lucide-react";
+import { X, ExternalLink, Code2, Play, FileText } from "lucide-react";
 
 // ── Project data ─────────────────────────────────────────────────────────────
 interface Project {
@@ -14,6 +14,7 @@ interface Project {
   featured?: boolean;
   liveUrl?: string;
   codeUrl?: string;
+  docUrl?: string;
   demo?: { role: string; user: string; pass: string }[];
   scrubTitle: { top: string; bottom: string };
   frameCount: number;
@@ -107,6 +108,7 @@ const PROJECTS: Project[] = [
       "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80",
     tags: ["Python", "Machine Learning", "Data Science", "Redes", "AR/VR", "SQL"],
     accentHex: "#6f97ff",
+    docUrl: "https://docs.google.com/document/d/1DtKBkq6CwijJIqOuluMZie4ZT17tEN1fkA3H_LZdEM0/edit?usp=drivesdk",
     scrubTitle: { top: "SPY26DER", bottom: "Space GS" },
     frameCount: 300,
     frameUrl: (i) =>
@@ -349,7 +351,13 @@ function ExpandedProjectCard({
               }}
             >
               <Play className="h-3.5 w-3.5 fill-white animate-pulse" />
-              <span>{project.liveUrl ? "VER PROJETO AO VIVO" : "DEMO EM BREVE"}</span>
+              <span>
+                {project.liveUrl
+                  ? "VER PROJETO AO VIVO"
+                  : project.docUrl
+                    ? "VER DOCUMENTO DO PROJETO"
+                    : "DEMO EM BREVE"}
+              </span>
               
               <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
             </button>
@@ -378,6 +386,18 @@ function ExpandedProjectCard({
                 >
                   <ExternalLink className="h-4 w-4" />
                   Live Demo
+                </a>
+              )}
+              {project.docUrl && (
+                <a
+                  href={project.docUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-3 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/80 flex items-center gap-2 text-xs font-mono"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <FileText className="h-4 w-4" />
+                  Documento
                 </a>
               )}
             </div>
@@ -511,6 +531,18 @@ function ProjectCard({
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
             )}
+            {project.docUrl && (
+              <a
+                href={project.docUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/40"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="Ver documento do projeto"
+              >
+                <FileText className="h-3.5 w-3.5" />
+              </a>
+            )}
           </div>
         </div>
 
@@ -558,19 +590,21 @@ export default function ProjetosHeroScrub() {
   // flourish while the live site opens in a NEW TAB, so the recruiter keeps the
   // portfolio open and can actually browse the project.
   const handlePlay = (project: Project) => {
-    if (!project.liveUrl) {
-      // No public demo yet (e.g. Compromisso) → graceful note instead.
+    // Live site when there is one; otherwise the project document (e.g. the GS).
+    const url = project.liveUrl ?? project.docUrl;
+    if (!url) {
+      // Nothing public to open yet → graceful note instead.
       setFallbackProject(project.title);
       return;
     }
     // window.open runs INSIDE the click gesture → never popup-blocked.
-    const win = window.open(project.liveUrl, "_blank", "noopener,noreferrer");
+    const win = window.open(url, "_blank", "noopener,noreferrer");
     setTransitionProject(project); // brief cinematic flourish
     if (!win) {
       // If a browser still blocks the popup, fall back to a same-tab redirect
       // so the user always reaches the project.
       setTimeout(() => {
-        if (project.liveUrl) window.location.href = project.liveUrl;
+        window.location.href = url;
       }, 900);
     }
   };
