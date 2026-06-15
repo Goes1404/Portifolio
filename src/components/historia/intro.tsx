@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 
 const STATS = [
-  { value: 'FIAP',        label: 'Engenharia de Software',  sub: 'formação em andamento' },
+  { value: 'FIAP',        label: 'Engenharia de Software',  sub: 'conclusão em 2028' },
   { value: 'Thales',      label: 'multinacional de tech',   sub: 'base em infra de TI' },
   { value: 'Freelancer',  label: 'projetos reais no ar',    sub: 'setor imobiliário' },
   { value: 'Dev + Dados', label: 'web · tráfego · Power BI', sub: 'performance & análise' },
@@ -100,7 +100,7 @@ export default function HistoriaIntro() {
                 style={{ background: '#2f6bff' }}
               />
               <span className="font-code text-xs tracking-[0.28em] uppercase text-[#6f97ff]">
-                Disponível para novos projetos
+                Aberto a estágio e vagas júnior
               </span>
             </motion.div>
 

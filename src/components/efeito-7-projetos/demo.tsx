@@ -67,9 +67,9 @@ const PROJECTS: Project[] = [
   {
     id: 3,
     title: "JR Acessórios",
-    subtitle: "Cliente Real · Loja Virtual com Domínio Próprio",
+    subtitle: "Cliente Real · Loja Virtual (em implementação)",
     description:
-      "Loja virtual completa para acessórios artesanais, no ar com domínio próprio (jracessorios.com). Catálogo de produtos, sistema de pedidos e foco em conversão e entrega rápida. E-commerce real entregue para cliente — do front-end ao deploy.",
+      "Loja virtual de acessórios artesanais para cliente real, com domínio próprio (jracessorios.com) — atualmente em implementação. Catálogo de produtos, fluxo de pedidos e foco em conversão. Desenvolvimento de ponta a ponta, do front-end ao deploy.",
     cover:
       "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&auto=format&fit=crop&q=80",
     tags: ["React", "Next.js", "Node.js", "E-commerce"],
@@ -703,7 +703,7 @@ export default function ProjetosHeroScrub() {
               className="text-center px-6 z-10"
             >
               <span className="font-code text-xs uppercase tracking-[0.45em] text-[#6f97ff] block mb-4 animate-pulse">
-                Abrindo projeto ao vivo
+                {transitionProject.liveUrl ? "Abrindo projeto ao vivo" : "Abrindo documento do projeto"}
               </span>
               <h1 className="font-display text-4xl md:text-6xl text-white tracking-tight mb-2">
                 {transitionProject.title}
@@ -759,15 +759,41 @@ export default function ProjetosHeroScrub() {
         </motion.div>
       </div>
 
-      {/* Grid de Projetos */}
-      <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {PROJECTS.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            onClick={() => setActiveProject(project)}
-          />
-        ))}
+      {/* Grade de Projetos — destaques primeiro, depois os demais */}
+      <div className="max-w-5xl mx-auto">
+        {/* Em destaque */}
+        <div className="mb-4 flex items-center gap-3">
+          <span className="h-px w-8 bg-[#2f6bff]" />
+          <span className="font-code text-[11px] uppercase tracking-[0.3em] text-[#6f97ff]">
+            Em destaque
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {PROJECTS.filter((p) => p.featured).map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              onClick={() => setActiveProject(project)}
+            />
+          ))}
+        </div>
+
+        {/* Mais projetos */}
+        <div className="mt-16 mb-4 flex items-center gap-3">
+          <span className="h-px w-8 bg-white/20" />
+          <span className="font-code text-[11px] uppercase tracking-[0.3em] text-white/45">
+            Mais projetos — clientes & FIAP
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {PROJECTS.filter((p) => !p.featured).map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              onClick={() => setActiveProject(project)}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Detalhes Expandidos (Modal com Shared Layout) */}

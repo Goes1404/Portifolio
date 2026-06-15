@@ -3,7 +3,7 @@ import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from '@studio-freight/lenis'
-import { ArrowDown, ArrowUpRight, Code2, Globe, Mail, Menu, X } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, Code2, Globe, Mail, MessageCircle, Menu, X } from 'lucide-react'
 import {
   CustomCursor,
   ParticleField,
@@ -38,6 +38,9 @@ const STACK = [
 const GITHUB_URL = 'https://github.com/Goes1404'
 const REPO_URL = 'https://github.com/Goes1404/Portifolio' // código-fonte deste site
 const LINKEDIN_URL = 'https://www.linkedin.com/in/matheus-goes-da-silva'
+const EMAIL = 'sq1matheusgsilva@gmail.com'
+// WhatsApp: número no formato internacional (55 = Brasil, 11 = São Paulo)
+const WHATSAPP_URL = 'https://wa.me/5511950085875'
 const CV_URL = '/cv.pdf' // arquivo em public/cv.pdf
 
 gsap.registerPlugin(ScrollTrigger)
@@ -318,12 +321,21 @@ function App() {
             </nav>
 
             {/* Footer of the menu */}
-            <div className="px-7 pb-[calc(env(safe-area-inset-bottom)_+_2rem)]">
+            <div className="flex flex-col gap-3 px-7 pb-[calc(env(safe-area-inset-bottom)_+_2rem)]">
               <a
-                href="mailto:sq1matheusgsilva@gmail.com"
+                href={`mailto:${EMAIL}`}
                 className="font-code text-xs tracking-widest text-white/50"
               >
-                sq1matheusgsilva@gmail.com
+                {EMAIL}
+              </a>
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 font-code text-xs tracking-widest text-white/50"
+              >
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp · (11) 95008-5875
               </a>
             </div>
           </motion.div>
@@ -377,12 +389,12 @@ function App() {
               <motion.div variants={rise} className="flex flex-wrap items-center gap-x-6 gap-y-2 font-code text-xs tracking-[0.3em] text-white/45">
                 <span className="flex items-center gap-2">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
-                  ABERTO A VAGAS JÚNIOR · ESTÁGIO
+                  ABERTO A ESTÁGIO · VAGAS JÚNIOR
                 </span>
                 <span className="hidden sm:inline">·</span>
-                <span>PORTFÓLIO — ED. 2026</span>
+                <span>SÃO PAULO · BR</span>
                 <span className="hidden sm:inline">·</span>
-                <span>BRASIL</span>
+                <span>PORTFÓLIO — ED. 2026</span>
               </motion.div>
             </div>
 
@@ -514,20 +526,21 @@ function App() {
           <motion.div variants={rise} className="mt-14 flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
             <Magnetic strength={0.3}>
               <a
-                href="mailto:sq1matheusgsilva@gmail.com"
+                href={`mailto:${EMAIL}`}
                 data-cursor="escrever"
                 className="group inline-flex max-w-full items-center gap-2 border-b-2 border-[#2f6bff] pb-2 font-editorial text-lg italic text-[#e9edf7] transition-colors hover:text-brand sm:gap-3 sm:text-2xl md:text-4xl"
               >
-                <LiquidText as="span" className="break-words">sq1matheusgsilva@gmail.com</LiquidText>
+                <LiquidText as="span" className="break-words">{EMAIL}</LiquidText>
                 <ArrowUpRight className="h-5 w-5 shrink-0 text-brand transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-6 sm:w-6" />
               </a>
             </Magnetic>
 
             <div className="flex items-center gap-3">
               {[
-                { icon: Code2,  label: 'GitHub',   href: GITHUB_URL },
-                { icon: Globe,  label: 'LinkedIn',  href: LINKEDIN_URL },
-                { icon: Mail,   label: 'E-mail',    href: 'mailto:sq1matheusgsilva@gmail.com' },
+                { icon: Code2,         label: 'GitHub',   href: GITHUB_URL },
+                { icon: Globe,         label: 'LinkedIn', href: LINKEDIN_URL },
+                { icon: MessageCircle, label: 'WhatsApp', href: WHATSAPP_URL },
+                { icon: Mail,          label: 'E-mail',   href: `mailto:${EMAIL}` },
               ].filter((s) => s.href).map(({ icon: Icon, label, href }) => (
                 <Magnetic key={label} strength={0.45}>
                   <a
