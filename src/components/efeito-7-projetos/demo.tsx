@@ -110,16 +110,19 @@ const PROJECTS: Project[] = [
   },
   {
     id: 6,
-    title: "Deuca",
-    subtitle: "FIAP × TOTVS · Plataforma de Vendas",
+    title: "NEXUS",
+    subtitle: "TOTVS Challenge 2026 · FIAP · IA de Vendas",
     description:
-      "Deuca — plataforma de vendas desenvolvida no desafio da FIAP em parceria com a TOTVS. Aplicação web com autenticação e painel do usuário, construída em equipe com gestão ágil do board (Trello) e deploy contínuo na Vercel.",
+      "Plataforma de inteligência conversacional do TOTVS Challenge 2026 (FIAP). Transforma transcrições brutas de reuniões em planos de ação automáticos via agente Pydantic AI multi-provider — pipeline de 5 tools em ~90s, monorepo com Next.js 16, Fastify 5, FastAPI e PostgreSQL + pgvector.",
     cover:
       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
-    tags: ["React", "Vercel", "FIAP", "TOTVS", "Auth"],
+    tags: ["Next.js", "React 19", "Fastify", "Python", "PostgreSQL", "Redis", "Pydantic AI", "TOTVS"],
     accentHex: "#38e0ff",
     liveUrl: "https://frontend-seven-mauve-95.vercel.app/login",
-    scrubTitle: { top: "Deuca", bottom: "FIAP × TOTVS" },
+    demo: [
+      { role: "Demo", user: "joao.silva@totvs.com.br", pass: "nexus2026" },
+    ],
+    scrubTitle: { top: "NEXUS", bottom: "TOTVS × IA" },
     frameCount: 300,
     frameUrl: (i) =>
       `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
