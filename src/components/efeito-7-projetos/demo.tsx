@@ -111,15 +111,15 @@ const PROJECTS: Project[] = [
   {
     id: 6,
     title: "Deuca",
-    subtitle: "FIAP · Global Solution — Aplicação Full Stack",
+    subtitle: "FIAP × TOTVS · Plataforma de Vendas",
     description:
-      "Global Solution da FIAP — aplicação web completa com autenticação, painel de usuário e backend dedicado. Deploy de frontend no Vercel. Projeto desenvolvido para resolver um desafio real proposto pela FIAP.",
+      "Deuca — plataforma de vendas desenvolvida no desafio da FIAP em parceria com a TOTVS. Aplicação web com autenticação e painel do usuário, construída em equipe com gestão ágil do board (Trello) e deploy contínuo na Vercel.",
     cover:
       "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
-    tags: ["React", "Node.js", "Vercel", "FIAP", "Auth"],
+    tags: ["React", "Vercel", "FIAP", "TOTVS", "Auth"],
     accentHex: "#38e0ff",
-    liveUrl: "https://frontend-seven-mauve-95.vercel.app/",
-    scrubTitle: { top: "Deuca", bottom: "GS FIAP" },
+    liveUrl: "https://frontend-seven-mauve-95.vercel.app/login",
+    scrubTitle: { top: "Deuca", bottom: "FIAP × TOTVS" },
     frameCount: 300,
     frameUrl: (i) =>
       `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
