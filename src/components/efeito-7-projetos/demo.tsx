@@ -31,7 +31,10 @@ const PROJECTS: Project[] = [
     accentHex: "#2f6bff",
     liveUrl: "https://compromissose.com",
     demo: [
-      { role: "Aluno", user: "aluno@compromisso.com", pass: "compromisso2026@" },
+      { role: "Aluno",     user: "aluno@compromisso.com",     pass: "compromisso2026@" },
+      { role: "Professor", user: "professor@compromisso.com", pass: "compromisso2026@" },
+      { role: "Admin",     user: "admin@compromisso.com",     pass: "compromisso2026@" },
+      { role: "Staff",     user: "staff@compromisso.com",     pass: "compromisso2026@" },
     ],
     scrubTitle: { top: "Compromisso", bottom: "EdTech" },
     frameCount: 300,
