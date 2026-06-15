@@ -8,14 +8,14 @@ const EXPERIENCES = [
     status: 'Projeto principal',
     role: 'Desenvolvedor Full Stack · à frente do projeto',
     company: 'Compromisso (EdTech)',
-    type: 'Plataforma Educacional',
+    type: 'Preparatório ENEM & ETEC · IA',
     description:
-      'Meu principal projeto. Desenvolvi a Compromisso — uma plataforma educacional completa — ao lado de um único parceiro, estando à frente de todo o desenvolvimento, da concepção à entrega. Foi onde mais cresci como dev: assumir um produto inteiro, de ponta a ponta.',
+      'Meu principal projeto. Desenvolvi a Compromisso — plataforma de preparação para ENEM e ETEC com IA — ao lado de um único parceiro, à frente de todo o desenvolvimento, da concepção à entrega. Foi onde mais cresci como dev: assumir um produto inteiro, de ponta a ponta.',
     highlights: [
+      'Mais de 730 usuários cadastrados — no ar em compromissose.com',
       'Ownership de todo o ciclo: front-end, back-end, banco e deploy',
       'Front-end em React / Next.js e back-end em Node.js com banco relacional',
       'Autenticação, painel do aluno e o fluxo completo da plataforma',
-      'Time enxuto (eu + 1 parceiro) — decisões técnicas e produto na prática',
     ],
     tags: ['Next.js', 'React', 'Node.js', 'TypeScript', 'PostgreSQL'],
     accent: '#2f6bff',

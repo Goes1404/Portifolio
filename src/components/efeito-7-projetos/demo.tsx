@@ -13,6 +13,7 @@ interface Project {
   accentHex: string;
   liveUrl?: string;
   codeUrl?: string;
+  demo?: { role: string; user: string; pass: string }[];
   scrubTitle: { top: string; bottom: string };
   frameCount: number;
   frameUrl: (i: number) => string;
@@ -22,15 +23,16 @@ const PROJECTS: Project[] = [
   {
     id: 1,
     title: "Compromisso",
-    subtitle: "EdTech · Meu principal projeto",
-    // Dica: se houver um link ao vivo da Compromisso, preencha liveUrl para abrir
-    // direto da seção. Um print real da plataforma como `cover` deixa o card muito mais forte.
+    subtitle: "EdTech · ENEM & ETEC · 730+ usuários",
     description:
-      "Meu principal projeto. Desenvolvi a Compromisso — plataforma educacional completa — ao lado de um parceiro e à frente de todo o desenvolvimento, da concepção à entrega. Front-end em React/Next.js, back-end em Node.js, autenticação e painel do aluno. Ownership de ponta a ponta.",
-    cover:
-      "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800&auto=format&fit=crop&q=80",
+      "Meu principal projeto: a Compromisso, plataforma de preparação para ENEM e ETEC com tecnologia de IA. Desenvolvi de ponta a ponta ao lado de um parceiro, à frente de todo o desenvolvimento — hoje com mais de 730 usuários cadastrados. Front-end em React/Next.js, back-end em Node.js, autenticação e painel do aluno.",
+    cover: "/projects/compromisso.jpg",
     tags: ["Next.js", "React", "Node.js", "TypeScript", "PostgreSQL"],
     accentHex: "#2f6bff",
+    liveUrl: "https://compromissose.com",
+    demo: [
+      { role: "Aluno", user: "aluno@compromisso.com", pass: "compromisso2026@" },
+    ],
     scrubTitle: { top: "Compromisso", bottom: "EdTech" },
     frameCount: 300,
     frameUrl: (i) =>
@@ -280,6 +282,29 @@ function ExpandedProjectCard({
                 </span>
               ))}
             </motion.div>
+
+            {/* Acesso de demonstração — recrutador entra e explora a plataforma */}
+            {project.demo && project.demo.length > 0 && (
+              <div
+                className="mt-6 rounded-xl border p-4"
+                style={{ borderColor: `${project.accentHex}33`, background: `${project.accentHex}0d` }}
+              >
+                <div className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6f97ff]">
+                  <span className="h-1.5 w-1.5 rounded-full" style={{ background: project.accentHex }} />
+                  Acesso de demonstração — entre e explore
+                </div>
+                <div className="space-y-2">
+                  {project.demo.map((d) => (
+                    <div key={d.role} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-xs">
+                      <span className="text-slate-500">{d.role}</span>
+                      <span className="text-slate-200 break-all select-all">{d.user}</span>
+                      <span className="text-slate-600">·</span>
+                      <span className="text-slate-400 break-all select-all">{d.pass}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Rodapé com Ações */}
