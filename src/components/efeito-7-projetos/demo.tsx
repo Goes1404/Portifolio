@@ -165,6 +165,23 @@ const PROJECTS: Project[] = [
     frameUrl: (i) =>
       `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
+  {
+    id: 9,
+    title: "EcoTrend",
+    subtitle: "FIAP · Checkpoint 04 — E-commerce Sustentável",
+    description:
+      "Checkpoint de front-end da FIAP — e-commerce de produtos sustentáveis e ecológicos (beleza, vestuário, acessórios e utilidades). Catálogo com filtro dinâmico de produtos por categoria, carrinho de compras e layout responsivo. HTML5, CSS3, Bootstrap 5 e JavaScript.",
+    cover:
+      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&auto=format&fit=crop&q=80",
+    tags: ["HTML5", "CSS3", "Bootstrap", "JavaScript", "FIAP"],
+    accentHex: "#6f97ff",
+    liveUrl: "https://mariaeduardaacyole.github.io/EcoTrend---CP4/",
+    codeUrl: "https://github.com/mariaeduardaacyole/EcoTrend---CP4",
+    scrubTitle: { top: "Eco", bottom: "Trend" },
+    frameCount: 300,
+    frameUrl: (i) =>
+      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
+  },
 ];
 
 // ── Expanded Card ─────────────────────────────────────────────────────────────
