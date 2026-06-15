@@ -148,6 +148,23 @@ const PROJECTS: Project[] = [
     frameUrl: (i) =>
       `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
+  {
+    id: 8,
+    title: "Melodia",
+    subtitle: "FIAP · Checkpoint 05 — Landing Page de Streaming",
+    description:
+      "Checkpoint de front-end da FIAP — landing page para o serviço de streaming de música \"Melodia\". Hero, seções de recursos, depoimentos, player com playlist dinâmica e newsletter, com layout responsivo. HTML5, CSS3 e JavaScript.",
+    cover:
+      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+    tags: ["HTML5", "CSS3", "JavaScript", "FIAP"],
+    accentHex: "#6f97ff",
+    liveUrl: "https://maykesantos98.github.io/Front-end-CP5/",
+    codeUrl: "https://github.com/Maykesantos98/Front-end-CP5",
+    scrubTitle: { top: "Melodia", bottom: "Streaming" },
+    frameCount: 300,
+    frameUrl: (i) =>
+      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
+  },
 ];
 
 // ── Expanded Card ─────────────────────────────────────────────────────────────
