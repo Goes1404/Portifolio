@@ -11,6 +11,7 @@ interface Project {
   cover: string;
   tags: string[];
   accentHex: string;
+  featured?: boolean;
   liveUrl?: string;
   codeUrl?: string;
   demo?: { role: string; user: string; pass: string }[];
@@ -29,6 +30,7 @@ const PROJECTS: Project[] = [
     cover: "/projects/compromisso.jpg",
     tags: ["Next.js", "React", "Node.js", "TypeScript", "PostgreSQL"],
     accentHex: "#2f6bff",
+    featured: true,
     liveUrl: "https://compromissose.com",
     demo: [
       { role: "Aluno",     user: "aluno@compromisso.com",     pass: "compromisso2026@" },
@@ -43,6 +45,44 @@ const PROJECTS: Project[] = [
   },
   {
     id: 2,
+    title: "NEXUS",
+    subtitle: "TOTVS Challenge 2026 · FIAP · IA de Vendas",
+    description:
+      "Plataforma de inteligência conversacional do TOTVS Challenge 2026 (FIAP). Transforma transcrições brutas de reuniões em planos de ação automáticos via agente Pydantic AI multi-provider — pipeline de 5 tools em ~90s, monorepo com Next.js 16, Fastify 5, FastAPI e PostgreSQL + pgvector.",
+    cover:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
+    tags: ["Next.js", "React 19", "Fastify", "Python", "PostgreSQL", "Redis", "Pydantic AI", "TOTVS"],
+    accentHex: "#38e0ff",
+    featured: true,
+    liveUrl: "https://frontend-seven-mauve-95.vercel.app/login",
+    demo: [
+      { role: "Demo", user: "joao.silva@totvs.com.br", pass: "nexus2026" },
+    ],
+    scrubTitle: { top: "NEXUS", bottom: "TOTVS × IA" },
+    frameCount: 300,
+    frameUrl: (i) =>
+      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
+  },
+  {
+    id: 3,
+    title: "JR Acessórios",
+    subtitle: "Cliente Real · Loja Virtual com Domínio Próprio",
+    description:
+      "Loja virtual completa para acessórios artesanais, no ar com domínio próprio (jracessorios.com). Catálogo de produtos, sistema de pedidos e foco em conversão e entrega rápida. E-commerce real entregue para cliente — do front-end ao deploy.",
+    cover:
+      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&auto=format&fit=crop&q=80",
+    tags: ["React", "Next.js", "Node.js", "E-commerce"],
+    accentHex: "#2f6bff",
+    featured: true,
+    liveUrl: "https://www.jracessorios.com",
+    codeUrl: "https://github.com/Goes1404/jota-r-craft-connect",
+    scrubTitle: { top: "JR", bottom: "Acessórios" },
+    frameCount: 300,
+    frameUrl: (i) =>
+      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
+  },
+  {
+    id: 4,
     title: "Corretora Cristal",
     subtitle: "Cliente Real · Site Imobiliário em Alphaville, SP",
     description:
@@ -58,7 +98,22 @@ const PROJECTS: Project[] = [
       `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
-    id: 3,
+    id: 5,
+    title: "SPY26DER",
+    subtitle: "FIAP · Global Solution 2026 — Space Connect",
+    description:
+      "Global Solution da FIAP (Space Connect 2026): sistema robótico semi-autônomo que mapeia tubos de lava lunares com enxames de micro-robôs (LIDAR + SLAM + rede mesh), transformando cavernas naturais em habitats protegidos da radiação. O projeto exigiu trabalhar em TODAS as áreas — Data Science (Python/ML), modelagem de banco, simulação de redes (Cisco Packet Tracer), modelagem 3D/AR-VR e metodologia ágil.",
+    cover:
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80",
+    tags: ["Python", "Machine Learning", "Data Science", "Redes", "AR/VR", "SQL"],
+    accentHex: "#6f97ff",
+    scrubTitle: { top: "SPY26DER", bottom: "Space GS" },
+    frameCount: 300,
+    frameUrl: (i) =>
+      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
+  },
+  {
+    id: 6,
     title: "Vinheria Agnello",
     subtitle: "FIAP · Checkpoint 01 — Desenvolvimento Web",
     description:
@@ -75,24 +130,7 @@ const PROJECTS: Project[] = [
       `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
-    id: 4,
-    title: "JR Acessórios",
-    subtitle: "Cliente Real · E-commerce com Domínio Próprio",
-    description:
-      "E-commerce completo para loja de acessórios artesanais com domínio próprio (jracessorios.com). Catálogo de produtos, sistema de pedidos e foco em entrega rápida. Projeto real entregue para cliente.",
-    cover:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&auto=format&fit=crop&q=80",
-    tags: ["React", "Next.js", "Node.js", "E-commerce"],
-    accentHex: "#2f6bff",
-    liveUrl: "https://www.jracessorios.com",
-    codeUrl: "https://github.com/Goes1404/jota-r-craft-connect",
-    scrubTitle: { top: "JR", bottom: "Acessórios" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
-  },
-  {
-    id: 5,
+    id: 7,
     title: "GlowCare",
     subtitle: "FIAP · Checkpoint 02 — E-commerce de Cosméticos",
     description:
@@ -104,25 +142,6 @@ const PROJECTS: Project[] = [
     liveUrl: "https://goes1404.github.io/Glowcare/",
     codeUrl: "https://github.com/Goes1404/Glowcare",
     scrubTitle: { top: "Glow", bottom: "Care" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
-  },
-  {
-    id: 6,
-    title: "NEXUS",
-    subtitle: "TOTVS Challenge 2026 · FIAP · IA de Vendas",
-    description:
-      "Plataforma de inteligência conversacional do TOTVS Challenge 2026 (FIAP). Transforma transcrições brutas de reuniões em planos de ação automáticos via agente Pydantic AI multi-provider — pipeline de 5 tools em ~90s, monorepo com Next.js 16, Fastify 5, FastAPI e PostgreSQL + pgvector.",
-    cover:
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
-    tags: ["Next.js", "React 19", "Fastify", "Python", "PostgreSQL", "Redis", "Pydantic AI", "TOTVS"],
-    accentHex: "#38e0ff",
-    liveUrl: "https://frontend-seven-mauve-95.vercel.app/login",
-    demo: [
-      { role: "Demo", user: "joao.silva@totvs.com.br", pass: "nexus2026" },
-    ],
-    scrubTitle: { top: "NEXUS", bottom: "TOTVS × IA" },
     frameCount: 300,
     frameUrl: (i) =>
       `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
@@ -393,7 +412,9 @@ function ProjectCard({
     <motion.div ref={wrapRef} style={{ scale, opacity }} className="will-change-transform">
     <motion.article
       layoutId={`card-container-${project.id}`}
-      className="group relative overflow-hidden rounded-2xl cursor-pointer bg-slate-950 border border-slate-900/60"
+      className={`group relative overflow-hidden rounded-2xl cursor-pointer bg-slate-950 border ${
+        project.featured ? "border-[#2f6bff]/40" : "border-slate-900/60"
+      }`}
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -410,6 +431,21 @@ function ProjectCard({
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+
+        {/* Selo de destaque — só nos melhores projetos */}
+        {project.featured && (
+          <div
+            className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] backdrop-blur-md"
+            style={{
+              color: "#bcd2ff",
+              borderColor: `${project.accentHex}55`,
+              background: `${project.accentHex}1f`,
+            }}
+          >
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: project.accentHex }} />
+            Destaque
+          </div>
+        )}
         
         {/* Glow temático no hover */}
         <div
