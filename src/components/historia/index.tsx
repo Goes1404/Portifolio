@@ -2,8 +2,20 @@ import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, AnimatePresence } from 'framer-motion';
+import RevealSpotlight from '@/components/efeito-8-revelar/reveal-spotlight';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// ─────────────────────────────────────────────────────────────────────────
+//  SUAS FOTOS (retrato ao lado da história)
+//  Os dois arquivos ficam em /public/reveal/. Para usar as suas fotos, basta
+//  substituir esses arquivos mantendo os mesmos nomes (ou trocar os caminhos).
+//  Hoje são placeholders gerados automaticamente.
+//    1ª imagem → PRETO E BRANCO (aparece em repouso)
+//    2ª imagem → COLORIDA       (revelada sob o ponteiro / dedo)
+// ─────────────────────────────────────────────────────────────────────────
+const FOTO_PB = '/reveal/matheus-pb.png';
+const FOTO_COLOR = '/reveal/matheus-color.png';
 
 const CHAPTERS = [
   {
@@ -208,52 +220,67 @@ export default function HistoriaSection() {
             />
           </div>
 
-          {/* Body + code + tags */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`body-${idx}`}
-              initial={{ opacity: 0, y: 30, filter: 'blur(14px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.68, delay: 0.1, ease: EASE_IN } }}
-              exit={{ opacity: 0, y: -14, filter: 'blur(8px)', transition: { duration: 0.3 } }}
-              className="flex flex-col md:flex-row gap-8 md:gap-16 items-start"
-            >
-              {/* Left: body text + tags */}
-              <div className="flex flex-col gap-5 max-w-lg md:gap-6">
-                <p className="font-editorial text-lg italic leading-snug text-white/[0.60] sm:text-xl md:text-[1.35rem]">
-                  {ch.body}
-                </p>
-                {/* Skill / trait tags */}
-                <div className="flex flex-wrap gap-2">
-                  {ch.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="font-code text-[10px] tracking-[0.3em] uppercase px-3 py-1.5 rounded-full border"
-                      style={{
-                        color: ch.accent,
-                        borderColor: `${ch.accent}28`,
-                        background: `${ch.accent}0a`,
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
+          {/* Body row: chapter text (cycles) sits beside the portrait (persistent) */}
+          <div className="flex flex-row items-center gap-4 sm:gap-7 md:gap-12 lg:gap-16">
 
-              {/* Right: code snippet — hidden on mobile to keep the pinned frame within 100vh */}
-              <pre
-                className="hidden shrink-0 rounded-2xl border px-6 py-5 font-code text-sm leading-relaxed md:block"
-                style={{
-                  color: ch.accent,
-                  borderColor: `${ch.accent}20`,
-                  background: `${ch.accent}08`,
-                  boxShadow: `0 0 50px ${ch.accent}0f`,
-                }}
-              >
-                {ch.code}
-              </pre>
-            </motion.div>
-          </AnimatePresence>
+            {/* ── Left: body text + tags + code — re-animates each chapter ── */}
+            <div className="min-w-0 flex-1">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`body-${idx}`}
+                  initial={{ opacity: 0, y: 30, filter: 'blur(14px)' }}
+                  animate={{ opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.68, delay: 0.1, ease: EASE_IN } }}
+                  exit={{ opacity: 0, y: -14, filter: 'blur(8px)', transition: { duration: 0.3 } }}
+                  className="flex flex-col gap-5 md:gap-6"
+                >
+                  <p className="max-w-xl font-editorial text-base italic leading-snug text-white/[0.60] sm:text-xl md:text-[1.35rem]">
+                    {ch.body}
+                  </p>
+                  {/* Skill / trait tags */}
+                  <div className="flex flex-wrap gap-2">
+                    {ch.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border px-3 py-1.5 font-code text-[10px] uppercase tracking-[0.3em]"
+                        style={{
+                          color: ch.accent,
+                          borderColor: `${ch.accent}28`,
+                          background: `${ch.accent}0a`,
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  {/* Code snippet — only on lg+, where there's vertical room beside the portrait */}
+                  <pre
+                    className="hidden w-fit rounded-2xl border px-6 py-5 font-code text-sm leading-relaxed lg:block"
+                    style={{
+                      color: ch.accent,
+                      borderColor: `${ch.accent}20`,
+                      background: `${ch.accent}08`,
+                      boxShadow: `0 0 50px ${ch.accent}0f`,
+                    }}
+                  >
+                    {ch.code}
+                  </pre>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* ── Right: the reveal portrait — stays put as the chapters change ── */}
+            <figure className="m-0 w-[38%] max-w-[150px] shrink-0 sm:max-w-[200px] md:w-[300px] md:max-w-none lg:w-[340px] xl:w-[380px]">
+              <RevealSpotlight
+                bwSrc={FOTO_PB}
+                colorSrc={FOTO_COLOR}
+                alt="Matheus Goes da Silva"
+                hint="passe o mouse · arraste o dedo"
+              />
+              <figcaption className="mt-3 font-code text-[10px] uppercase tracking-[0.3em] text-white/30">
+                preto &amp; branco&nbsp;&nbsp;⇄&nbsp;&nbsp;cor
+              </figcaption>
+            </figure>
+          </div>
 
           {/* Scroll hint — first chapter only */}
           {idx === 0 && (
