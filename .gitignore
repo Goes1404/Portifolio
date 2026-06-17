@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Netlify CLI local state (machine-specific; cloud build uses UI/root config)
+.netlify
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
