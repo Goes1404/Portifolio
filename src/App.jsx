@@ -16,6 +16,7 @@ import ScrollingAnimationDemo from '@/components/efeito-2-perfis/demo'
 import ScrollPortraitWallDemo from '@/components/efeito-3-portrait-wall/demo'
 import HeroScrollDemo from '@/components/efeito-4-container-scroll/demo'
 import ProjetosHeroScrub from '@/components/efeito-7-projetos/demo'
+import RevealDemo from '@/components/efeito-8-revelar/demo'
 import HistoriaSection from '@/components/historia'
 import HistoriaIntro from '@/components/historia/intro'
 import ExperienciaSection from '@/components/experiencia'
@@ -466,6 +467,9 @@ function App() {
       {/* ── 01 · HISTÓRIA ────────────────────────────────────── */}
       <HistoriaIntro />
       <HistoriaSection />
+
+      {/* ── INTERLÚDIO · RETRATO (revelar cor no hover/toque) ─── */}
+      <RevealDemo />
 
       {/* ── 02 · EXPERIÊNCIA ─────────────────────────────────── */}
       <ExperienciaSection />
