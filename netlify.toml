@@ -1,0 +1,16 @@
+# Configuração de build/deploy do Netlify (lida pelo build na nuvem).
+# Vite 8 exige Node >= 20.19 / 22 — fixamos o Node para o build não falhar
+# em sites cujo padrão ainda é Node 18 (causa comum de "produção não atualiza").
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Fallback SPA (inofensivo para esta página única com âncoras): só age quando
+# nenhum arquivo estático corresponde à rota; assets existentes são servidos normalmente.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
