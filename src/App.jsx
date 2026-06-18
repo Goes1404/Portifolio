@@ -28,8 +28,8 @@ const NAV = [
 ]
 
 const STACK = [
-  'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Tailwind',
-  'Python', 'C++', 'SQL', 'Power BI', 'Git', 'GitHub',
+  'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Next.js',
+  'Node.js', 'Tailwind', 'Python', 'SQL', 'PostgreSQL', 'Power BI', 'Git',
 ]
 
 // ── PREENCHA COM SEUS LINKS REAIS ──────────────────────────────────────────

@@ -12,24 +12,34 @@ type Group = { label: string; muted?: boolean; skills: Skill[] }
 
 const GROUPS: Group[] = [
   {
-    label: 'Desenvolvimento',
+    label: 'Front-end',
     skills: [
       { name: 'HTML5', color: '#e44d26' },
       { name: 'CSS3', color: '#2196f3' },
       { name: 'JavaScript', color: '#f7df1e' },
       { name: 'TypeScript', color: '#4c8bf5' },
       { name: 'React', color: '#38e0ff' },
+      { name: 'Next.js', color: '#e6eaf2' },
       { name: 'Tailwind CSS', color: '#22d3ee' },
-      { name: 'Python', color: '#ffd43b' },
-      { name: 'C++', color: '#6aa9e0' },
     ],
   },
   {
-    label: 'Dados & BI',
+    label: 'Back-end & Dados',
     skills: [
+      { name: 'Node.js', color: '#6cc24a' },
+      { name: 'Python', color: '#ffd43b' },
+      { name: 'C++', color: '#6aa9e0' },
       { name: 'SQL', color: '#f59e0b' },
+      { name: 'PostgreSQL', color: '#5b9bd5' },
+    ],
+  },
+  {
+    label: 'Dados & Tráfego',
+    skills: [
       { name: 'Power BI', color: '#f2c811' },
       { name: 'Análise de Dados', color: '#a78bfa' },
+      { name: 'Meta Ads', color: '#0a84ff' },
+      { name: 'Google Ads', color: '#fbbc05' },
     ],
   },
   {
@@ -38,13 +48,6 @@ const GROUPS: Group[] = [
       { name: 'Git & GitHub', color: '#f0652f' },
       { name: 'Infraestrutura de TI', color: '#34d399' },
       { name: 'Redes', color: '#2dd4bf' },
-    ],
-  },
-  {
-    label: 'Tráfego & Performance',
-    skills: [
-      { name: 'Meta Ads', color: '#0a84ff' },
-      { name: 'Google Ads', color: '#fbbc05' },
     ],
   },
   {
