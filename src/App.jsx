@@ -12,8 +12,7 @@ import {
   ScrollVelocity,
   LiquidText,
 } from '@/components/effects'
-import ScrollingAnimationDemo from '@/components/efeito-2-perfis/demo'
-import ScrollPortraitWallDemo from '@/components/efeito-3-portrait-wall/demo'
+import SkillsShowcase from '@/components/skills'
 import HeroScrollDemo from '@/components/efeito-4-container-scroll/demo'
 import ProjetosHeroScrub from '@/components/efeito-7-projetos/demo'
 import HistoriaSection from '@/components/historia'
@@ -29,8 +28,8 @@ const NAV = [
 ]
 
 const STACK = [
-  'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Next.js',
-  'Node.js', 'Tailwind', 'Python', 'C++', 'SQL', 'Power BI', 'Git',
+  'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Tailwind',
+  'Python', 'C++', 'SQL', 'Power BI', 'Git', 'GitHub',
 ]
 
 // ── PREENCHA COM SEUS LINKS REAIS ──────────────────────────────────────────
@@ -492,9 +491,7 @@ function App() {
         title="Como eu construo"
         lead="O ecossistema de tecnologias com que trabalho no dia a dia."
       />
-      <ScrollingAnimationDemo />
-      <Bridge label="a stack, em detalhe" />
-      <ScrollPortraitWallDemo />
+      <SkillsShowcase />
 
       {/* ── 05 · CONTATO ─────────────────────────────────────── */}
       <footer id="contato" className="bg-grain relative overflow-hidden border-t rule px-6 py-24 scroll-mt-24 md:py-40">
