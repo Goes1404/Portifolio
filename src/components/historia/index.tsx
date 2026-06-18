@@ -272,7 +272,7 @@ export default function HistoriaSection() {
             {/* Mobile: a compact column beside the text. md+: sized by available
                 viewport HEIGHT (not width) so it grows on tall screens yet never
                 clips inside the pinned 100vh frame on short laptops. */}
-            <figure className="m-0 w-[38%] max-w-[150px] shrink-0 sm:max-w-[210px] md:w-[min(460px,42vh)] md:max-w-none">
+            <figure className="m-0 w-[46%] max-w-[190px] shrink-0 sm:max-w-[230px] md:w-[min(460px,42vh)] md:max-w-none">
               <RevealSpotlight
                 bwSrc={FOTO_PB}
                 colorSrc={FOTO_COLOR}
