@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import RevealSpotlight from '@/components/efeito-8-revelar/reveal-spotlight';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -59,6 +59,36 @@ const KW_H  = 'clamp(2.05rem, 9.35vw, 9.9rem)'; // 1.1 × KW_FS
 
 const EASE_IN  = [0.16, 1, 0.3, 1]    as const;
 const EASE_OUT = [0.4,  0, 0.6, 1]    as const;
+
+// Cada tag tem a sua cor (mesma linguagem da seção Skills); cai para o accent
+// do capítulo se a tag não estiver no mapa.
+const TAG_COLORS: Record<string, string> = {
+  'HTML5': '#e44d26',
+  'CSS3': '#2196f3',
+  'JavaScript': '#f7df1e',
+  'React': '#38e0ff',
+  'Power BI': '#f2c811',
+  'Infraestrutura de TI': '#34d399',
+  'Redes': '#38bdf8',
+  'Ticketing': '#fb923c',
+  'Thales Group': '#818cf8',
+  'EdTech': '#a78bfa',
+  'Tráfego Pago': '#f472b6',
+  'IoT': '#2dd4bf',
+};
+
+// As tags sobem em cascata, coloridas, quando o capítulo entra na tela.
+const TAGS_STAGGER: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.07, delayChildren: 0.25 } },
+};
+const TAG_POP: Variants = {
+  hidden: { opacity: 0, y: 18, scale: 0.7 },
+  show: {
+    opacity: 1, y: 0, scale: 1,
+    transition: { type: 'spring', stiffness: 380, damping: 18, mass: 0.6 },
+  },
+};
 
 export default function HistoriaSection() {
   const trackRef    = useRef<HTMLDivElement>(null);
@@ -236,22 +266,38 @@ export default function HistoriaSection() {
                   <p className="max-w-xl font-editorial text-base italic leading-snug text-white/[0.60] sm:text-xl md:text-[1.35rem]">
                     {ch.body}
                   </p>
-                  {/* Skill / trait tags */}
-                  <div className="flex flex-wrap gap-2">
-                    {ch.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border px-3 py-1.5 font-code text-[10px] uppercase tracking-[0.3em]"
-                        style={{
-                          color: ch.accent,
-                          borderColor: `${ch.accent}28`,
-                          background: `${ch.accent}0a`,
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  {/* Skill / trait tags — coloridas, sobem em cascata ao aparecer */}
+                  <motion.div
+                    className="flex flex-wrap gap-2"
+                    variants={TAGS_STAGGER}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+                  >
+                    {ch.tags.map((tag) => {
+                      const c = TAG_COLORS[tag] ?? ch.accent;
+                      return (
+                        <motion.span
+                          key={tag}
+                          variants={TAG_POP}
+                          whileHover={{ y: -3, scale: 1.06 }}
+                          className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 font-code text-[10px] uppercase tracking-[0.25em]"
+                          style={{
+                            color: c,
+                            borderColor: `${c}66`,
+                            background: `${c}14`,
+                            boxShadow: `0 6px 20px -10px ${c}80`,
+                          }}
+                        >
+                          <span
+                            className="h-1.5 w-1.5 rounded-full"
+                            style={{ background: c, boxShadow: `0 0 8px ${c}` }}
+                          />
+                          {tag}
+                        </motion.span>
+                      );
+                    })}
+                  </motion.div>
                   {/* Code snippet — only on lg+, where there's vertical room beside the portrait */}
                   <pre
                     className="hidden w-fit rounded-2xl border px-6 py-5 font-code text-sm leading-relaxed lg:block"
