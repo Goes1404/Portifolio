@@ -57,6 +57,7 @@ const VERT = /* glsl */ `
 uniform float uTime;
 uniform float uAmp;
 uniform float uFreq;
+uniform float uScroll;   // 0→1 mapped from page scroll through the hero
 uniform vec2  uMouse;
 varying float vDisp;
 varying vec3  vNormal;
@@ -66,10 +67,14 @@ void main() {
   vec3 pos = position;
   float n1 = snoise(pos * uFreq + vec3(0.0, 0.0, uTime * 0.22));
   float n2 = snoise(pos * (uFreq * 2.1) + vec3(uTime * 0.16, 0.0, 0.0));
-  float disp = (n1 * 0.7 + n2 * 0.3) * uAmp;
+  // Scroll deepens the displacement a touch — the surface reacts to the page.
+  float disp = (n1 * 0.7 + n2 * 0.3) * uAmp * (1.0 + uScroll * 0.35);
   disp += (uMouse.x * pos.x + uMouse.y * pos.y) * 0.12 * uAmp;
   vDisp = disp;
-  vec3 newPos = pos + normal * disp;
+  // …and the whole blob breathes ~5% larger as you scroll through the hero,
+  // so the 3D element reads as part of the scroll. Scale via the shader (GPU),
+  // never a layout property.
+  vec3 newPos = pos * (1.0 + uScroll * 0.05) + normal * disp;
   vec4 mv = modelViewMatrix * vec4(newPos, 1.0);
   vNormal = normalize(normalMatrix * normal);
   vView = normalize(-mv.xyz);
@@ -89,6 +94,13 @@ void main() {
   vec3 base = mix(uColorA, uColorB, smoothstep(-0.25, 0.4, vDisp));
   vec3 col = mix(base, uColorC, fres);
   col += uColorC * fres * 0.45;          // rim glow
+
+  // Algorithmic dithering: a sub-quantum (±0.5/255) hash noise applied just
+  // before output. Breaks smooth gradients into a fine, studio-grade grain so
+  // common 8-bit panels never show stepped "color banding".
+  float dither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+  col += (dither - 0.5) / 255.0;
+
   gl_FragColor = vec4(col, 1.0);
 }
 `
@@ -99,8 +111,9 @@ void main() {
  * is independent of any React-three version coupling. Degrades to nothing
  * (the CSS hero stays) if WebGL is unavailable or reduced-motion is requested.
  */
-export default function WebGLHero({ className = '' }) {
+export default function WebGLHero({ className = '', posterSrc }) {
   const mountRef = useRef(null)
+  const posterRef = useRef(null)
 
   useEffect(() => {
     const mount = mountRef.current
@@ -125,7 +138,13 @@ export default function WebGLHero({ className = '' }) {
     renderer.setSize(w, h, false)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     mount.appendChild(renderer.domElement)
-    Object.assign(renderer.domElement.style, { width: '100%', height: '100%', display: 'block' })
+    // Canvas sits ON TOP of the poster and starts invisible — it cross-fades in
+    // only after the first real frame is drawn (shaders compiled, GPU warm).
+    Object.assign(renderer.domElement.style, {
+      width: '100%', height: '100%', display: 'block',
+      position: 'absolute', inset: '0',
+      opacity: '0', transition: 'opacity 0.8s ease',
+    })
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100)
@@ -135,6 +154,7 @@ export default function WebGLHero({ className = '' }) {
       uTime: { value: 0 },
       uAmp: { value: 0.42 },
       uFreq: { value: 0.9 },
+      uScroll: { value: 0 },
       uMouse: { value: new THREE.Vector2(0, 0) },
       uColorA: { value: new THREE.Color('#0b1a4d') },
       uColorB: { value: new THREE.Color('#2f6bff') },
@@ -169,27 +189,49 @@ export default function WebGLHero({ className = '' }) {
 
     const clock = new THREE.Clock()
     let raf = 0
+    let revealed = false
+    let scrollEased = 0 // eased 0→1 scroll value handed to the uScroll uniform
+
+    // Reduced-motion: don't freeze the blob — slow time to ~12% (equivalent to
+    // u_time * 0.12 in the shader) for a calm, almost-zen drift. Pointer input
+    // is already disabled above, so nothing reacts abruptly.
+    const timeScale = reduced ? 0.12 : 1.0
+
+    // First successful frame → cross-fade: live canvas in, static poster out.
+    const reveal = () => {
+      if (revealed) return
+      revealed = true
+      renderer.domElement.style.opacity = '1'
+      if (posterRef.current) posterRef.current.style.opacity = '0'
+    }
 
     const renderFrame = () => {
-      const t = clock.getElapsedTime()
+      const t = clock.getElapsedTime() * timeScale
       uniforms.uTime.value = t
+
+      // Scroll → uniform. window.scrollY is a cheap, cached read (no layout/
+      // reflow). Normalised over the hero's pinned travel (~2 viewport heights),
+      // then eased so the blob responds smoothly rather than 1:1 with the wheel.
+      const scrollTarget = Math.min(1, Math.max(0, window.scrollY / (window.innerHeight * 2)))
+      scrollEased += (scrollTarget - scrollEased) * 0.08
+      uniforms.uScroll.value = scrollEased
+
       uniforms.uMouse.value.x += (target.x - uniforms.uMouse.value.x) * 0.04
       uniforms.uMouse.value.y += (target.y - uniforms.uMouse.value.y) * 0.04
       blob.rotation.y = t * 0.12 + uniforms.uMouse.value.x * 0.4
       blob.rotation.x = uniforms.uMouse.value.y * 0.3 + window.scrollY * 0.0006
       renderer.render(scene, camera)
+      reveal()
     }
 
+    // Render ONLY while the hero is on-screen (IntersectionObserver) AND the tab
+    // is visible — never spin the GPU on an invisible canvas. We keep looping
+    // even under reduced-motion (just slowed), so the poster still hands off.
     const loop = () => {
       raf = requestAnimationFrame(loop)
-      if (visible) renderFrame()
+      if (visible && !document.hidden) renderFrame()
     }
-
-    if (reduced) {
-      renderFrame() // single static frame
-    } else {
-      loop()
-    }
+    loop()
 
     return () => {
       cancelAnimationFrame(raf)
@@ -203,5 +245,27 @@ export default function WebGLHero({ className = '' }) {
     }
   }, [])
 
-  return <div ref={mountRef} aria-hidden className={className} />
+  // Purely decorative 3D backdrop — hidden from the accessibility tree.
+  return (
+    <div ref={mountRef} aria-hidden="true" role="presentation" className={className}>
+      {/* Instant-paint placeholder behind the canvas. Keeps LCP fast while the
+          WebGL context compiles shaders off the critical path, then fades out as
+          the first real frame fades in. Pass `posterSrc` (an exported .webp of a
+          nice blob frame) for a literal still; otherwise this lightweight CSS
+          approximation of the blob's palette is used — zero network cost. */}
+      <div
+        ref={posterRef}
+        aria-hidden="true"
+        className="absolute inset-0 transition-opacity duration-700 ease-out"
+        style={
+          posterSrc
+            ? { backgroundImage: `url(${posterSrc})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+            : {
+                background:
+                  'radial-gradient(58% 58% at 42% 44%, rgba(47,107,255,0.30) 0%, rgba(11,26,77,0.20) 38%, rgba(5,7,15,0) 70%)',
+              }
+        }
+      />
+    </div>
+  )
 }

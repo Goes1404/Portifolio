@@ -737,7 +737,7 @@ export default function ProjetosHeroScrub() {
 
       {/* Headline cinemática — fica FIXA no topo da seção enquanto os cards
           deslizam por trás (sticky + backdrop-blur). */}
-      <div className="sticky top-16 z-20 mx-auto mb-12 max-w-5xl sm:top-[72px]">
+      <div className="relative z-20 mx-auto mb-12 max-w-5xl">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}

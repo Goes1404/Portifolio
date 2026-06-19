@@ -21,30 +21,27 @@ const CHAPTERS = [
   {
     num: '01',
     year: '2023',
-    keyword: 'APRENDIZ',
-    kicker: '// jovem aprendiz na Thales Group',
+    keyword: 'REDES & INFRA',
+    kicker: '// as fundações na Thales Group',
     body: 'Comecei pelas entranhas da TI, não pela tela. Como Jovem Aprendiz de Infraestrutura na Thales Group — uma multinacional —, cuidei de redes e IPs, administrei contas de usuário e operei o sistema de chamados, mantendo tudo no ar. Aprendi como a tecnologia funciona por baixo: camada sobre camada.',
-    code: `# diagnóstico de rede\nping -c 4 192.168.1.1\n\n64 bytes: icmp_seq=1\n  time=0.8 ms`,
     tags: ['Infraestrutura de TI', 'Redes', 'Ticketing', 'Thales Group'],
     accent: '#2f6bff',
   },
   {
     num: '02',
     year: '2024',
-    keyword: 'CONSTRUTOR',
-    kicker: '// do infra ao front-end',
+    keyword: 'DESENVOLVIMENTO',
+    kicker: '// criando produtos digitais de alto impacto',
     body: 'Da infraestrutura, parti para construir o que se vê. Como freelancer, desenvolvo landing pages de alta conversão para o setor imobiliário e comercial — de HTML, CSS e JavaScript a React. Interfaces responsivas, foco em UI/UX, velocidade e captação de leads. Cada cliente, um problema novo — aprendi fazendo.',
-    code: `const landing = {\n  nicho: 'imobiliário',\n  stack: ['HTML','CSS','JS','React'],\n  meta: 'conversão',\n};`,
     tags: ['HTML5', 'CSS3', 'JavaScript', 'React'],
     accent: '#38e0ff',
   },
   {
     num: '03',
     year: '2025',
-    keyword: 'FULL STACK',
-    kicker: '// FIAP, produto e performance',
+    keyword: 'SISTEMAS & DADOS',
+    kicker: '// liderança tech e análise de performance',
     body: 'Hoje toco várias frentes. À frente do desenvolvimento da Compromisso, plataforma educacional que construí do início ao fim. Na Next Home, como Analista de Tráfego e Performance, transformo dados em decisão (Meta/Google Ads, CPC, CTR, conversão). E concilio a Engenharia de Software na FIAP com automação residencial (IoT) — da interface ao hardware.',
-    code: `const hoje = {\n  produto: 'Compromisso',\n  papel: 'à frente do dev',\n  dados: ['Meta Ads','Power BI'],\n  iot: true,\n};`,
     tags: ['EdTech', 'Tráfego Pago', 'Power BI', 'IoT'],
     accent: '#e9edf7',
   },
@@ -295,21 +292,9 @@ export default function HistoriaSection() {
                           />
                           {tag}
                         </motion.span>
-                      );
+                      )
                     })}
                   </motion.div>
-                  {/* Code snippet — only on lg+, where there's vertical room beside the portrait */}
-                  <pre
-                    className="hidden w-fit rounded-2xl border px-6 py-5 font-code text-sm leading-relaxed lg:block"
-                    style={{
-                      color: ch.accent,
-                      borderColor: `${ch.accent}20`,
-                      background: `${ch.accent}08`,
-                      boxShadow: `0 0 50px ${ch.accent}0f`,
-                    }}
-                  >
-                    {ch.code}
-                  </pre>
                 </motion.div>
               </AnimatePresence>
             </div>
