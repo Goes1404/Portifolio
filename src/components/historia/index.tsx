@@ -51,8 +51,8 @@ const CHAPTERS = [
 // Keep container slightly generous (1.1×) to avoid cap-height clipping on any OS.
 // Mobile floor kept low (1.85rem) so wide 10-char words like AUTODIDATA/CONSTRUTOR
 // fit on a 320–375px screen without the whitespace-nowrap line clipping.
-const KW_FS = 'clamp(1.85rem, 8.5vw, 9rem)';
-const KW_H  = 'clamp(2.05rem, 9.35vw, 9.9rem)'; // 1.1 × KW_FS
+const KW_FS = 'clamp(1.5rem, 6.2vw, 6.8rem)';
+const KW_H  = 'clamp(1.7rem, 6.9vw, 7.5rem)'; // 1.1 × KW_FS
 
 const EASE_IN  = [0.16, 1, 0.3, 1]    as const;
 const EASE_OUT = [0.4,  0, 0.6, 1]    as const;
@@ -221,10 +221,10 @@ export default function HistoriaSection() {
                 initial={{ y: '104%' }}
                 animate={{ y: '0%', transition: { duration: 0.74, ease: EASE_IN } }}
                 exit={{ y: '-104%', transition: { duration: 0.44, ease: EASE_OUT } }}
-                className="absolute bottom-0 inset-x-0 font-display text-[#e9edf7] whitespace-nowrap"
+                className="absolute bottom-[0.05em] inset-x-0 font-display text-[#e9edf7] whitespace-nowrap"
                 style={{
                   fontSize: KW_FS,
-                  lineHeight: '0.88',
+                  lineHeight: '0.95',
                   textShadow: `0 0 120px ${ch.accent}28`,
                 }}
               >
@@ -303,7 +303,7 @@ export default function HistoriaSection() {
             {/* Mobile: a compact column beside the text. md+: sized by available
                 viewport HEIGHT (not width) so it grows on tall screens yet never
                 clips inside the pinned 100vh frame on short laptops. */}
-            <figure className="m-0 w-[46%] max-w-[190px] shrink-0 sm:max-w-[230px] md:w-[min(460px,42vh)] md:max-w-none">
+            <figure className="m-0 w-[48%] max-w-[210px] shrink-0 sm:max-w-[250px] md:w-[min(420px,48vh)] md:max-w-none">
               <RevealSpotlight
                 bwSrc={FOTO_PB}
                 colorSrc={FOTO_COLOR}

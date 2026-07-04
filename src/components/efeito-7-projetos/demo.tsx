@@ -50,8 +50,7 @@ const PROJECTS: Project[] = [
     subtitle: "TOTVS Challenge 2026 · FIAP · IA de Vendas",
     description:
       "Plataforma de inteligência conversacional do TOTVS Challenge 2026 (FIAP). Transforma transcrições brutas de reuniões em planos de ação automáticos via agente Pydantic AI multi-provider — pipeline de 5 tools em ~90s, monorepo com Next.js 16, Fastify 5, FastAPI e PostgreSQL + pgvector.",
-    cover:
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/nexus.jpg",
     tags: ["Next.js", "React 19", "Fastify", "Python", "PostgreSQL", "Redis", "Pydantic AI", "TOTVS"],
     accentHex: "#38e0ff",
     featured: true,
@@ -70,8 +69,7 @@ const PROJECTS: Project[] = [
     subtitle: "Cliente Real · Loja Virtual (em implementação)",
     description:
       "Loja virtual de acessórios artesanais para cliente real, com domínio próprio (jracessorios.com) — atualmente em implementação. Catálogo de produtos, fluxo de pedidos e foco em conversão. Desenvolvimento de ponta a ponta, do front-end ao deploy.",
-    cover:
-      "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/jr-acessorios.jpg",
     tags: ["React", "Next.js", "Node.js", "E-commerce"],
     accentHex: "#2f6bff",
     featured: true,
@@ -88,8 +86,7 @@ const PROJECTS: Project[] = [
     subtitle: "Cliente Real · Site Imobiliário em Alphaville, SP",
     description:
       "Site profissional para corretora imobiliária em Alphaville, SP. Catálogo de imóveis, dashboard administrativo, formulário de contato e vitrine de estatísticas do negócio. Meu primeiro projeto para um cliente real no nicho imobiliário.",
-    cover:
-      "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/corretora-cristal.jpg",
     tags: ["Lovable", "Next.js", "React", "Imobiliário"],
     accentHex: "#38e0ff",
     liveUrl: "https://cristal-nexthome.lovable.app/",
@@ -104,8 +101,7 @@ const PROJECTS: Project[] = [
     subtitle: "FIAP · Global Solution 2026 — Space Connect",
     description:
       "Global Solution da FIAP (Space Connect 2026): sistema robótico semi-autônomo que mapeia tubos de lava lunares com enxames de micro-robôs (LIDAR + SLAM + rede mesh), transformando cavernas naturais em habitats protegidos da radiação. O projeto exigiu trabalhar em TODAS as áreas — Data Science (Python/ML), modelagem de banco, simulação de redes (Cisco Packet Tracer), modelagem 3D/AR-VR e metodologia ágil.",
-    cover:
-      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/spy26der.jpg",
     tags: ["Python", "Machine Learning", "Data Science", "Redes", "AR/VR", "SQL"],
     accentHex: "#6f97ff",
     docUrl: "https://docs.google.com/document/d/1DtKBkq6CwijJIqOuluMZie4ZT17tEN1fkA3H_LZdEM0/edit?usp=drivesdk",
@@ -120,8 +116,7 @@ const PROJECTS: Project[] = [
     subtitle: "FIAP · Checkpoint 01 — Desenvolvimento Web",
     description:
       "Primeiro checkpoint da FIAP — site completo para vinheria artesanal com catálogo de produtos, navegação entre páginas, seção de personalização e layout responsivo. HTML semântico e CSS puro.",
-    cover:
-      "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/vinheria-agnello.jpg",
     tags: ["HTML", "CSS", "GitHub Pages", "FIAP"],
     accentHex: "#6f97ff",
     liveUrl: "https://mariaeduardaacyole.github.io/Checkpoint-Site-da-Vinheria-Agnello/src/pages/produtos.html",
@@ -137,8 +132,7 @@ const PROJECTS: Project[] = [
     subtitle: "FIAP · Checkpoint 02 — E-commerce de Cosméticos",
     description:
       "Segundo checkpoint da FIAP — e-commerce de cosméticos e maquiagem com identidade visual própria, catálogo de produtos, carrinho de compras e galeria. Design focado em autocuidado e expressão pessoal.",
-    cover:
-      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/glowcare.jpg",
     tags: ["HTML", "CSS", "GitHub Pages", "FIAP"],
     accentHex: "#6f97ff",
     liveUrl: "https://goes1404.github.io/Glowcare/",
@@ -154,8 +148,7 @@ const PROJECTS: Project[] = [
     subtitle: "FIAP · Checkpoint 05 — Landing Page de Streaming",
     description:
       "Checkpoint de front-end da FIAP — landing page para o serviço de streaming de música \"Melodia\". Hero, seções de recursos, depoimentos, player com playlist dinâmica e newsletter, com layout responsivo. HTML5, CSS3 e JavaScript.",
-    cover:
-      "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/melodia.jpg",
     tags: ["HTML5", "CSS3", "JavaScript", "FIAP"],
     accentHex: "#6f97ff",
     liveUrl: "https://maykesantos98.github.io/Front-end-CP5/",
@@ -171,8 +164,7 @@ const PROJECTS: Project[] = [
     subtitle: "FIAP · Checkpoint 04 — E-commerce Sustentável",
     description:
       "Checkpoint de front-end da FIAP — e-commerce de produtos sustentáveis e ecológicos (beleza, vestuário, acessórios e utilidades). Catálogo com filtro dinâmico de produtos por categoria, carrinho de compras e layout responsivo. HTML5, CSS3, Bootstrap 5 e JavaScript.",
-    cover:
-      "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&auto=format&fit=crop&q=80",
+    cover: "/projects/ecotrend.jpg",
     tags: ["HTML5", "CSS3", "Bootstrap", "JavaScript", "FIAP"],
     accentHex: "#6f97ff",
     liveUrl: "https://mariaeduardaacyole.github.io/EcoTrend---CP4/",
@@ -249,7 +241,7 @@ function ExpandedProjectCard({
       {/* Container Principal Expandido com Layout Compartilhado */}
       <motion.div
         layoutId={`card-container-${project.id}`}
-        className="relative w-full max-w-4xl bg-slate-950 border border-slate-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh] z-10"
+        className="relative w-full max-w-4xl bg-[#0a0e1c] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh] z-10"
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
       >
         {/* Lado Esquerdo: Imagem Cover com efeito glow dinâmico */}
@@ -262,7 +254,7 @@ function ExpandedProjectCard({
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           />
           {/* Degradê cinematográfico para fundir com o fundo preto */}
-          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-[#0a0e1c] via-[#0a0e1c]/40 to-transparent" />
           
           {/* Ambient Glow com a cor de destaque do projeto */}
           <div
@@ -286,13 +278,13 @@ function ExpandedProjectCard({
               <div>
                 <motion.h3
                   layoutId={`card-title-${project.id}`}
-                  className="text-2xl md:text-3xl font-display font-bold text-white tracking-tight leading-tight"
+                  className="text-2xl md:text-3xl font-display text-white tracking-tight leading-tight"
                 >
                   {project.title}
                 </motion.h3>
                 <motion.p
                   layoutId={`card-subtitle-${project.id}`}
-                  className="text-sm font-mono text-[#6f97ff] mt-1"
+                  className="text-sm font-code text-[#6f97ff] mt-1"
                 >
                   {project.subtitle}
                 </motion.p>
@@ -301,7 +293,7 @@ function ExpandedProjectCard({
               {/* Botão de Fechar */}
               <button
                 onClick={onClose}
-                className="p-2 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/80"
+                className="p-2 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10"
                 aria-label="Fechar"
               >
                 <X className="h-4 w-4" />
@@ -319,13 +311,10 @@ function ExpandedProjectCard({
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.15, duration: 0.4 }}
-              className="space-y-4 text-slate-300 text-sm md:text-base leading-relaxed"
+              className="text-white/65 text-sm md:text-base leading-relaxed"
             >
               <p>
                 {project.description}
-              </p>
-              <p className="text-slate-400 text-xs">
-                A engenharia de software aplicada a este projeto foca em alta performance visual, modularização rígida do código e uma experiência rica em micro-interações que retêm o engajamento do usuário final.
               </p>
             </motion.div>
 
@@ -337,7 +326,7 @@ function ExpandedProjectCard({
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2.5 py-1 rounded-full text-[11px] font-mono border border-slate-900 text-slate-400 bg-slate-900/60"
+                  className="px-2.5 py-1 rounded-full text-[11px] font-code border border-white/10 text-white/55 bg-white/[0.04]"
                 >
                   {tag}
                 </span>
@@ -350,17 +339,17 @@ function ExpandedProjectCard({
                 className="mt-6 rounded-xl border p-4"
                 style={{ borderColor: `${project.accentHex}33`, background: `${project.accentHex}0d` }}
               >
-                <div className="mb-3 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-[#6f97ff]">
+                <div className="mb-3 flex items-center gap-2 font-code text-[10px] uppercase tracking-[0.18em] text-[#6f97ff]">
                   <span className="h-1.5 w-1.5 rounded-full" style={{ background: project.accentHex }} />
                   Acesso de demonstração — entre e explore
                 </div>
                 <div className="space-y-2">
                   {project.demo.map((d) => (
-                    <div key={d.role} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 font-mono text-xs">
-                      <span className="text-slate-500">{d.role}</span>
-                      <span className="text-slate-200 break-all select-all">{d.user}</span>
-                      <span className="text-slate-600">·</span>
-                      <span className="text-slate-400 break-all select-all">{d.pass}</span>
+                    <div key={d.role} className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 font-code text-xs">
+                      <span className="text-white/40">{d.role}</span>
+                      <span className="text-white/80 break-all select-all">{d.user}</span>
+                      <span className="text-white/25">·</span>
+                      <span className="text-white/55 break-all select-all">{d.pass}</span>
                     </div>
                   ))}
                 </div>
@@ -373,12 +362,12 @@ function ExpandedProjectCard({
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.25, duration: 0.4 }}
-            className="flex flex-col sm:flex-row items-center gap-4 mt-8 pt-6 border-t border-slate-900"
+            className="flex flex-col sm:flex-row items-center gap-4 mt-8 pt-6 border-t border-white/10"
           >
             {/* Botão de Transição Cinematográfica */}
             <button
               onClick={() => onPlay(project)}
-              className="relative group overflow-hidden w-full sm:w-auto px-8 py-3.5 rounded-full text-white font-code text-xs font-bold flex items-center justify-center gap-3 transition-all duration-300 shadow-lg active:scale-95"
+              className="cta-sheen relative group w-full sm:w-auto px-8 py-3.5 rounded-full text-white font-code text-xs font-bold flex items-center justify-center gap-3 transition-all duration-300 shadow-lg active:scale-95"
               style={{
                 backgroundColor: project.accentHex,
                 boxShadow: `0 8px 30px ${project.accentHex}30`,
@@ -403,7 +392,7 @@ function ExpandedProjectCard({
                   href={project.codeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-3 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/80 flex items-center gap-2 text-xs font-mono"
+                  className="px-4 py-3 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10 flex items-center gap-2 text-xs font-code"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <Code2 className="h-4 w-4" />
@@ -415,7 +404,7 @@ function ExpandedProjectCard({
                   href={project.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-3 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/80 flex items-center gap-2 text-xs font-mono"
+                  className="px-4 py-3 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10 flex items-center gap-2 text-xs font-code"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <ExternalLink className="h-4 w-4" />
@@ -427,7 +416,7 @@ function ExpandedProjectCard({
                   href={project.docUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-3 rounded-full bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/80 flex items-center gap-2 text-xs font-mono"
+                  className="px-4 py-3 rounded-full bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10 flex items-center gap-2 text-xs font-code"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <FileText className="h-4 w-4" />
@@ -466,8 +455,8 @@ function ProjectCard({
     <motion.div ref={wrapRef} style={{ scale, opacity }} className="will-change-transform">
     <motion.article
       layoutId={`card-container-${project.id}`}
-      className={`group relative overflow-hidden rounded-2xl cursor-pointer bg-slate-950 border ${
-        project.featured ? "border-[#2f6bff]/40" : "border-slate-900/60"
+      className={`group relative overflow-hidden rounded-2xl cursor-pointer bg-[#0a0e1c] border ${
+        project.featured ? "border-[#2f6bff]/40" : "border-white/[0.07]"
       }`}
       onClick={onClick}
       role="button"
@@ -484,12 +473,12 @@ function ProjectCard({
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e1c] via-[#0a0e1c]/20 to-transparent" />
 
         {/* Selo de destaque — só nos melhores projetos */}
         {project.featured && (
           <div
-            className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.18em] backdrop-blur-md"
+            className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-code text-[10px] uppercase tracking-[0.18em] backdrop-blur-md"
             style={{
               color: "#bcd2ff",
               borderColor: `${project.accentHex}55`,
@@ -510,7 +499,7 @@ function ProjectCard({
         {/* Ícone de Play centralizado */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-slate-900/70 backdrop-blur-md border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100"
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0a0e1c]/70 backdrop-blur-md border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100"
           >
             <Play className="h-5 w-5 fill-white ml-0.5" />
           </div>
@@ -535,7 +524,7 @@ function ProjectCard({
             </motion.h3>
             <motion.p 
               layoutId={`card-subtitle-${project.id}`}
-              className="text-xs text-[#6f97ff] font-mono mt-0.5"
+              className="text-xs text-[#6f97ff] font-code mt-0.5"
             >
               {project.subtitle}
             </motion.p>
@@ -546,7 +535,7 @@ function ProjectCard({
                 href={project.codeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/40"
+                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10"
                 onClick={(e) => e.stopPropagation()}
                 aria-label="Ver código"
               >
@@ -558,7 +547,7 @@ function ProjectCard({
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/40"
+                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10"
                 onClick={(e) => e.stopPropagation()}
                 aria-label="Ver site ao vivo"
               >
@@ -570,7 +559,7 @@ function ProjectCard({
                 href={project.docUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800/40"
+                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10"
                 onClick={(e) => e.stopPropagation()}
                 aria-label="Ver documento do projeto"
               >
@@ -581,7 +570,7 @@ function ProjectCard({
         </div>
 
         {/* Resumo/Descrição */}
-        <p className="text-xs text-slate-400 leading-relaxed mb-4 line-clamp-2">
+        <p className="text-xs text-white/50 leading-relaxed mb-4 line-clamp-2">
           {project.description}
         </p>
 
@@ -593,14 +582,14 @@ function ProjectCard({
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="px-2 py-0.5 rounded-full text-[10px] font-mono border border-slate-900 text-slate-400 bg-slate-950/40"
+              className="px-2 py-0.5 rounded-full text-[10px] font-code border border-white/10 text-white/50 bg-white/[0.03]"
             >
               {tag}
             </span>
           ))}
         </motion.div>
 
-        <div className="flex items-center gap-2 text-[10px] text-slate-500 group-hover:text-[#6f97ff] transition-colors duration-300 font-mono">
+        <div className="flex items-center gap-2 text-[10px] text-white/40 group-hover:text-[#6f97ff] transition-colors duration-300 font-code">
           <Play className="h-2.5 w-2.5" />
           <span>Ver detalhes do projeto</span>
         </div>
@@ -660,21 +649,21 @@ export default function ProjetosHeroScrub() {
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.9 }}
-            className="fixed bottom-6 right-6 left-6 z-[100001] bg-slate-950 border border-[#2f6bff]/40 px-6 py-4 rounded-2xl shadow-xl flex flex-col gap-1 sm:left-auto sm:max-w-sm"
+            className="fixed bottom-6 right-6 left-6 z-[100001] bg-[#0a0e1c] border border-[#2f6bff]/40 px-6 py-4 rounded-2xl shadow-xl flex flex-col gap-1 sm:left-auto sm:max-w-sm"
           >
             <div className="flex items-center gap-2 text-[#6f97ff] text-[10px] font-code font-bold">
               <span className="h-1.5 w-1.5 rounded-full bg-[#2f6bff] animate-ping" />
               DEMO AO VIVO EM BREVE
             </div>
             <p className="text-white text-sm font-medium mt-1">
-              O demo de <span className="font-mono text-[#38e0ff]">{fallbackProject}</span> ainda está sendo preparado.
+              O demo de <span className="font-code text-[#38e0ff]">{fallbackProject}</span> ainda está sendo preparado.
             </p>
-            <p className="text-slate-400 text-[11px] leading-normal mt-1">
+            <p className="text-white/50 text-[11px] leading-normal mt-1">
               Enquanto isso, role o card aberto para ver os detalhes técnicos do projeto.
             </p>
             <button
               onClick={() => setFallbackProject(null)}
-              className="mt-3 text-left text-xs text-white/40 hover:text-white transition-colors underline font-mono w-fit"
+              className="mt-3 text-left text-xs text-white/40 hover:text-white transition-colors underline font-code w-fit"
             >
               Fechar
             </button>
@@ -708,12 +697,12 @@ export default function ProjetosHeroScrub() {
               <h1 className="font-display text-4xl md:text-6xl text-white tracking-tight mb-2">
                 {transitionProject.title}
               </h1>
-              <p className="text-slate-400 font-mono text-sm max-w-md mx-auto">
+              <p className="text-white/50 font-code text-sm max-w-md mx-auto">
                 {transitionProject.subtitle}
               </p>
 
               {/* Barra de progresso linear ambientada */}
-              <div className="w-48 h-[1px] bg-slate-900 mx-auto mt-8 relative overflow-hidden rounded-full border border-slate-800/40">
+              <div className="w-48 h-[1px] bg-white/10 mx-auto mt-8 relative overflow-hidden rounded-full border border-white/10">
                 <motion.div
                   initial={{ left: "-100%" }}
                   animate={{ left: "100%" }}

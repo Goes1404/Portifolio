@@ -335,4 +335,67 @@
   .tilt-3d {
     position: relative;
   }
+
+  /* ─────────────────────────────────────────────────────────────
+     CTA micro-interactions — cohesive hover/press language
+     ───────────────────────────────────────────────────────────── */
+
+  /* Sheen — a soft diagonal light streak sweeps across on hover. */
+  @keyframes cta-sheen {
+    from { transform: translateX(-140%) skewX(-18deg); }
+    to   { transform: translateX(260%)  skewX(-18deg); }
+  }
+  .cta-sheen { position: relative; overflow: hidden; isolation: isolate; }
+  .cta-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 42%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+    transform: translateX(-140%) skewX(-18deg);
+    pointer-events: none;
+    z-index: 1;
+  }
+  .cta-sheen:hover::after { animation: cta-sheen 0.85s var(--ease-out-expo); }
+
+  /* Underline wipe — grows from the left on hover, recedes on leave. */
+  .link-underline { position: relative; }
+  .link-underline::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -3px;
+    height: 1.5px;
+    width: 100%;
+    background: #2f6bff;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--ease-out-expo);
+  }
+  .link-underline:hover::after,
+  .group:hover .link-underline::after { transform: scaleX(1); }
+
+  /* Fill sweep — brand color rises from the bottom (icon buttons / pills). */
+  .icon-fill { position: relative; overflow: hidden; z-index: 0; }
+  .icon-fill::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: #2f6bff;
+    transform: translateY(101%);
+    transition: transform 0.45s var(--ease-out-expo);
+  }
+  .icon-fill:hover::before { transform: translateY(0); }
+
+  /* Press — a tactile sink on active, shared by all CTAs. */
+  .cta-press { transition: transform 0.18s var(--ease-out-expo); }
+  .cta-press:active { transform: scale(0.96); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta-sheen:hover::after { animation: none; }
+    .link-underline::after,
+    .icon-fill::before,
+    .cta-press { transition: none; }
+  }
 }

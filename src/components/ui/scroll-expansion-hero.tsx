@@ -285,7 +285,7 @@ export default function ScrollExpandMedia({
             </motion.p>
           )}
 
-          <h2 className="font-display leading-[0.92] tracking-tight" style={{ fontSize: 'clamp(2.4rem, 7.5vw, 6rem)' }}>
+          <h2 className="fx-title font-display leading-[1.1] tracking-tight" style={{ fontSize: 'clamp(2.2rem, 6.5vw, 5.2rem)' }}>
             {topLine && (
               <motion.span
                 style={{ x: xLeft }}

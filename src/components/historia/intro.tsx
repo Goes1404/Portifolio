@@ -4,6 +4,7 @@ import ScrollReveal from '@/components/effects/ScrollReveal';
 import Magnetic from '@/components/effects/Magnetic';
 import Tilt3D from '@/components/effects/Tilt3D';
 import ParticleField from '@/components/effects/ParticleField';
+import InkReveal from '@/components/ui/ink-reveal';
 
 const STATS = [
   { value: 'FIAP',        label: 'Engenharia de Software',   sub: 'Conclusão em 2028' },
@@ -51,23 +52,35 @@ export default function HistoriaIntro() {
       id="historia"
       className="relative scroll-mt-20 bg-[#05070f] px-6 pt-20 pb-28 md:pt-28 md:pb-36 overflow-hidden"
     >
+      {/* Background glow that is revealed by the ink mask */}
+      <div
+        className="absolute inset-0 z-0 opacity-90 pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at 30% 40%, rgba(47, 107, 255, 0.4) 0%, rgba(56, 224, 255, 0.2) 35%, rgba(10, 31, 107, 0.35) 65%, transparent 80%)'
+        }}
+      />
+
       {/* interactive constellation — sparse, low-opacity, reacts to the cursor.
           Sits behind everything; pointer-events-none so it never blocks text. */}
       <ParticleField
-        className="pointer-events-none absolute inset-0 opacity-[0.4]"
-        maxParticles={24}
-        linkDist={160}
-        color="47, 107, 255"
+        className="pointer-events-none absolute inset-0 opacity-[0.85] z-0"
+        maxParticles={80}
+        density={0.00015}
+        linkDist={140}
+        color="255, 255, 255"
       />
 
+      {/* Ink reveal canvas masking layer */}
+      <InkReveal maskColor={[5, 7, 15]} className="z-0" />
+
       {/* grain */}
-      <div className="bg-noise pointer-events-none absolute inset-0 opacity-[0.04]" />
+      <div className="bg-noise pointer-events-none absolute inset-0 opacity-[0.04] z-10" />
 
       {/* faint top rule separating from hero */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent z-10" />
 
       {/* static measure wrapper (keeps the centering/max-width + stacking) */}
-      <div ref={contentRef} className="relative mx-auto max-w-6xl">
+      <div ref={contentRef} className="relative mx-auto max-w-6xl z-10">
       {/* scroll-linked entry/exit envelope */}
       <motion.div style={{ y: envY, scale: envScale, opacity: envOpacity, filter: envBlur }} className="origin-center">
       <motion.div
@@ -91,7 +104,7 @@ export default function HistoriaIntro() {
             {/* Section heading */}
             <motion.h2
               variants={rise}
-              className="font-display leading-[0.88] text-[#e9edf7] mb-10"
+              className="font-display leading-none text-[#e9edf7] mb-10"
               style={{ fontSize: 'clamp(3rem, 8vw, 6.5rem)' }}
             >
               Minha{' '}

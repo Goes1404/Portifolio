@@ -202,15 +202,21 @@ const Frame = ({ ref, className, active, hint, children, ...handlers }: FramePro
     {/* Resting hint — fades out the moment the reveal is active */}
     <div
       className={cn(
-        "pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center gap-3 transition-opacity duration-500",
+        "pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center gap-3.5 transition-opacity duration-500",
         active ? "opacity-0" : "opacity-100",
       )}
     >
-      <span className="relative flex h-12 w-12 items-center justify-center">
+      {/* Soft scrim so the hint reads on any photo — light or dark */}
+      <span
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: "radial-gradient(58% 48% at 50% 50%, rgba(5,7,15,0.6) 0%, rgba(5,7,15,0) 72%)" }}
+      />
+      <span className="relative flex h-11 w-11 items-center justify-center">
         <span className="absolute inset-0 rounded-full border border-white/40" />
         <span className="thread-dot h-2 w-2 rounded-full bg-brand" />
       </span>
-      <span className="font-code text-[10px] uppercase tracking-[0.35em] text-white/70">
+      <span className="relative max-w-[82%] rounded-full border border-white/15 bg-[#05070f]/55 px-3 py-1.5 text-center font-code text-[9px] uppercase leading-tight tracking-[0.26em] text-white/85 backdrop-blur-sm">
         {hint}
       </span>
     </div>

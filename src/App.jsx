@@ -11,6 +11,7 @@ import {
   SplitReveal,
   ScrollVelocity,
   LiquidText,
+  SectionTransition,
 } from '@/components/effects'
 import SkillsShowcase from '@/components/skills'
 import HeroScrollDemo from '@/components/efeito-4-container-scroll/demo'
@@ -18,6 +19,8 @@ import ProjetosHeroScrub from '@/components/efeito-7-projetos/demo'
 import HistoriaSection from '@/components/historia'
 import HistoriaIntro from '@/components/historia/intro'
 import ExperienciaSection from '@/components/experiencia'
+import OrbitCarousel from '@/components/ui/orbiting-carousel-with-animated-icons'
+import { ShaderBackground } from '@/components/ui/animated-shader-hero'
 
 const NAV = [
   { num: '01', label: 'História', href: '#historia' },
@@ -44,8 +47,6 @@ const CV_URL = '/cv.pdf' // arquivo em public/cv.pdf
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Three.js is the heaviest dependency — load it lazily so the hero shell paints
-// first and the WebGL bundle streams in afterwards.
 const WebGLHero = lazy(() => import('@/components/webgl-hero'))
 
 const stagger = {
@@ -75,22 +76,6 @@ const riseGroup = {
   show: { transition: { staggerChildren: 0.13 } },
 }
 const inView = { once: true, margin: '-12% 0px -12% 0px' }
-
-// Connective seam between two abutting effects
-function Bridge({ label }) {
-  return (
-    <div className="relative flex h-24 w-full items-center justify-center bg-[#05070f]">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2f6bff]/40 to-transparent" />
-      <div className="absolute left-1/2 top-0 h-12 w-px -translate-x-1/2 bg-gradient-to-b from-[#2f6bff]/50 to-transparent" />
-      <div className="relative flex flex-col items-center gap-3">
-        <span className="thread-dot h-2 w-2 rounded-full bg-[#2f6bff]" />
-        {label && (
-          <span className="font-code text-[10px] uppercase tracking-[0.4em] text-white/30">{label}</span>
-        )}
-      </div>
-    </div>
-  )
-}
 
 // Infinite editorial ticker
 function Marquee() {
@@ -134,7 +119,7 @@ function SectionMarker({ id, num, kicker, title, lead }) {
         {/* Each word surges up on its own — staggered by wordStagger */}
         <motion.h2
           variants={wordStagger}
-          className="mt-7 font-display text-[12vw] leading-[0.92] text-[#e9edf7] sm:text-6xl md:text-7xl"
+          className="mt-7 font-display text-[12vw] leading-none text-[#e9edf7] sm:text-6xl md:text-7xl"
           aria-label={title}
         >
           {title.split(' ').map((word, i) => (
@@ -192,11 +177,11 @@ function App() {
       })
       // Depth velocities: Silva exits the viewport ~5× faster than the meta line.
       // The "Goes da" line also drifts right, as if on a different lateral plane.
-      tl.to('[data-hero-layer="meta"]',    { y: '-16vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line1"]',   { y: '-36vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line2"]',   { y: '-58vh', x: '2.5vw', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line3"]',   { y: '-85vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="tagline"]', { y: '-26vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="meta"]',    { y: '-90vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line1"]',   { y: '-75vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line2"]',   { y: '-55vh', x: '2.5vw', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line3"]',   { y: '-35vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="tagline"]', { y: '-15vh', ease: 'none' }, 0)
       // Veil fades to reveal more of the WebGL blob as the parallax deepens
       tl.to('[data-hero-layer="veil"]',    { opacity: 0.55, ease: 'none' }, 0)
     }, track)
@@ -221,6 +206,9 @@ function App() {
     <div className="relative min-h-screen bg-[#05070f] text-[#e9edf7] selection:bg-[#2f6bff] selection:text-white">
       {/* Custom magnetic cursor (desktop / fine-pointer only) */}
       <CustomCursor />
+
+      {/* Curtain wipe when a new section reaches the viewport center on scroll */}
+      <SectionTransition />
 
       {/* Scroll-progress thread */}
       <motion.div
@@ -258,7 +246,7 @@ function App() {
                 className="group flex items-baseline gap-1.5 px-2 py-1.5 font-code text-sm text-white/55 transition-colors hover:text-[#e9edf7]"
               >
                 <span className="text-[10px] text-brand">{item.num}</span>
-                <span>{item.label}</span>
+                <span className="link-underline">{item.label}</span>
               </a>
             ))}
           </nav>
@@ -354,10 +342,8 @@ function App() {
         {/* Sticky viewport — pinned, always fills the screen */}
         <div className="sticky top-0 h-screen overflow-hidden">
 
-          {/* WebGL blob layer (z-0) — lazily loaded */}
-          <Suspense fallback={null}>
-            <WebGLHero className="pointer-events-none absolute inset-0 z-0" />
-          </Suspense>
+          {/* WebGL animated shader background layer (z-0) */}
+          <ShaderBackground className="pointer-events-none absolute inset-0 z-0" />
 
           {/* Interactive particle constellation (z-[1]) — drifts, links nearby
               nodes and is repelled by the pointer (light physics). Sits below the
@@ -381,7 +367,7 @@ function App() {
             variants={stagger}
             initial="hidden"
             animate="show"
-            className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center px-6"
+            className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center gap-2 md:gap-4 px-6"
           >
             {/* Status meta line — slowest layer */}
             <div data-hero-layer="meta" className="will-change-transform">
@@ -401,7 +387,7 @@ function App() {
             <div data-hero-layer="line1" className="will-change-transform">
               <motion.h1
                 variants={rise}
-                className="mt-5 font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.88] text-[#e9edf7]"
+                className="mt-5 font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7]"
               >
                 Matheus
               </motion.h1>
@@ -411,7 +397,7 @@ function App() {
             <div data-hero-layer="line2" className="will-change-transform">
               <motion.h1
                 variants={rise}
-                className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.88] text-[#e9edf7] md:ml-[16%]"
+                className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7] md:ml-[16%]"
               >
                 Goes <span className="text-gradient-anim">da</span>
               </motion.h1>
@@ -421,7 +407,7 @@ function App() {
             <div data-hero-layer="line3" className="will-change-transform">
               <motion.h1
                 variants={rise}
-                className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.88] text-[#e9edf7] md:ml-[5%]"
+                className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7] md:ml-[5%]"
               >
                 {/* Hover to ripple the type with an SVG liquid-distortion filter */}
                 <LiquidText data-cursor="liquid">Silva</LiquidText>
@@ -440,9 +426,9 @@ function App() {
                     href="#historia"
                     onClick={(e) => handleNav(e, '#historia')}
                     data-cursor="rolar"
-                    className="group inline-flex items-center justify-start gap-2 font-code text-sm tracking-widest text-brand md:justify-end"
+                    className="group cta-press inline-flex items-center justify-start gap-2 font-code text-sm tracking-widest text-brand md:justify-end"
                   >
-                    CONHEÇA A HISTÓRIA
+                    <span className="link-underline">CONHEÇA A HISTÓRIA</span>
                     <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
                   </a>
                 </Magnetic>
@@ -471,16 +457,61 @@ function App() {
       {/* ── 02 · EXPERIÊNCIA ─────────────────────────────────── */}
       <ExperienciaSection />
 
+      {/* ── Parceiros & Clientes ───────────────────────────────────
+          Blob WebGL ambiente, calmado por um véu radial para o conteúdo
+          ficar nítido; grão + selo na linguagem das outras seções. */}
+      <section id="parceiros" className="relative overflow-hidden border-t rule bg-[#05070f] py-20 md:py-28">
+        <Suspense fallback={null}>
+          <WebGLHero className="pointer-events-none absolute inset-0 z-0 opacity-40" />
+        </Suspense>
+
+        {/* Readability veil — calms the blob behind the heading + orbit */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-[1]"
+          style={{
+            background:
+              'radial-gradient(78% 62% at 50% 44%, rgba(5,7,15,0.84) 0%, rgba(5,7,15,0.38) 56%, rgba(5,7,15,0) 82%)',
+          }}
+        />
+        {/* Film grain for cohesion with the rest of the site */}
+        <div className="bg-noise pointer-events-none absolute inset-0 z-[1] opacity-[0.05] mix-blend-overlay" />
+
+        {/* Heading */}
+        <div className="relative z-10 flex flex-col items-center px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center"
+          >
+            <span className="flex items-center gap-3 font-code text-[11px] uppercase tracking-[0.4em] text-white/40">
+              <span className="h-px w-8 bg-brand/60" />
+              ecossistema de projetos e marcas
+              <span className="h-px w-8 bg-brand/60" />
+            </span>
+            <h3 className="mt-4 bg-gradient-to-b from-white to-white/55 bg-clip-text font-display text-3xl leading-[1.05] text-transparent sm:text-4xl md:text-5xl">
+              Parceiros &amp; Clientes
+            </h3>
+            <p className="mt-4 max-w-md font-editorial text-lg italic leading-snug text-white/45 md:text-xl">
+              As marcas e os times com quem construí, codei e entreguei.
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Orbit carousel */}
+        <div className="relative z-10 mt-8 md:mt-12">
+          <OrbitCarousel />
+        </div>
+      </section>
+
       {/* ── 03 · PROJETOS ────────────────────────────────────── */}
-      <SectionMarker
-        id="projetos"
-        num="03"
-        kicker="Trabalhos Selecionados"
-        title="Projetos"
-        lead="Coisas que construí. Clique em cada uma para mergulhar."
-      />
-      {/* E4: clean scroll expand — suspense build-up before projects */}
-      <HeroScrollDemo />
+      {/* E4: clean scroll expand — suspense build-up before projects.
+          Carries the #projetos anchor now that the section header is gone. */}
+      <div id="projetos" className="scroll-mt-24">
+        <HeroScrollDemo />
+      </div>
       <ProjetosHeroScrub />
 
       {/* ── 04 · SKILLS ──────────────────────────────────────── */}
@@ -515,7 +546,7 @@ function App() {
 
           {/* Footer heading — GSAP per-character mask reveal (SplitReveal) */}
           <h2
-            className="mt-8 font-display text-[13vw] leading-[0.9] text-[#e9edf7] sm:text-6xl md:text-8xl"
+            className="mt-8 font-display text-[13vw] leading-none text-[#e9edf7] sm:text-6xl md:text-8xl"
             aria-label="Vamos construir algo juntos?"
           >
             <SplitReveal as="span" className="block">Vamos construir</SplitReveal>
@@ -546,7 +577,7 @@ function App() {
                     href={href}
                     aria-label={label}
                     data-cursor={label}
-                    className="flex h-12 w-12 items-center justify-center rounded-full border rule text-white/60 transition-colors hover:border-[#2f6bff] hover:text-brand"
+                    className="icon-fill cta-press flex h-12 w-12 items-center justify-center rounded-full border rule text-white/60 transition-colors hover:border-[#2f6bff] hover:text-white"
                   >
                     <Icon className="h-5 w-5" />
                   </a>
@@ -563,10 +594,10 @@ function App() {
                   href={CV_URL}
                   download
                   data-cursor="baixar"
-                  className="inline-flex items-center gap-2.5 rounded-full border border-[#2f6bff]/40 bg-[#2f6bff]/10 px-6 py-3.5 font-code text-xs tracking-[0.2em] text-[#6f97ff] transition-colors hover:bg-[#2f6bff]/20 hover:text-white"
+                  className="group cta-sheen cta-press inline-flex items-center gap-2.5 rounded-full border border-[#2f6bff]/40 bg-[#2f6bff]/10 px-6 py-3.5 font-code text-xs tracking-[0.2em] text-[#6f97ff] transition-colors hover:bg-[#2f6bff]/20 hover:text-white"
                 >
                   BAIXAR CV (PDF)
-                  <ArrowDown className="h-4 w-4" />
+                  <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
                 </a>
               </Magnetic>
             </motion.div>

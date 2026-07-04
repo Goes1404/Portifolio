@@ -113,7 +113,7 @@ export default function ExperienciaSection() {
 
           <motion.h2
             variants={rise}
-            className="font-display leading-[0.88] text-[#e9edf7]"
+            className="font-display leading-none text-[#e9edf7]"
             style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)' }}
           >
             Onde <span style={{ color: '#2f6bff' }}>trabalhei</span>
@@ -184,7 +184,7 @@ export default function ExperienciaSection() {
 
                 {/* Role — editorial display */}
                 <h3
-                  className="font-display text-[#e9edf7] leading-[0.9] mb-5"
+                  className="font-display text-[#e9edf7] leading-tight mb-5"
                   style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)' }}
                 >
                   {exp.role}

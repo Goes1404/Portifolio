@@ -133,7 +133,7 @@ export default function SkillsShowcase() {
       <div
         aria-hidden
         className="pointer-events-none absolute -right-24 bottom-8 h-80 w-80 rounded-full opacity-[0.12] blur-3xl"
-        style={{ background: 'radial-gradient(circle, #a855f7, transparent 70%)' }}
+        style={{ background: 'radial-gradient(circle, #38e0ff, transparent 70%)' }}
       />
 
       <motion.div
