@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from 'react'
 import gsap from 'gsap'
+import { shouldEnablePointerEffects } from '@/lib/device'
 
 /**
  * Liquid-distortion hover. The content is filtered through an SVG turbulence +
@@ -25,7 +26,12 @@ export default function LiquidText({
   const wrapRef = useRef(null)
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    // Touch fires `pointerenter` on tap, so on a phone this would run an SVG
+    // turbulence + displacement-map filter over the largest display text on the
+    // page every time someone taps near it — one of the most expensive filter
+    // combinations there is, on the weakest GPUs, for an effect that reads as
+    // the text glitching rather than as a deliberate hover flourish.
+    if (!shouldEnablePointerEffects()) return
     const wrap = wrapRef.current
     const disp = dispRef.current
     const turb = turbRef.current

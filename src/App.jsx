@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState, Suspense, lazy } from 'react'
+import { useCallback, useEffect, useRef, useState, Suspense, lazy } from 'react'
 import { motion, useScroll, AnimatePresence } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Lenis from '@studio-freight/lenis'
-import { ArrowDown, ArrowUpRight, Code2, Globe, Mail, MessageCircle, Menu, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpRight, Code2, Globe, Mail, MessageCircle, Menu, X } from 'lucide-react'
+import { initSmoothScroll, scrollToTarget, lockScroll, unlockScroll } from '@/lib/scroll'
+import { scrubFor, useSkipHeavyVisuals, useReducedMotion } from '@/lib/device'
+import { useScrollSpy, useFocusTrap, useScrolledPast } from '@/lib/hooks'
 import {
   CustomCursor,
   ParticleField,
@@ -23,12 +25,16 @@ import OrbitCarousel from '@/components/ui/orbiting-carousel-with-animated-icons
 import { ShaderBackground } from '@/components/ui/animated-shader-hero'
 
 const NAV = [
-  { num: '01', label: 'História', href: '#historia' },
-  { num: '02', label: 'Experiência', href: '#experiencia' },
-  { num: '03', label: 'Projetos', href: '#projetos' },
-  { num: '04', label: 'Skills', href: '#skills' },
-  { num: '05', label: 'Contato', href: '#contato' },
+  { num: '01', label: 'História', href: '#historia', id: 'historia' },
+  { num: '02', label: 'Experiência', href: '#experiencia', id: 'experiencia' },
+  { num: '03', label: 'Projetos', href: '#projetos', id: 'projetos' },
+  { num: '04', label: 'Skills', href: '#skills', id: 'skills' },
+  { num: '05', label: 'Contato', href: '#contato', id: 'contato' },
 ]
+
+// Module scope so the array identity is stable across renders — the scroll-spy
+// observer would otherwise be torn down and rebuilt on every render.
+const SECTION_IDS = NAV.map((item) => item.id)
 
 const STACK = [
   'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Next.js',
@@ -141,69 +147,101 @@ function SectionMarker({ id, num, kicker, title, lead }) {
 
 function App() {
   const { scrollYProgress } = useScroll()
-  const lenisRef    = useRef(null)
-  const heroTrackRef = useRef(null) // the 280vh outer section
+  const heroTrackRef = useRef(null) // the tall outer hero section
   const [menuOpen, setMenuOpen] = useState(false)
+  const lightweight = useSkipHeavyVisuals()
+  const reducedMotion = useReducedMotion()
+  const activeSection = useScrollSpy(SECTION_IDS)
+  const showBackToTop = useScrolledPast(900)
 
-  // Global Lenis smooth-scroll, synced with GSAP ticker
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
+  const menuRef = useFocusTrap(menuOpen, closeMenu)
+
+  // Boot the scroll system (Lenis on fine pointers, native momentum on touch)
+  // and keep GSAP ScrollTrigger in sync with whichever is active.
+  useEffect(() => initSmoothScroll(), [])
+
+  // Publish the sticky header's height as --header-h so pinned panes can size
+  // themselves to the area that's actually visible beneath it. Measured rather
+  // than hard-coded: it differs between mobile and desktop and grows by the
+  // safe-area inset on notched iPhones.
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-    })
-    lenisRef.current = lenis
-    lenis.on('scroll', ScrollTrigger.update)
-    const raf = (time) => lenis.raf(time * 1000)
-    gsap.ticker.add(raf)
-    gsap.ticker.lagSmoothing(0)
-    return () => { gsap.ticker.remove(raf); lenis.destroy(); lenisRef.current = null }
+    const header = document.querySelector('[data-site-header]')
+    if (!header) return
+    const root = document.documentElement
+    const apply = () => {
+      const h = Math.round(header.getBoundingClientRect().height)
+      root.style.setProperty('--header-h', `${h}px`)
+    }
+    apply()
+    const ro = new ResizeObserver(apply)
+    ro.observe(header)
+    return () => {
+      ro.disconnect()
+      root.style.removeProperty('--header-h')
+    }
   }, [])
 
   // Hero depth-parallax: each [data-hero-layer] wrapper moves at its own velocity
-  // as the 280vh track scrolls. GSAP owns the wrapper's y; framer-motion owns the
+  // as the track scrolls. GSAP owns the wrapper's y; framer-motion owns the
   // inner element's entry animation y — different DOM nodes, zero conflict.
   useEffect(() => {
     const track = heroTrackRef.current
-    if (!track) return
+    if (!track || reducedMotion) return
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: track,
           start: 'top top',
           end: 'bottom bottom',
-          scrub: 1.5,
+          // On touch the content is pinned to the finger, so a long scrub lag
+          // reads as the page failing to respond rather than as inertia.
+          scrub: scrubFor(1.5),
+          invalidateOnRefresh: true,
         },
       })
       // Depth velocities: Silva exits the viewport ~5× faster than the meta line.
       // The "Goes da" line also drifts right, as if on a different lateral plane.
-      tl.to('[data-hero-layer="meta"]',    { y: '-90vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line1"]',   { y: '-75vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line2"]',   { y: '-55vh', x: '2.5vw', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line3"]',   { y: '-35vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="tagline"]', { y: '-15vh', ease: 'none' }, 0)
-      // Veil fades to reveal more of the WebGL blob as the parallax deepens
+      // Distances are expressed against the stable --svh unit so the mobile
+      // address bar can't change how far each layer travels mid-scroll.
+      const svh = (n) => `${n}svh`
+      tl.to('[data-hero-layer="meta"]',    { y: svh(-90), ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line1"]',   { y: svh(-75), ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line2"]',   { y: svh(-55), x: '2.5vw', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line3"]',   { y: svh(-35), ease: 'none' }, 0)
+      tl.to('[data-hero-layer="tagline"]', { y: svh(-15), ease: 'none' }, 0)
+      // Veil fades to reveal more of the shader background as the parallax deepens
       tl.to('[data-hero-layer="veil"]',    { opacity: 0.55, ease: 'none' }, 0)
     }, track)
     return () => ctx.revert()
-  }, [])
+  }, [reducedMotion])
 
   const handleNav = (e, href) => {
     e.preventDefault()
     setMenuOpen(false)
-    // Wait a tick so the overlay starts closing before we hand control to Lenis
-    requestAnimationFrame(() => lenisRef.current?.scrollTo(href, { offset: -72 }))
+    // Let the overlay begin closing (and the scroll lock lift) before handing
+    // control to the scroller, otherwise the scroll is applied to a locked page.
+    requestAnimationFrame(() => scrollToTarget(href))
   }
 
-  // Freeze background scroll while the mobile menu is open
+  // Freeze background scroll while the mobile menu is open.
   useEffect(() => {
-    const lenis = lenisRef.current
-    if (menuOpen) lenis?.stop()
-    else lenis?.start()
+    if (!menuOpen) return
+    lockScroll()
+    return () => unlockScroll()
   }, [menuOpen])
 
   return (
     <div className="relative min-h-screen bg-[#05070f] text-[#e9edf7] selection:bg-[#2f6bff] selection:text-white">
+      {/* Bypass the decorative hero for keyboard and screen-reader users */}
+      <a
+        href="#historia"
+        onClick={(e) => handleNav(e, '#historia')}
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[200] focus:rounded-full focus:bg-brand focus:px-5 focus:py-3 focus:font-code focus:text-xs focus:tracking-widest focus:text-white"
+      >
+        Ir para o conteúdo
+      </a>
+
       {/* Custom magnetic cursor (desktop / fine-pointer only) */}
       <CustomCursor />
 
@@ -227,39 +265,67 @@ function App() {
       </div>
 
       {/* Header */}
-      <header className="pt-safe sticky top-0 z-50 border-b rule bg-[#05070f]/75 backdrop-blur-md">
+      <header
+        data-site-header
+        className="pt-safe sticky top-0 z-50 border-b rule bg-[#05070f]/75 backdrop-blur-md"
+      >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4">
-          <a href="#top" onClick={(e) => handleNav(e, '#top')} className="flex items-center gap-3">
+          <a href="#top" onClick={(e) => handleNav(e, '#top')} className="flex items-center gap-3" aria-label="Voltar ao topo">
             <span className="flex h-9 w-9 items-center justify-center rounded-sm bg-brand font-display text-sm text-white">M</span>
             <span className="hidden font-code text-xs tracking-[0.3em] text-[#e9edf7] sm:block">
               MGS<span className="text-brand">_</span>STUDIO
             </span>
           </a>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-3 sm:flex">
-            {NAV.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={(e) => handleNav(e, item.href)}
-                className="group flex items-baseline gap-1.5 px-2 py-1.5 font-code text-sm text-white/55 transition-colors hover:text-[#e9edf7]"
-              >
-                <span className="text-[10px] text-brand">{item.num}</span>
-                <span className="link-underline">{item.label}</span>
-              </a>
-            ))}
+          {/* Desktop nav — the section you're currently in stays lit */}
+          <nav className="hidden items-center gap-3 sm:flex" aria-label="Seções do site">
+            {NAV.map((item) => {
+              const current = activeSection === item.id
+              return (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  onClick={(e) => handleNav(e, item.href)}
+                  aria-current={current ? 'true' : undefined}
+                  className={`group flex items-baseline gap-1.5 px-2 py-1.5 font-code text-sm transition-colors ${
+                    current ? 'text-[#e9edf7]' : 'text-white/55 hover:text-[#e9edf7]'
+                  }`}
+                >
+                  <span className={current ? 'text-[10px] text-brand-cyan' : 'text-[10px] text-brand'}>
+                    {item.num}
+                  </span>
+                  <span className={`link-underline ${current ? 'is-current' : ''}`}>{item.label}</span>
+                </a>
+              )
+            })}
           </nav>
 
-          {/* Mobile menu trigger */}
-          <button
-            onClick={() => setMenuOpen(true)}
-            aria-label="Abrir menu"
-            aria-expanded={menuOpen}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-[#e9edf7] transition-colors hover:bg-white/5 sm:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
+          {/* Mobile: current section label + menu trigger */}
+          <div className="flex items-center gap-2 sm:hidden">
+            <AnimatePresence mode="wait">
+              {activeSection && (
+                <motion.span
+                  key={activeSection}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.22 }}
+                  className="font-code text-[10px] uppercase tracking-[0.28em] text-white/40"
+                >
+                  {NAV.find((n) => n.id === activeSection)?.label}
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <button
+              onClick={() => setMenuOpen(true)}
+              aria-label="Abrir menu de navegação"
+              aria-expanded={menuOpen}
+              aria-haspopup="dialog"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-[#e9edf7] transition-colors active:bg-white/10"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -267,6 +333,11 @@ function App() {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
+            ref={menuRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Navegação"
+            tabIndex={-1}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -281,30 +352,48 @@ function App() {
               <button
                 onClick={() => setMenuOpen(false)}
                 aria-label="Fechar menu"
-                className="flex h-11 w-11 items-center justify-center rounded-full text-[#e9edf7] transition-colors hover:bg-white/5"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-[#e9edf7] transition-colors active:bg-white/10"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            {/* Links — big editorial type, staggered in */}
-            <nav className="flex flex-1 flex-col justify-center gap-2 overflow-y-auto px-7 py-8">
-              {NAV.map((item, i) => (
-                <motion.a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => handleNav(e, item.href)}
-                  initial={{ opacity: 0, x: -24 }}
-                  animate={{ opacity: 1, x: 0, transition: { delay: 0.08 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
-                  className="group flex items-center gap-4 border-b rule py-4"
-                >
-                  <span className="font-code text-xs text-brand">{item.num}</span>
-                  <span className="font-display leading-none text-[#e9edf7] transition-colors group-hover:text-brand" style={{ fontSize: 'clamp(1.75rem, 7vw, 2.5rem)' }}>
-                    {item.label}
-                  </span>
-                  <ArrowUpRight className="ml-auto h-5 w-5 shrink-0 text-white/30 transition-colors group-hover:text-brand" />
-                </motion.a>
-              ))}
+            {/* Links — big editorial type, staggered in. The overlay can scroll
+                internally on short screens, so it opts back into touch panning
+                while the page behind it stays locked. */}
+            <nav
+              data-scroll-lock-allow
+              className="flex flex-1 flex-col justify-center gap-2 overflow-y-auto px-7 py-8"
+              aria-label="Seções do site"
+            >
+              {NAV.map((item, i) => {
+                const current = activeSection === item.id
+                return (
+                  <motion.a
+                    key={item.href}
+                    href={item.href}
+                    onClick={(e) => handleNav(e, item.href)}
+                    aria-current={current ? 'true' : undefined}
+                    initial={{ opacity: 0, x: -24 }}
+                    animate={{ opacity: 1, x: 0, transition: { delay: 0.08 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
+                    className="group flex items-center gap-4 border-b rule py-4"
+                  >
+                    <span className={`font-code text-xs ${current ? 'text-brand-cyan' : 'text-brand'}`}>
+                      {item.num}
+                    </span>
+                    <span
+                      className={`font-display leading-none transition-colors ${current ? 'text-brand' : 'text-[#e9edf7]'}`}
+                      style={{ fontSize: 'clamp(1.75rem, 7vw, 2.5rem)' }}
+                    >
+                      {item.label}
+                    </span>
+                    {current && (
+                      <span aria-hidden className="thread-dot ml-1 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-cyan" />
+                    )}
+                    <ArrowUpRight className="ml-auto h-5 w-5 shrink-0 text-white/30" />
+                  </motion.a>
+                )
+              })}
             </nav>
 
             {/* Footer of the menu */}
@@ -329,26 +418,37 @@ function App() {
         )}
       </AnimatePresence>
 
-      {/* ── HERO: 280vh sticky scroll track ─────────────────── */}
-      {/* The outer section is 280vh tall — the scroll "engine" for the parallax.
-          The sticky inner div stays pinned to the viewport while the user scrolls
-          through the full track, giving the illusion of cinematic depth. */}
+      {/* ── HERO: sticky scroll track ────────────────────────── */}
+      {/* The outer section is the scroll "engine" for the parallax: 280svh on
+          desktop, 165svh on phones (see .track-hero). The sticky inner pane
+          stays pinned to the viewport while the user scrolls through the full
+          track, giving the illusion of cinematic depth. */}
       <main
         id="top"
         ref={heroTrackRef}
-        className="relative bg-grain bg-[#05070f]"
-        style={{ height: '280vh' }}
+        className="track-hero relative bg-grain bg-[#05070f]"
       >
-        {/* Sticky viewport — pinned, always fills the screen */}
-        <div className="sticky top-0 h-screen overflow-hidden">
+        {/* Sticky viewport — pinned, sized from the stable viewport unit */}
+        <div className="pane-sticky">
 
-          {/* WebGL animated shader background layer (z-0) */}
-          <ShaderBackground className="pointer-events-none absolute inset-0 z-0" />
+          {/* Animated background.
+              The WebGL2 fragment shader is a fullscreen per-pixel effect — the
+              single most expensive thing on the page. On phones it competes with
+              the scroll itself for the main thread and drains battery, so a
+              static CSS aurora stands in: same palette and mood, zero runtime
+              cost. Desktop still gets the live shader. */}
+          {lightweight ? (
+            <div aria-hidden className="pointer-events-none absolute inset-0 z-0 bg-hero-static" />
+          ) : (
+            <ShaderBackground className="pointer-events-none absolute inset-0 z-0" />
+          )}
 
           {/* Interactive particle constellation (z-[1]) — drifts, links nearby
               nodes and is repelled by the pointer (light physics). Sits below the
               readability veil so it never cuts contrast under the headline. */}
-          <ParticleField className="pointer-events-none absolute inset-0 z-[1]" />
+          {!lightweight && (
+            <ParticleField className="pointer-events-none absolute inset-0 z-[1]" />
+          )}
 
           {/* Readability veil (z-2) — also fades via GSAP as you scroll in */}
           <div
@@ -370,10 +470,14 @@ function App() {
             className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center gap-2 md:gap-4 px-6"
           >
             {/* Status meta line — slowest layer */}
-            <div data-hero-layer="meta" className="will-change-transform">
-              <motion.div variants={rise} className="flex flex-wrap items-center gap-x-6 gap-y-2 font-code text-xs tracking-[0.3em] text-white/45">
-                <span className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
+            <div data-hero-layer="meta" className="hero-layer">
+              <motion.div className="flex flex-wrap items-center gap-x-6 gap-y-1.5 font-code text-[11px] tracking-[0.22em] text-white/45 sm:gap-y-2 sm:text-xs sm:tracking-[0.3em]" variants={rise}>
+                {/* items-start + a cap-height nudge keeps the status dot on the
+                    FIRST line when this label wraps on a narrow screen; with
+                    items-center it drifts to the vertical middle of two lines
+                    and reads as belonging to neither. */}
+                <span className="flex items-start gap-2">
+                  <span className="mt-[0.42em] h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-brand" />
                   ABERTO A ESTÁGIO · VAGAS JÚNIOR
                 </span>
                 <span className="hidden sm:inline">·</span>
@@ -384,7 +488,7 @@ function App() {
             </div>
 
             {/* "Matheus" — second-slowest, anchors the name visually */}
-            <div data-hero-layer="line1" className="will-change-transform">
+            <div data-hero-layer="line1" className="hero-layer">
               <motion.h1
                 variants={rise}
                 className="mt-5 font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7]"
@@ -394,7 +498,7 @@ function App() {
             </div>
 
             {/* "Goes da" — mid-speed + lateral drift, feels on a different plane */}
-            <div data-hero-layer="line2" className="will-change-transform">
+            <div data-hero-layer="line2" className="hero-layer">
               <motion.h1
                 variants={rise}
                 className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7] md:ml-[16%]"
@@ -404,7 +508,7 @@ function App() {
             </div>
 
             {/* "Silva" — fastest, rockets upward first, most dramatic depth */}
-            <div data-hero-layer="line3" className="will-change-transform">
+            <div data-hero-layer="line3" className="hero-layer">
               <motion.h1
                 variants={rise}
                 className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7] md:ml-[5%]"
@@ -415,7 +519,7 @@ function App() {
             </div>
 
             {/* Tagline — sits at a mid-depth between meta and name */}
-            <div data-hero-layer="tagline" className="will-change-transform">
+            <div data-hero-layer="tagline" className="hero-layer">
               <motion.div variants={rise} className="mt-7 flex flex-col gap-4 sm:mt-10 sm:gap-5 md:ml-auto md:max-w-md md:text-right">
                 <p className="font-editorial text-lg italic leading-snug text-white/65 sm:text-2xl md:text-3xl">
                   Desenvolvedor Full Stack — transformo ideias em produtos
@@ -461,9 +565,14 @@ function App() {
           Blob WebGL ambiente, calmado por um véu radial para o conteúdo
           ficar nítido; grão + selo na linguagem das outras seções. */}
       <section id="parceiros" className="relative overflow-hidden border-t rule bg-[#05070f] py-20 md:py-28">
-        <Suspense fallback={null}>
-          <WebGLHero className="pointer-events-none absolute inset-0 z-0 opacity-40" />
-        </Suspense>
+        {/* three.js blob — a second WebGL context on top of the hero's. Phones
+            get the static gradient instead; the module isn't even fetched, which
+            also keeps three.js (~600KB) off the mobile critical path. */}
+        {!lightweight && (
+          <Suspense fallback={null}>
+            <WebGLHero className="pointer-events-none absolute inset-0 z-0 opacity-40" />
+          </Suspense>
+        )}
 
         {/* Readability veil — calms the blob behind the heading + orbit */}
         <div
@@ -618,6 +727,26 @@ function App() {
           </motion.div>
         </motion.div>
       </footer>
+
+      {/* Back to top — this page is several screens of pinned scrolling, so
+          without it the only way back up a phone is a long flick marathon.
+          Sits above the safe-area inset so it clears the iOS home indicator. */}
+      <AnimatePresence>
+        {showBackToTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 12 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            onClick={() => scrollToTarget('#top')}
+            aria-label="Voltar ao topo da página"
+            className="cta-press fixed right-4 z-[90] flex h-12 w-12 items-center justify-center rounded-full border border-[#2f6bff]/40 bg-[#05070f]/85 text-[#6f97ff] backdrop-blur-md transition-colors active:bg-[#2f6bff]/20 sm:right-6"
+            style={{ bottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
+          >
+            <ArrowUp className="h-5 w-5" />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

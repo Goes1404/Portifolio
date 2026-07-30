@@ -1,10 +1,16 @@
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useSkipHeavyVisuals } from '@/lib/device';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import Magnetic from '@/components/effects/Magnetic';
 import Tilt3D from '@/components/effects/Tilt3D';
 import ParticleField from '@/components/effects/ParticleField';
 import InkReveal from '@/components/ui/ink-reveal';
+import RevealSpotlight from '@/components/efeito-8-revelar/reveal-spotlight';
+
+// As mesmas fotos usadas na trilha de capítulos (ver ./index.tsx).
+const FOTO_PB = '/reveal/matheus-pb.jpg';
+const FOTO_COLOR = '/reveal/matheus-color.jpg';
 
 const STATS = [
   { value: 'FIAP',        label: 'Engenharia de Software',   sub: 'Conclusão em 2028' },
@@ -29,6 +35,7 @@ const stagger = {
 };
 
 export default function HistoriaIntro() {
+  const lightweight = useSkipHeavyVisuals();
   // Scroll-linked entry/exit envelope. Measured on a STATIC wrapper (never
   // transformed) so the rect stays stable; the transforms drive an inner layer.
   // 0 → content top hits viewport bottom · 1 → content bottom leaves the top.
@@ -62,13 +69,15 @@ export default function HistoriaIntro() {
 
       {/* interactive constellation — sparse, low-opacity, reacts to the cursor.
           Sits behind everything; pointer-events-none so it never blocks text. */}
-      <ParticleField
-        className="pointer-events-none absolute inset-0 opacity-[0.85] z-0"
-        maxParticles={80}
-        density={0.00015}
-        linkDist={140}
-        color="255, 255, 255"
-      />
+      {!lightweight && (
+        <ParticleField
+          className="pointer-events-none absolute inset-0 opacity-[0.85] z-0"
+          maxParticles={80}
+          density={0.00015}
+          linkDist={140}
+          color="255, 255, 255"
+        />
+      )}
 
       {/* Ink reveal canvas masking layer */}
       <InkReveal maskColor={[5, 7, 15]} className="z-0" />
@@ -120,7 +129,7 @@ export default function HistoriaIntro() {
             {/* Primary bio */}
             <motion.p
               variants={rise}
-              className="font-editorial text-2xl italic leading-snug text-white/65 max-w-2xl mb-6 md:text-[1.65rem]"
+              className="mb-6 max-w-2xl font-editorial text-xl italic leading-snug text-white/65 sm:text-2xl md:text-[1.65rem]"
             >
               Sou o Matheus — desenvolvedor full stack apaixonado por construir
               soluções digitais completas. Comecei como jovem aprendiz em
@@ -131,7 +140,7 @@ export default function HistoriaIntro() {
             {/* Secondary bio */}
             <motion.p
               variants={rise}
-              className="font-editorial text-xl italic leading-relaxed text-white/42 max-w-xl mb-12 md:text-[1.25rem]"
+              className="mb-12 max-w-xl font-editorial text-lg italic leading-relaxed text-white/42 sm:text-xl md:text-[1.25rem]"
             >
               Hoje concilio a atuação como freelancer e analista de tráfego com
               minha formação em Engenharia de Software pela FIAP. Do setor
@@ -159,6 +168,24 @@ export default function HistoriaIntro() {
                 </span>
               </motion.div>
             </Magnetic>
+
+            {/* ── The reveal portrait, for screens below `lg` ──
+                On large screens this lives beside the chapter text inside the
+                pinned Historia track. There is no room for it there on a phone
+                or tablet, so it surfaces here instead, where the section flows
+                normally and it can be read at a comfortable size. Capped so it
+                never becomes a full-screen photo on a small phone. */}
+            <motion.figure variants={rise} className="m-0 mt-14 w-full max-w-[300px] lg:hidden">
+              <RevealSpotlight
+                bwSrc={FOTO_PB}
+                colorSrc={FOTO_COLOR}
+                alt="Matheus Goes da Silva"
+                hint="arraste o dedo para revelar"
+              />
+              <figcaption className="mt-3 font-code text-[10px] uppercase tracking-[0.3em] text-white/30">
+                preto &amp; branco&nbsp;&nbsp;⇄&nbsp;&nbsp;cor
+              </figcaption>
+            </motion.figure>
 
             {/* Horizontal divider before the scroll hint */}
             <motion.div

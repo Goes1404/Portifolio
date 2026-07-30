@@ -134,8 +134,8 @@ export default function HistoriaSection() {
   const ch = CHAPTERS[idx];
 
   return (
-    <div ref={trackRef} className="relative bg-[#05070f]" style={{ height: '400vh' }}>
-      <div className="sticky top-0 h-screen overflow-hidden bg-[#05070f]">
+    <div ref={trackRef} className="track-historia relative bg-[#05070f]">
+      <div className="pane-sticky bg-[#05070f]">
 
         {/* Ambient chapter glow */}
         <AnimatePresence mode="wait">
@@ -247,7 +247,13 @@ export default function HistoriaSection() {
             />
           </div>
 
-          {/* Body row: chapter text (cycles) sits beside the portrait (persistent) */}
+          {/* Body row: chapter text (cycles) sits beside the portrait (persistent).
+              The portrait is a large fixed-width element, so below `lg` there
+              isn't room for both: at 360px it left the paragraph a ~150px
+              column, which wrapped to a dozen lines and overflowed the bottom of
+              the pinned pane. Under `lg` the text takes the full width and the
+              portrait moves up into the Historia intro, which is a normal
+              flowing section with space for it. */}
           <div className="flex flex-row items-center gap-4 sm:gap-7 md:gap-12 lg:gap-16">
 
             {/* ── Left: body text + tags + code — re-animates each chapter ── */}
@@ -260,7 +266,10 @@ export default function HistoriaSection() {
                   exit={{ opacity: 0, y: -14, filter: 'blur(8px)', transition: { duration: 0.3 } }}
                   className="flex flex-col gap-5 md:gap-6"
                 >
-                  <p className="max-w-xl font-editorial text-base italic leading-snug text-white/[0.60] sm:text-xl md:text-[1.35rem]">
+                  {/* Chapter bodies run ~380 characters and have to fit inside a
+                      pinned pane, so the mobile size is set by what fits rather
+                      than by the type scale. */}
+                  <p className="max-w-xl font-editorial text-[1.0625rem] italic leading-snug text-white/[0.60] sm:text-xl md:text-[1.35rem]">
                     {ch.body}
                   </p>
                   {/* Skill / trait tags — coloridas, sobem em cascata ao aparecer */}
@@ -299,11 +308,11 @@ export default function HistoriaSection() {
               </AnimatePresence>
             </div>
 
-            {/* ── Right: the reveal portrait — stays put as the chapters change ── */}
-            {/* Mobile: a compact column beside the text. md+: sized by available
-                viewport HEIGHT (not width) so it grows on tall screens yet never
-                clips inside the pinned 100vh frame on short laptops. */}
-            <figure className="m-0 w-[48%] max-w-[210px] shrink-0 sm:max-w-[250px] md:w-[min(420px,48vh)] md:max-w-none">
+            {/* ── Right: the reveal portrait — stays put as the chapters change ──
+                Sized by available viewport HEIGHT (not width) so it grows on
+                tall screens yet never clips inside the pinned frame on short
+                laptops. */}
+            <figure className="m-0 hidden shrink-0 lg:block lg:w-[min(420px,44svh)]">
               <RevealSpotlight
                 bwSrc={FOTO_PB}
                 colorSrc={FOTO_COLOR}

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { canvasDpr, isNarrowScreen, isTouch, prefersReducedMotion } from '@/lib/device'
 
 /**
  * Interactive particle constellation with light physics.
@@ -25,9 +26,16 @@ export default function ParticleField({
     const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const coarse = window.matchMedia('(pointer: coarse)').matches
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const reduced = prefersReducedMotion()
+    const coarse = isTouch()
+    const narrow = isNarrowScreen()
+    const dpr = canvasDpr(2)
+
+    // The link pass is O(n²) and, unlike the dots, it also costs a stroke call
+    // per pair — it dominates the frame budget. On phones the constellation is
+    // dense enough to read as texture from the dots alone, so the links are
+    // dropped rather than the whole effect.
+    const drawLinks = !(coarse && narrow)
 
     let w = 0
     let h = 0
@@ -35,9 +43,8 @@ export default function ParticleField({
     const pointer = { x: -9999, y: -9999, active: false }
 
     const spawn = () => {
-      // Thin out the field on small / touch screens to save CPU and battery —
-      // the O(n²) link pass dominates, so fewer nodes matters most there.
-      const cap = window.innerWidth < 768 ? Math.round(maxParticles * 0.45) : maxParticles
+      // Thin out the field on small / touch screens to save CPU and battery.
+      const cap = narrow ? Math.round(maxParticles * 0.35) : maxParticles
       const count = Math.min(cap, Math.floor(w * h * density))
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * w,
@@ -58,7 +65,20 @@ export default function ParticleField({
       spawn()
     }
     resize()
-    window.addEventListener('resize', resize)
+
+    // Mobile browsers fire `resize` every time the address bar slides in or out,
+    // i.e. constantly while scrolling. Reallocating the backing store and
+    // respawning the field on each of those is both wasteful and visible (the
+    // constellation restarts). Only react to a real width change, and debounce.
+    let resizeTimer = 0
+    let lastWidth = window.innerWidth
+    const onResize = () => {
+      if (coarse && window.innerWidth === lastWidth) return
+      lastWidth = window.innerWidth
+      window.clearTimeout(resizeTimer)
+      resizeTimer = window.setTimeout(resize, 150)
+    }
+    window.addEventListener('resize', onResize)
 
     const onMove = (e) => {
       const rect = canvas.getBoundingClientRect()
@@ -109,21 +129,24 @@ export default function ParticleField({
       }
 
       // Links
-      for (let i = 0; i < particles.length; i++) {
-        const a = particles[i]
-        for (let j = i + 1; j < particles.length; j++) {
-          const b = particles[j]
-          const dx = a.x - b.x
-          const dy = a.y - b.y
-          const d2 = dx * dx + dy * dy
-          if (d2 < linkDist * linkDist) {
-            const alpha = (1 - Math.sqrt(d2) / linkDist) * 0.5
-            ctx.strokeStyle = `rgba(${color}, ${alpha})`
-            ctx.lineWidth = 1
-            ctx.beginPath()
-            ctx.moveTo(a.x, a.y)
-            ctx.lineTo(b.x, b.y)
-            ctx.stroke()
+      if (drawLinks) {
+        const linkDist2 = linkDist * linkDist
+        ctx.lineWidth = 1
+        for (let i = 0; i < particles.length; i++) {
+          const a = particles[i]
+          for (let j = i + 1; j < particles.length; j++) {
+            const b = particles[j]
+            const dx = a.x - b.x
+            const dy = a.y - b.y
+            const d2 = dx * dx + dy * dy
+            if (d2 < linkDist2) {
+              const alpha = (1 - Math.sqrt(d2) / linkDist) * 0.5
+              ctx.strokeStyle = `rgba(${color}, ${alpha})`
+              ctx.beginPath()
+              ctx.moveTo(a.x, a.y)
+              ctx.lineTo(b.x, b.y)
+              ctx.stroke()
+            }
           }
         }
       }
@@ -139,7 +162,9 @@ export default function ParticleField({
 
     const loop = () => {
       raf = requestAnimationFrame(loop)
-      if (visible) draw()
+      // Skip the work — but keep the rAF alive so it resumes instantly — while
+      // the canvas is scrolled away or the tab is in the background.
+      if (visible && !document.hidden) draw()
     }
 
     if (reduced) draw()
@@ -147,8 +172,9 @@ export default function ParticleField({
 
     return () => {
       cancelAnimationFrame(raf)
+      window.clearTimeout(resizeTimer)
       io.disconnect()
-      window.removeEventListener('resize', resize)
+      window.removeEventListener('resize', onResize)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('pointerleave', onLeave)
     }

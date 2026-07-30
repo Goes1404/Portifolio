@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { shouldEnablePointerEffects, usePointerEffects } from '@/lib/device'
 
 /**
  * 3D tilt card. Tracks the pointer over the element and rotates it in 3D around
@@ -6,7 +7,10 @@ import { useRef } from 'react'
  * lifted inner layer (`[data-tilt-layer]`) that floats above the surface on the
  * Z axis for parallax depth. Eased back to flat on leave.
  *
- * Pure transforms (GPU-friendly). No-op on coarse pointers / reduced-motion.
+ * Pure transforms (GPU-friendly). On coarse pointers / reduced-motion it renders
+ * a plain wrapper: no handlers, no `preserve-3d` (which promotes the card and
+ * everything in it to its own layer), and no glare element — none of which can
+ * do anything useful without a hovering cursor.
  */
 export default function Tilt3D({
   children,
@@ -19,10 +23,9 @@ export default function Tilt3D({
   const ref = useRef(null)
   const glareRef = useRef(null)
   const raf = useRef(0)
+  const enabled = usePointerEffects()
 
-  const fineOk = () =>
-    window.matchMedia('(pointer: fine)').matches &&
-    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const fineOk = shouldEnablePointerEffects
 
   const onMove = (e) => {
     const el = ref.current
@@ -54,6 +57,14 @@ export default function Tilt3D({
     el.style.transition = 'transform 0.5s cubic-bezier(0.16,1,0.3,1)'
     el.style.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)'
     if (glareRef.current) glareRef.current.style.opacity = '0'
+  }
+
+  if (!enabled) {
+    return (
+      <div className={`tilt-3d ${className}`} {...rest}>
+        {children}
+      </div>
+    )
   }
 
   return (

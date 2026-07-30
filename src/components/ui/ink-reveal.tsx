@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useCallback } from "react";
+import { shouldEnablePointerEffects, usePointerEffects } from "@/lib/device";
 
 interface InkRevealProps {
   /** RGB color of the mask overlay, e.g. [252, 250, 248] */
@@ -58,6 +59,7 @@ export default function InkReveal({
   const runningRef = useRef(false);
   const lastPosRef = useRef<{ x: number; y: number } | null>(null);
   const dimsRef = useRef({ w: 0, h: 0 });
+  const pointerEffects = usePointerEffects();
 
   const mc = maskColor;
 
@@ -195,6 +197,14 @@ export default function InkReveal({
   }, [loop]);
 
   useEffect(() => {
+    // This effect is driven entirely by pointer *movement across* the element.
+    // A touchscreen has no hover, so on a phone the mask is painted once, fully
+    // opaque, and then never carved — it becomes an invisible full-section
+    // canvas that costs memory and a compositing layer while doing nothing at
+    // all. Skip it outright there (and under reduced-motion), and let the
+    // section's own background show through.
+    if (!shouldEnablePointerEffects()) return;
+
     resize();
     window.addEventListener("resize", resize);
 
@@ -235,6 +245,11 @@ export default function InkReveal({
       parent.removeEventListener("pointerleave", handlePointerLeave);
     };
   }, [resize, stampAlong, startLoop]);
+
+  // Don't render the canvas at all where the effect can't run — an opaque
+  // full-section element that never reveals anything would just hide the
+  // background it is supposed to be masking.
+  if (!pointerEffects) return null;
 
   return (
     <canvas

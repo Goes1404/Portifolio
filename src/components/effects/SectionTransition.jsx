@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { isTouch, prefersReducedMotion } from '@/lib/device'
 
 // Sections that get a transition when they become the centered one on scroll.
 // Order isn't important — the IntersectionObserver decides what's active.
@@ -24,6 +25,15 @@ const EASE = [0.76, 0, 0.24, 1] // strong in-out — reads as a deliberate sweep
  *
  * Honors prefers-reduced-motion (disabled) and ignores activations in the first
  * moments after mount so a page that loads scrolled mid-section doesn't flash.
+ *
+ * ── Why this is desktop-only ────────────────────────────────────────────────
+ * The wipe is a full-screen opaque panel. With a mouse wheel you cross a
+ * section boundary deliberately, every few seconds, and the sweep reads as a
+ * chapter break. A touch flick crosses two or three boundaries in one gesture,
+ * so on a phone the same effect means a panel slams over the content you were
+ * trying to read, repeatedly, while you're mid-scroll — you can't see where you
+ * are or where you're going. It's the single most disorienting thing on the page
+ * on mobile, so touch devices don't get it at all.
  */
 export default function SectionTransition() {
   const [trigger, setTrigger] = useState(null) // { key, num, label }
@@ -31,7 +41,7 @@ export default function SectionTransition() {
   const animatingRef = useRef(false)
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (prefersReducedMotion() || isTouch()) return
 
     const els = SECTIONS
       .map((s) => ({ ...s, el: document.getElementById(s.id) }))

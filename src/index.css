@@ -61,6 +61,25 @@
     --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* Stable viewport height unit.
+       `vh` on mobile means the LARGEST viewport (address bar hidden), so a
+       100vh pane is taller than what you can actually see, and every toolbar
+       show/hide re-lays-out the page mid-scroll. `svh` is the SMALLEST
+       viewport: it never changes during a scroll gesture, which is exactly
+       what a pinned pane needs. Falls back to `vh` on older browsers. */
+    --svh: 1vh;
+
+    /* Live height of the sticky header, written by App.jsx via ResizeObserver.
+       Pinned panes subtract it so they fill exactly the area the visitor can
+       actually see (see .pane-sticky). */
+    --header-h: 0px;
+  }
+
+  @supports (height: 1svh) {
+    :root {
+      --svh: 1svh;
+    }
   }
 
   html {
@@ -83,6 +102,39 @@
     text-rendering: optimizeLegibility;
     /* Kill the grey tap flash on touch — we provide our own active states */
     -webkit-tap-highlight-color: transparent;
+    /* Stop a scroll that reaches the end of the page from chaining into the
+       browser's pull-to-refresh / rubber-band, which on a long scroll-jacked
+       page fires constantly and feels like the page is fighting back. */
+    overscroll-behavior-y: none;
+  }
+
+  /* ── Scroll lock (see src/lib/scroll.js) ──────────────────────────────────
+     Applied to <html> rather than <body>, and without repositioning anything,
+     so the scroll offset is preserved and GSAP's pinned sections stay pinned
+     while an overlay is open. */
+  html[data-scroll-locked] {
+    overflow: hidden;
+    /* iOS needs the touch-action hint as well; `overflow: hidden` alone still
+       lets a touch drag rubber-band the document. */
+    touch-action: none;
+  }
+  html[data-scroll-locked] body {
+    overflow: hidden;
+  }
+  /* Regions that must stay scrollable inside a locked page opt back in. */
+  html[data-scroll-locked] [data-lenis-prevent],
+  html[data-scroll-locked] [data-scroll-lock-allow] {
+    touch-action: pan-y;
+    overscroll-behavior: contain;
+  }
+
+  /* Keyboard focus is the only way some visitors navigate this page, and the
+     dark surface swallows the default outline on several browsers. One
+     consistent branded ring, only for keyboard users. */
+  :focus-visible {
+    outline: 2px solid #6f97ff;
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   /* Media never overflows its container on small screens */
@@ -147,6 +199,95 @@
 }
 
 @layer utilities {
+  /* ─────────────────────────────────────────────────────────────
+     Pinned scroll panes & tracks
+
+     A "track" is a tall scrolling section; the "pane" inside it is the
+     sticky viewport-sized frame that stays put while the track scrolls
+     past. Both are sized from --svh so the mobile address bar can't shift
+     them mid-gesture.
+
+     Track lengths are deliberately much shorter on small screens. On a
+     phone, 280vh of hero + 400vh of chapters + 480vh of image sequence is
+     roughly thirteen screens of scroll-jacked content before you can reach
+     the projects — enough that visitors give up. Desktop keeps the long,
+     cinematic version; mobile gets the same choreography at a length you
+     can actually get through.
+     ───────────────────────────────────────────────────────────── */
+  /* A pinned pane sticks directly under the sticky header and fills the rest of
+     the visible area.
+
+     Subtracting the header height is not cosmetic. The header is in normal flow,
+     so a pane declared `top: 0; height: 100svh` comes to rest at y = header
+     height and its last `header-h` pixels fall below the fold — which is why
+     the hero's bottom marquee was completely invisible at page load, and why
+     anything a pane anchors to its bottom edge appeared cut off. */
+  .pane-sticky {
+    position: sticky;
+    top: var(--header-h, 0px);
+    height: calc(var(--svh) * 100 - var(--header-h, 0px));
+    overflow: hidden;
+  }
+
+  .track-hero {
+    height: calc(var(--svh) * 165);
+  }
+  .track-historia {
+    height: calc(var(--svh) * 230);
+  }
+  .track-expand {
+    height: calc(var(--svh) * 185);
+  }
+
+  @media (min-width: 768px) {
+    .track-hero {
+      height: calc(var(--svh) * 280);
+    }
+    .track-historia {
+      height: calc(var(--svh) * 400);
+    }
+    .track-expand {
+      height: calc(var(--svh) * 480);
+    }
+  }
+
+  /* Reduced motion: keep the panes pinned (sticky is layout, not animation) but
+     cut the tracks to the shortest length that still lets each beat be read.
+     Historia keeps a little more room than the others because its track has to
+     step through three chapters. */
+  @media (prefers-reduced-motion: reduce) {
+    .track-hero {
+      height: calc(var(--svh) * 110);
+    }
+    .track-historia {
+      height: calc(var(--svh) * 190);
+    }
+    .track-expand {
+      height: calc(var(--svh) * 120);
+    }
+  }
+
+  /* Hero parallax layers. `will-change` is declared here rather than inline so
+     it can be dropped when the parallax isn't running — an unused
+     `will-change: transform` still forces its own compositor layer, and five
+     large-type layers is real memory on a phone for no benefit. */
+  .hero-layer {
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-layer {
+      will-change: auto;
+    }
+  }
+
+  /* NOTE: `content-visibility: auto` is deliberately NOT used on this page.
+     It looks like an easy win for the long non-pinned sections, but an
+     off-screen element reports `contain-intrinsic-size` instead of its real
+     height. Several of those sections sit BETWEEN GSAP-pinned tracks, so the
+     placeholder height feeds a wrong document height into ScrollTrigger's
+     start/end calculations on first refresh — reintroducing exactly the pin
+     misalignment the rest of this work removes. */
+
   /* Display font (Boldonse) — used for big editorial headings */
   .font-display {
     font-family: 'Boldonse', 'Inter', system-ui, sans-serif;
@@ -165,8 +306,26 @@
   .text-brand {
     color: #2f6bff;
   }
+  .text-brand-cyan {
+    color: #38e0ff;
+  }
   .bg-brand {
     background-color: #2f6bff;
+  }
+  .bg-brand-cyan {
+    background-color: #38e0ff;
+  }
+
+  /* Static stand-in for the WebGL hero shader on phones / reduced-motion.
+     Same cold-blue palette and centre-weighted glow as the live shader, but
+     it's a handful of gradients the compositor paints once. */
+  .bg-hero-static {
+    background-color: #05070f;
+    background-image:
+      radial-gradient(78% 62% at 28% 38%, rgba(47, 107, 255, 0.34) 0%, transparent 62%),
+      radial-gradient(64% 54% at 82% 22%, rgba(56, 224, 255, 0.16) 0%, transparent 66%),
+      radial-gradient(90% 70% at 50% 108%, rgba(10, 31, 107, 0.55) 0%, transparent 70%),
+      linear-gradient(180deg, #060a18 0%, #05070f 100%);
   }
 
   /* Vertical metadata rail */
@@ -374,6 +533,12 @@
   }
   .link-underline:hover::after,
   .group:hover .link-underline::after { transform: scaleX(1); }
+  /* Scroll-spy: the nav item for the section you're in keeps its underline,
+     in the cyan accent so it reads as "you are here" rather than "hovered". */
+  .link-underline.is-current::after {
+    transform: scaleX(1);
+    background: #38e0ff;
+  }
 
   /* Fill sweep — brand color rises from the bottom (icon buttons / pills). */
   .icon-fill { position: relative; overflow: hidden; z-index: 0; }

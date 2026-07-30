@@ -259,13 +259,21 @@ void main(){gl_Position=position;}`;
 
   const resize = () => {
     if (!canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const dpr = Math.max(1, 0.5 * window.devicePixelRatio);
-    
-    canvas.width = window.innerWidth * dpr;
-    canvas.height = window.innerHeight * dpr;
-    
+
+    // Size to the canvas's own box rather than the window. The pane this sits in
+    // is sized in `svh`, so measuring the window would make the backing store
+    // taller than the element every time the mobile address bar is visible.
+    const rect = canvas.getBoundingClientRect();
+    const w = Math.max(1, Math.round((rect.width || window.innerWidth) * dpr));
+    const h = Math.max(1, Math.round((rect.height || window.innerHeight) * dpr));
+    if (canvas.width === w && canvas.height === h) return;
+
+    canvas.width = w;
+    canvas.height = h;
+
     if (rendererRef.current) {
       rendererRef.current.updateScale(dpr);
     }
@@ -323,10 +331,19 @@ void main(){gl_Position=position;}`;
       loop(0);
     }
 
-    window.addEventListener('resize', resize);
+    // Debounced: mobile fires `resize` on every address-bar transition, and
+    // reallocating a fullscreen WebGL backing store mid-scroll is a guaranteed
+    // dropped frame. `resize` itself also no-ops when the size is unchanged.
+    let resizeTimer = 0;
+    const onResize = () => {
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(resize, 150);
+    };
+    window.addEventListener('resize', onResize);
 
     return () => {
-      window.removeEventListener('resize', resize);
+      window.clearTimeout(resizeTimer);
+      window.removeEventListener('resize', onResize);
       io.disconnect();
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);

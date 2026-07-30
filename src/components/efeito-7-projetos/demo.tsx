@@ -1,6 +1,9 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { X, ExternalLink, Code2, Play, FileText } from "lucide-react";
+import { lockScroll, unlockScroll } from "@/lib/scroll";
+import { useFocusTrap } from "@/lib/hooks";
+import { useReducedMotion } from "@/lib/device";
 
 // ── Project data ─────────────────────────────────────────────────────────────
 interface Project {
@@ -187,47 +190,31 @@ function ExpandedProjectCard({
   onClose: () => void;
   onPlay: (project: Project) => void;
 }) {
-  const modalRef = useRef<HTMLDivElement>(null);
-
-  // Prevenir rolagem da página por baixo da modal (incluindo Lenis)
+  // Bloqueia a rolagem da página atrás da modal.
+  //
+  // A versão anterior registava um `touchmove` não-passivo no window e chamava
+  // preventDefault em tudo que não estivesse dentro da área rolável. Isso tem
+  // dois problemas no mobile: um listener não-passivo de touchmove no window
+  // impede o navegador de tratar o gesto na thread de composição (ou seja,
+  // deixa TODA a rolagem da página mais pesada enquanto a modal existe), e
+  // cancelar o gesto por JS quebra o momentum nativo dentro da própria modal.
+  // O lock centralizado (src/lib/scroll.js) resolve via CSS, sem tocar no
+  // gesto, e também pausa o Lenis no desktop — que era o motivo original do
+  // hack.
   useEffect(() => {
-    // 1. Bloquear o scroll nativo
-    document.body.style.overflow = "hidden";
+    lockScroll();
+    return () => unlockScroll();
+  }, []);
 
-    // 2. Prevenir eventos de wheel e touch que sobem para o window (essencial para parar o Lenis)
-    const preventScroll = (e: Event) => {
-      const target = e.target as HTMLElement;
-      const isInsideScrollable = target.closest(".scrollable-modal-content");
-      if (isInsideScrollable) {
-        // Se estiver rolando dentro da modal, não impede a rolagem interna, mas para a propagação
-        e.stopPropagation();
-      } else {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-
-    window.addEventListener("wheel", preventScroll, { passive: false });
-    window.addEventListener("touchmove", preventScroll, { passive: false });
-
-    // Fechar ao pressionar Escape
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("wheel", preventScroll);
-      window.removeEventListener("touchmove", preventScroll);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onClose]);
+  // Escape para fechar + foco preso dentro da modal enquanto ela está aberta.
+  const dialogRef = useFocusTrap(true, onClose);
 
   return (
     <div
-      ref={modalRef}
       className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Detalhes do projeto ${project.title}`}
     >
       {/* Backdrop escuro com desfoque de alta fidelidade */}
       <motion.div
@@ -238,10 +225,16 @@ function ExpandedProjectCard({
         onClick={onClose}
       />
 
-      {/* Container Principal Expandido com Layout Compartilhado */}
+      {/* Container Principal Expandido com Layout Compartilhado.
+          Altura máxima em --svh: com vh a modal fica mais alta que a área
+          visível sempre que a barra de endereço do mobile está à mostra, e o
+          rodapé com os botões de ação cai fora da tela. */}
       <motion.div
+        ref={dialogRef}
+        tabIndex={-1}
         layoutId={`card-container-${project.id}`}
-        className="relative w-full max-w-4xl bg-[#0a0e1c] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh] z-10"
+        className="relative z-10 flex w-full max-w-4xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0a0e1c] shadow-2xl md:flex-row"
+        style={{ maxHeight: 'calc(var(--svh) * 90)' }}
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
       >
         {/* Lado Esquerdo: Imagem Cover com efeito glow dinâmico */}
@@ -269,9 +262,10 @@ function ExpandedProjectCard({
         <div className="flex-1 p-6 md:p-10 flex flex-col justify-between overflow-hidden">
           
           {/* Div com scroll para o conteúdo de texto */}
-          <div 
+          <div
             data-lenis-prevent
-            className="scrollable-modal-content overflow-y-auto flex-1 pr-2 scrollbar-thin scrollbar-thumb-slate-800 scrollbar-track-transparent"
+            data-scroll-lock-allow
+            className="scrollable-modal-content flex-1 overflow-y-auto overscroll-contain pr-2"
           >
             {/* Cabeçalho */}
             <div className="flex justify-between items-start gap-4">
@@ -444,15 +438,20 @@ function ProjectCard({
   // Lives on a WRAPPER (not the layoutId article) so the expand projection
   // never fights the scroll transform.
   const wrapRef = useRef<HTMLDivElement>(null);
+  const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({
     target: wrapRef,
     offset: ["start end", "center 62%"],
   });
-  const scale = useTransform(scrollYProgress, [0, 1], [0.84, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [0.25, 1]);
+  // Start closer to the final state. At 0.84 scale / 0.25 opacity the cards in
+  // a single-column mobile grid spend most of their time on screen visibly
+  // small and half-transparent, because one card fills the viewport and so
+  // never reaches the end of its own scroll range while you're reading it.
+  const scale = useTransform(scrollYProgress, [0, 1], [0.94, 1]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [0.55, 1]);
 
   return (
-    <motion.div ref={wrapRef} style={{ scale, opacity }} className="will-change-transform">
+    <motion.div ref={wrapRef} style={reduced ? undefined : { scale, opacity }}>
     <motion.article
       layoutId={`card-container-${project.id}`}
       className={`group relative overflow-hidden rounded-2xl cursor-pointer bg-[#0a0e1c] border ${
