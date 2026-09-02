@@ -1,0 +1,144 @@
+/* ── Portrait reveal: grayscale → color spotlight ─────────────────────────── */
+/* Animatable spotlight radius (needs @property, so it lives at top level). */
+@property --pr-r {
+  syntax: '<length-percentage>';
+  inherits: true;
+  initial-value: 0%;
+}
+
+.portrait-reveal {
+  --px: 50%;
+  --py: 34%;
+  --pr-r: 0%;
+  position: relative;
+  display: block;
+  margin: 0;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #05070f;
+  isolation: isolate;
+}
+.portrait-reveal img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 30%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.portrait-reveal__base {
+  z-index: 1;
+  filter: grayscale(1) contrast(1.05) brightness(0.9);
+  transition: filter 0.6s ease, transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.portrait-reveal__color {
+  z-index: 2;
+  transform: scale(1.05);
+  transition: --pr-r 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  -webkit-mask-image: radial-gradient(
+    circle var(--pr-r) at var(--px) var(--py),
+    #000 0,
+    #000 62%,
+    rgba(0, 0, 0, 0) 78%
+  );
+  mask-image: radial-gradient(
+    circle var(--pr-r) at var(--px) var(--py),
+    #000 0,
+    #000 62%,
+    rgba(0, 0, 0, 0) 78%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+.portrait-reveal.is-active {
+  --pr-r: 64%;
+}
+.portrait-reveal.is-active .portrait-reveal__base {
+  transform: scale(1.07);
+  filter: grayscale(1) contrast(1.05) brightness(0.7);
+}
+.portrait-reveal.is-active .portrait-reveal__color {
+  transform: scale(1);
+}
+
+/* Spotlight glow that follows the pointer */
+.portrait-reveal__ring {
+  position: absolute;
+  left: var(--px);
+  top: var(--py);
+  z-index: 3;
+  width: 2px;
+  height: 2px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+.portrait-reveal.is-active:not(.is-reduced) .portrait-reveal__ring {
+  opacity: 1;
+  box-shadow: 0 0 60px 30px rgba(47, 107, 255, 0.1),
+    0 0 140px 70px rgba(56, 224, 255, 0.06);
+}
+
+/* Frame vignette */
+.portrait-reveal__frame {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 -120px 90px -60px rgba(5, 7, 15, 0.9);
+}
+.portrait-reveal__cap {
+  position: absolute;
+  left: 1rem;
+  bottom: 0.9rem;
+  z-index: 5;
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(233, 237, 247, 0.78);
+  pointer-events: none;
+}
+.portrait-reveal__hint {
+  position: absolute;
+  right: 0.9rem;
+  top: 0.9rem;
+  z-index: 5;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(5, 7, 15, 0.45);
+  backdrop-filter: blur(4px);
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(233, 237, 247, 0.55);
+  pointer-events: none;
+  transition: opacity 0.35s ease;
+}
+.portrait-reveal.is-active .portrait-reveal__hint {
+  opacity: 0;
+}
+
+/* Reduced motion: no spotlight, just a clean crossfade to full color */
+.portrait-reveal.is-reduced .portrait-reveal__color {
+  -webkit-mask-image: none;
+  mask-image: none;
+  opacity: 0;
+  transform: scale(1);
+  transition: opacity 0.4s ease;
+}
+.portrait-reveal.is-reduced.is-active .portrait-reveal__color {
+  opacity: 1;
+}

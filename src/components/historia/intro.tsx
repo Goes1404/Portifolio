@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import ScrollReveal from '@/components/effects/ScrollReveal';
+import PortraitReveal from '@/components/effects/PortraitReveal';
 
 const STATS = [
   { value: 'FIAP',        label: 'Engenharia de Software',  sub: 'conclusão em 2028' },
@@ -117,9 +118,18 @@ export default function HistoriaIntro() {
             </motion.div>
           </div>
 
-          {/* ── RIGHT: stats — each card unmasks with a clip-path curtain ── */}
-          <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
-            {STATS.map((s, i) => (
+          {/* ── RIGHT: portrait (B&W → color spotlight) + stats ── */}
+          <div className="flex flex-col gap-6">
+            {/* Portrait — grayscale that blooms into color as you hover/touch */}
+            <PortraitReveal
+              src="/me/portrait.webp"
+              alt="Matheus Goes da Silva"
+              caption="Matheus · São Paulo"
+            />
+
+            {/* Stats — each card unmasks with a clip-path curtain */}
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+              {STATS.map((s, i) => (
               <ScrollReveal
                 key={s.value}
                 direction="up"
@@ -149,7 +159,8 @@ export default function HistoriaIntro() {
                   </div>
                 </div>
               </ScrollReveal>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </motion.div>
