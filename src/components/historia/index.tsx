@@ -52,7 +52,7 @@ const CHAPTERS = [
 // Mobile floor kept low (1.85rem) so wide 10-char words like AUTODIDATA/CONSTRUTOR
 // fit on a 320–375px screen without the whitespace-nowrap line clipping.
 const KW_FS = 'clamp(1.5rem, 6.2vw, 6.8rem)';
-const KW_H  = 'clamp(1.7rem, 6.9vw, 7.5rem)'; // 1.1 × KW_FS
+const KW_H  = 'clamp(1.95rem, 7.6vw, 7.5rem)'; // ≈1.2 × KW_FS — room for descenders on phones
 
 const EASE_IN  = [0.16, 1, 0.3, 1]    as const;
 const EASE_OUT = [0.4,  0, 0.6, 1]    as const;
@@ -268,8 +268,7 @@ export default function HistoriaSection() {
                     className="flex flex-wrap gap-2"
                     variants={TAGS_STAGGER}
                     initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+                    animate="show"
                   >
                     {ch.tags.map((tag) => {
                       const c = TAG_COLORS[tag] ?? ch.accent;
@@ -308,7 +307,8 @@ export default function HistoriaSection() {
                 bwSrc={FOTO_PB}
                 colorSrc={FOTO_COLOR}
                 alt="Matheus Goes da Silva"
-                hint="passe o mouse · arraste o dedo"
+                hint="passe o mouse"
+                touchHint="toque e arraste"
               />
               <figcaption className="mt-3 hidden font-code text-[10px] uppercase tracking-[0.3em] text-white/30 md:block">
                 preto &amp; branco&nbsp;&nbsp;⇄&nbsp;&nbsp;cor

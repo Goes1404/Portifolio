@@ -218,7 +218,7 @@ export default function ScrollExpandMedia({
   return (
     // No overflow-x here — that breaks position:sticky in Chromium.
     // The sticky inner div has overflow:hidden which handles clipping.
-    <div ref={trackRef} className="relative bg-[#05070f]" style={{ height: '480vh' }}>
+    <div ref={trackRef} className="relative h-[320vh] bg-[#05070f] md:h-[480vh]">
 
       {/* ── Pinned viewport ─────────────────────────────────── */}
       <div className="sticky top-0 h-screen overflow-hidden">
@@ -230,7 +230,7 @@ export default function ScrollExpandMedia({
           {/* Blurred, darkened still — composited once, then cached by the GPU */}
           <div
             aria-hidden
-            className="absolute inset-0 scale-110 bg-cover bg-center"
+            className="keep-blur absolute inset-0 scale-110 bg-cover bg-center"
             style={{
               backgroundImage: `url(${bgImageSrc})`,
               filter: 'blur(28px) brightness(0.42) saturate(1.15)',

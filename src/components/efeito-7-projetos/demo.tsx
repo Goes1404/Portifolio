@@ -45,6 +45,20 @@ const PROJECTS: Project[] = [
     ],
   },
   {
+    id: 12,
+    title: "Astro Soluções",
+    subtitle: "Agência · Sites, sistemas e automações sob medida",
+    description:
+      "Site institucional da Astro Soluções, que constrói sites, sistemas web, robôs de WhatsApp, cobrança automática e painéis em tempo real para empresas que precisam sair do manual. Hero em órbita com foguete e Terra, seções de serviços, processo e agendamento de diagnóstico — pensado para converter.",
+    cover: "/projects/astro-solucoes.jpg",
+    tags: ["React", "TypeScript", "Tailwind", "Motion", "Landing page", "Netlify"],
+    accentHex: "#6f97ff",
+    year: "2026",
+    kind: "Cliente real",
+    featured: true,
+    liveUrl: "https://astrosolucoes.netlify.app",
+  },
+  {
     id: 10,
     title: "Next Home",
     subtitle: "Imobiliária · Alphaville, Barueri e região",

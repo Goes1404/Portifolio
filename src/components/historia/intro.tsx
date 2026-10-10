@@ -185,8 +185,8 @@ export default function HistoriaIntro() {
                 <div className="index-row group relative px-5 py-6 lg:px-7 lg:py-7">
                   <span className="font-code text-[10px] tracking-[0.3em] text-white/30">0{i + 1}</span>
                   <div
-                    className="mt-3 font-display leading-none text-[#e9edf7] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1"
-                    style={{ fontSize: 'clamp(1.35rem, 2.6vw, 1.9rem)' }}
+                    className="mt-3 font-display leading-[1.05] text-[#e9edf7] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1"
+                    style={{ fontSize: 'clamp(1.15rem, 4.2vw, 1.9rem)' }}
                   >
                     {s.value}
                   </div>

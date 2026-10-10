@@ -25,6 +25,13 @@ export interface HeroProps {
 }
 
 // Reusable Shader Background Hook
+// Render scale: half the device ratio on desktop (min 1), and a fixed 0.75 on
+// small/touch screens where a full-screen fragment shader is the dominant cost.
+const shaderDpr = () =>
+  window.matchMedia('(max-width: 767px), (pointer: coarse)').matches
+    ? 0.75
+    : Math.max(1, 0.5 * window.devicePixelRatio);
+
 export const useShaderBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number>();
@@ -58,7 +65,7 @@ void main(){gl_Position=position;}`;
       this.canvas = canvas;
       this.scale = scale;
       this.gl = canvas.getContext('webgl2')!;
-      this.gl.viewport(0, 0, canvas.width * scale, canvas.height * scale);
+      this.gl.viewport(0, 0, canvas.width, canvas.height);
       this.shaderSource = defaultShaderSource;
     }
 
@@ -87,7 +94,7 @@ void main(){gl_Position=position;}`;
 
     updateScale(scale: number) {
       this.scale = scale;
-      this.gl.viewport(0, 0, this.canvas.width * scale, this.canvas.height * scale);
+      this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
     }
 
     compile(shader: WebGLShader, source: string) {
@@ -261,7 +268,7 @@ void main(){gl_Position=position;}`;
     if (!canvasRef.current) return;
     
     const canvas = canvasRef.current;
-    const dpr = Math.max(1, 0.5 * window.devicePixelRatio);
+    const dpr = shaderDpr();
     
     canvas.width = window.innerWidth * dpr;
     canvas.height = window.innerHeight * dpr;
@@ -295,7 +302,7 @@ void main(){gl_Position=position;}`;
     if (!canvas.getContext('webgl2')) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const dpr = Math.max(1, 0.5 * window.devicePixelRatio);
+    const dpr = shaderDpr();
 
     rendererRef.current = new WebGLRenderer(canvas, dpr);
     pointersRef.current = new PointerHandler(canvas, dpr);

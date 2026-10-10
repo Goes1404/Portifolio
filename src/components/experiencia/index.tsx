@@ -136,12 +136,12 @@ function Row({ exp, index, open, onToggle, onHover }: {
             )}
           </span>
           <span
-            className="mt-2 block font-display leading-[1.05] text-[#e9edf7] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2"
+            className="mt-2 block font-display leading-[1.12] text-[#e9edf7] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2"
             style={{ fontSize: 'clamp(1.2rem, 3.2vw, 2.4rem)' }}
           >
             {exp.role}
           </span>
-          <span className="mt-1 block font-code text-[11px] tracking-widest text-white/45 md:hidden">
+          <span className="mt-2 block font-code text-[11px] tracking-widest text-white/45 md:hidden">
             {exp.company} <span className="text-white/20">·</span> {exp.type}
           </span>
         </span>

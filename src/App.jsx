@@ -155,19 +155,24 @@ function App() {
   useEffect(() => {
     const track = heroTrackRef.current
     if (!track) return
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia()
+    // Desktop: deep parallax — each line on its own plane.
+    // Phones: the lines stay grouped (a tall viewport pulls them apart otherwise)
+    // and the whole block drifts up a little while the veil clears.
+    mm.add({ desktop: '(min-width: 768px)', phone: '(max-width: 767px)' }, (c) => {
+      const d = c.conditions.desktop
       const tl = gsap.timeline({
         scrollTrigger: { trigger: track, start: 'top top', end: 'bottom bottom', scrub: 1.5 },
       })
-      tl.to('[data-hero-layer="meta"]',    { y: '-90vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line1"]',   { y: '-75vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line2"]',   { y: '-55vh', x: '2.5vw', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line3"]',   { y: '-35vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="tagline"]', { y: '-15vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="meta"]',    { y: d ? '-90vh' : '-34vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line1"]',   { y: d ? '-75vh' : '-30vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line2"]',   { y: d ? '-55vh' : '-27vh', x: d ? '2.5vw' : '1.5vw', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line3"]',   { y: d ? '-35vh' : '-24vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="tagline"]', { y: d ? '-15vh' : '-18vh', ease: 'none' }, 0)
       tl.to('[data-hero-layer="veil"]',    { opacity: 0.55, ease: 'none' }, 0)
       tl.to('[data-hero-layer="cue"]',     { opacity: 0, ease: 'none', duration: 0.25 }, 0)
-    }, track)
-    return () => ctx.revert()
+    })
+    return () => mm.revert()
   }, [])
 
   const handleNav = useCallback((e, href) => {
@@ -198,8 +203,7 @@ function App() {
       <main
         id="top"
         ref={heroTrackRef}
-        className="relative bg-grain bg-[#05070f]"
-        style={{ height: '240vh' }}
+        className="relative h-[170vh] bg-grain bg-[#05070f] md:h-[240vh]"
       >
         <div className="sticky top-0 h-screen overflow-hidden">
           <ShaderBackground className="pointer-events-none absolute inset-0 z-0" />
@@ -347,7 +351,7 @@ function App() {
           </motion.div>
 
           <h2
-            className="mt-8 font-display text-[13vw] leading-[1.02] text-[#e9edf7] sm:text-6xl md:text-8xl"
+            className="mt-8 font-display text-[13vw] leading-[1.2] text-[#e9edf7] sm:text-6xl sm:leading-[1.04] md:text-8xl"
             aria-label="Vamos construir algo juntos?"
           >
             <SplitReveal as="span" className="block">Vamos construir</SplitReveal>
