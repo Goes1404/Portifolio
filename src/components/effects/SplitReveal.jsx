@@ -70,7 +70,7 @@ export default function SplitReveal({
     }
 
     const ctx = gsap.context(() => {
-      gsap.set(chars, { yPercent: 110, opacity: 0, rotate: 6, filter: 'blur(6px)' })
+      gsap.set(chars, { yPercent: 150, opacity: 0, rotate: 6, filter: 'blur(6px)' })
       gsap.to(chars, {
         yPercent: 0,
         opacity: 1,

@@ -46,7 +46,7 @@ const companies = [
 // --- Utility for fallback images ---
 const safeImage = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
   const target = e.target as HTMLImageElement;
-  target.src = "https://placehold.co/100x100/E0E7FF/4338CA?text=Error";
+  target.style.visibility = "hidden";
 };
 
 // --- Custom hook for responsive detection ---
@@ -188,6 +188,18 @@ export default function OrbitCarousel() {
         style={{ width: containerSize, height: containerSize }}
       >
 
+        {/* Orbit ring — makes the path legible */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute rounded-full border border-dashed border-white/[0.12]"
+          style={{ width: containerRadius * 2, height: containerRadius * 2, left: `calc(50% - ${containerRadius}px)`, top: `calc(50% - ${containerRadius}px)` }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute rounded-full"
+          style={{ width: containerRadius * 1.3, height: containerRadius * 1.3, left: `calc(50% - ${containerRadius * 0.65}px)`, top: `calc(50% - ${containerRadius * 0.65}px)`, background: 'radial-gradient(circle, rgba(47,107,255,0.22), transparent 70%)', filter: 'blur(20px)' }}
+        />
+
         {/* Active Person Card */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -200,13 +212,13 @@ export default function OrbitCarousel() {
               stiffness: 300,
               damping: 25
             }}
-            className={`z-10 bg-white/[0.025] backdrop-blur-md shadow-2xl rounded-xl p-3 sm:p-4 ${cardWidth} text-center border border-white/[0.07]`}
+            className={`z-10 bg-[#0a0e1c]/80 backdrop-blur-md shadow-[0_30px_80px_-30px_rgba(47,107,255,0.45)] rounded-2xl p-3 sm:p-4 ${cardWidth} text-center border border-white/[0.09]`}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.3, delay: 0.1 }}
-              className={`${avatarSize} ${avatarMargin} mx-auto flex items-center justify-center overflow-hidden rounded-full bg-white p-2.5 ring-4 ring-[#0a0e1c] shadow-xl`}
+              className={`${avatarSize} ${avatarMargin} mx-auto flex items-center justify-center overflow-hidden rounded-full bg-white p-2.5 ring-4 ring-[#0a0e1c] shadow-[0_0_0_1px_rgba(47,107,255,0.5),0_12px_30px_-10px_rgba(47,107,255,0.6)]`}
             >
               <img
                 src={companies[activeIndex].profile}
@@ -305,7 +317,7 @@ export default function OrbitCarousel() {
                     boxShadow: "0 14px 32px -6px rgba(47,107,255,0.4)",
                   }}
                   whileTap={{ scale: 0.95 }}
-                  className={`flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white p-2.5 shadow-lg ring-1 transition-colors duration-300 ${
+                  className={`flex h-full w-full cursor-pointer items-center justify-center overflow-hidden rounded-full bg-white p-2.5 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.8)] ring-1 grayscale transition-all duration-500 hover:grayscale-0 ${
                     isActive
                       ? "ring-2 ring-[#2f6bff]"
                       : "ring-white/15 hover:ring-[#2f6bff]/60"

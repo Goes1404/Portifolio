@@ -304,8 +304,8 @@
     display: inline-block;
     overflow: hidden;
     vertical-align: top;
-    padding: 0.08em 0; /* room for blur + rotation without clipping glyphs */
-    margin: -0.08em 0;
+    padding: 0.22em 0 0.26em; /* room for descenders (g, j, p) + the rotation/blur */
+    margin: -0.22em 0 -0.26em;
   }
   .sr-char {
     display: inline-block;
@@ -397,5 +397,106 @@
     .link-underline::after,
     .icon-fill::before,
     .cta-press { transition: none; }
+  }
+  /* ─────────────────────────────────────────────────────────────
+     Shell additions — preloader, marquee, aurora, editorial rows
+     ───────────────────────────────────────────────────────────── */
+
+  /* Outlined display text (paired with filled words in the big marquee) */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(233, 237, 247, 0.55);
+  }
+
+  .animate-marquee-slow {
+    animation: marquee 48s linear infinite;
+  }
+
+  /* Hero scroll cue — a short dash that falls down a hairline */
+  @keyframes scroll-cue {
+    0%   { transform: translateY(-100%); opacity: 0; }
+    30%  { opacity: 1; }
+    100% { transform: translateY(200%); opacity: 0; }
+  }
+  .scroll-cue {
+    animation: scroll-cue 1.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+
+  /* Animated aurora — three drifting blurred blobs, pure CSS (no WebGL) */
+  @keyframes aurora-a {
+    0%, 100% { transform: translate(-10%, -10%) scale(1); }
+    50%      { transform: translate(12%, 8%) scale(1.15); }
+  }
+  @keyframes aurora-b {
+    0%, 100% { transform: translate(10%, 10%) scale(1.1); }
+    50%      { transform: translate(-8%, -12%) scale(0.95); }
+  }
+  @keyframes aurora-c {
+    0%, 100% { transform: translate(0%, 12%) scale(0.9) rotate(0deg); }
+    50%      { transform: translate(6%, -6%) scale(1.2) rotate(25deg); }
+  }
+  .aurora {
+    overflow: hidden;
+    filter: blur(70px) saturate(1.2);
+    opacity: 0.55;
+  }
+  .aurora::before,
+  .aurora::after,
+  .aurora > i {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    will-change: transform;
+  }
+  .aurora::before {
+    left: 10%; top: 10%; width: 48vw; height: 48vw;
+    background: radial-gradient(circle, rgba(47, 107, 255, 0.55), transparent 62%);
+    animation: aurora-a 22s ease-in-out infinite;
+  }
+  .aurora::after {
+    right: 5%; bottom: -10%; width: 42vw; height: 42vw;
+    background: radial-gradient(circle, rgba(56, 224, 255, 0.4), transparent 62%);
+    animation: aurora-b 26s ease-in-out infinite;
+  }
+  .aurora > i {
+    left: 40%; top: 30%; width: 36vw; height: 36vw;
+    background: radial-gradient(circle, rgba(111, 151, 255, 0.35), transparent 62%);
+    animation: aurora-c 30s ease-in-out infinite;
+  }
+
+  /* Dot grid */
+  .bg-dots {
+    background-image: radial-gradient(rgba(233, 237, 247, 0.18) 1px, transparent 1.2px);
+    background-size: 28px 28px;
+  }
+
+  /* Editorial index rows (Experiência / Projetos) — hover fill wipes in from the left */
+  .index-row {
+    position: relative;
+    isolation: isolate;
+  }
+  .index-row::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgba(47, 107, 255, 0.10), rgba(47, 107, 255, 0.02) 60%, transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.6s var(--ease-out-expo);
+  }
+  .index-row:hover::before,
+  .index-row[data-open="true"]::before {
+    transform: scaleX(1);
+  }
+
+  /* Hide scrollbars inside horizontal scrollers */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora::before, .aurora::after, .aurora > i, .scroll-cue, .animate-marquee-slow {
+      animation: none !important;
+    }
   }
 }

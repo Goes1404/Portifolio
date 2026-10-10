@@ -1,4 +1,5 @@
 import { motion, useReducedMotion, type Variants } from 'framer-motion'
+import SectionHead from '@/components/ui/section-head'
 
 // ─────────────────────────────────────────────────────────────────────────
 //  Minhas habilidades (baseado no CV + o que uso de fato).
@@ -8,11 +9,12 @@ import { motion, useReducedMotion, type Variants } from 'framer-motion'
 //  Para editar: adicione/remova itens abaixo. Cor opcional = chip neutro.
 // ─────────────────────────────────────────────────────────────────────────
 type Skill = { name: string; color?: string }
-type Group = { label: string; muted?: boolean; skills: Skill[] }
+type Group = { label: string; note?: string; muted?: boolean; skills: Skill[] }
 
 const GROUPS: Group[] = [
   {
     label: 'Front-end',
+    note: 'Interfaces que carregam rápido e convertem.',
     skills: [
       { name: 'HTML5', color: '#e44d26' },
       { name: 'CSS3', color: '#2196f3' },
@@ -25,6 +27,7 @@ const GROUPS: Group[] = [
   },
   {
     label: 'Back-end & Dados',
+    note: 'APIs, bancos relacionais e lógica de negócio.',
     skills: [
       { name: 'Node.js', color: '#6cc24a' },
       { name: 'Python', color: '#ffd43b' },
@@ -35,6 +38,7 @@ const GROUPS: Group[] = [
   },
   {
     label: 'Dados & Tráfego',
+    note: 'Métrica vira decisão.',
     skills: [
       { name: 'Power BI', color: '#f2c811' },
       { name: 'Análise de Dados', color: '#a78bfa' },
@@ -44,6 +48,7 @@ const GROUPS: Group[] = [
   },
   {
     label: 'Infra & Ferramentas',
+    note: 'A base que aprendi na Thales.',
     skills: [
       { name: 'Git & GitHub', color: '#f0652f' },
       { name: 'Infraestrutura de TI', color: '#34d399' },
@@ -68,22 +73,16 @@ const GROUPS: Group[] = [
 
 const container: Variants = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.045, delayChildren: 0.08 } },
+  show: { transition: { staggerChildren: 0.045, delayChildren: 0.05 } },
 }
 
 // Each item rises from below, pops with a spring, and resolves out of blur.
 const item: Variants = {
-  hidden: { opacity: 0, y: 46, scale: 0.78, filter: 'blur(6px)' },
+  hidden: { opacity: 0, y: 36, scale: 0.8, filter: 'blur(6px)' },
   show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    filter: 'blur(0px)',
+    opacity: 1, y: 0, scale: 1, filter: 'blur(0px)',
     transition: {
-      type: 'spring',
-      stiffness: 320,
-      damping: 17,
-      mass: 0.6,
+      type: 'spring', stiffness: 320, damping: 17, mass: 0.6,
       opacity: { duration: 0.35, ease: 'easeOut' },
       filter: { duration: 0.5, ease: 'easeOut' },
     },
@@ -120,40 +119,67 @@ function Chip({ name, color }: Skill) {
   )
 }
 
+/**
+ * Skills — an editorial ledger: each group is a hairline row with its index
+ * and note on the left, chips on the right. Same chip language as História.
+ */
 export default function SkillsShowcase() {
   const reduce = useReducedMotion()
+  const total = GROUPS.reduce((n, g) => n + g.skills.length, 0)
   return (
-    <section className="relative overflow-hidden bg-[#05070f] px-6 pb-28 pt-2 md:pb-36">
-      {/* colorful ambient glows */}
+    <section id="skills" className="relative scroll-mt-20 overflow-hidden bg-[#05070f] px-6 py-24 sm:px-8 md:py-36">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-6 -top-6 select-none font-display text-[30vw] leading-none text-white/[0.03] md:text-[18vw]"
+      >
+        04
+      </span>
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-32 top-6 h-80 w-80 rounded-full opacity-[0.13] blur-3xl"
+        className="pointer-events-none absolute -left-32 top-1/3 h-96 w-96 rounded-full opacity-[0.12] blur-3xl"
         style={{ background: 'radial-gradient(circle, #2f6bff, transparent 70%)' }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 bottom-8 h-80 w-80 rounded-full opacity-[0.12] blur-3xl"
-        style={{ background: 'radial-gradient(circle, #38e0ff, transparent 70%)' }}
-      />
 
-      <motion.div
-        variants={reduce ? undefined : container}
-        initial={reduce ? false : 'hidden'}
-        whileInView="show"
-        viewport={{ once: true, margin: '-12% 0px -12% 0px' }}
-        className="relative mx-auto flex max-w-5xl flex-wrap items-center gap-x-3 gap-y-3"
-      >
-        {GROUPS.flatMap((g, gi) => [
-          <motion.div
-            key={g.label}
-            variants={item}
-            className={`w-full ${gi === 0 ? '' : 'mt-7'} ${g.muted ? 'mt-10 border-t border-white/[0.06] pt-10' : ''}`}
-          >
-            <span className="font-code text-[11px] uppercase tracking-[0.32em] text-white/40">{g.label}</span>
-          </motion.div>,
-          ...g.skills.map((s) => <Chip key={`${g.label}-${s.name}`} {...s} />),
-        ])}
-      </motion.div>
+      <div className="relative mx-auto max-w-6xl">
+        <SectionHead
+          num="04"
+          kicker="Stack & ferramentas"
+          title={['Como eu', <span key="b" className="text-[#38e0ff]">construo</span>]}
+          aside={
+            <p className="font-code text-[11px] leading-relaxed tracking-[0.2em] text-white/40">
+              {total} FERRAMENTAS · {GROUPS.length} FRENTES<br />
+              DO FRONT AO DADO
+            </p>
+          }
+          lead="O ecossistema de tecnologias com que trabalho no dia a dia."
+        />
+
+        <div className="mt-16 border-b rule md:mt-20">
+          {GROUPS.map((g, gi) => (
+            <motion.div
+              key={g.label}
+              variants={reduce ? undefined : container}
+              initial={reduce ? false : 'hidden'}
+              whileInView="show"
+              viewport={{ once: true, margin: '-10% 0px -10% 0px' }}
+              className={`grid grid-cols-1 gap-5 border-t rule py-8 md:grid-cols-[14rem_1fr] md:gap-12 md:py-10 ${g.muted ? 'opacity-80' : ''}`}
+            >
+              <motion.div variants={item} className="flex items-start gap-4 md:flex-col md:gap-3">
+                <span className="font-display text-sm leading-none text-[#2f6bff]">{String(gi + 1).padStart(2, '0')}</span>
+                <div>
+                  <span className="block font-code text-[11px] uppercase tracking-[0.32em] text-white/60">{g.label}</span>
+                  {g.note && (
+                    <span className="mt-2 hidden font-editorial text-base italic leading-snug text-white/35 md:block">{g.note}</span>
+                  )}
+                </div>
+              </motion.div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-3">
+                {g.skills.map((s) => <Chip key={`${g.label}-${s.name}`} {...s} />)}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </section>
   )
 }
