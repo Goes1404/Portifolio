@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import ScrollReveal from '@/components/effects/ScrollReveal';
 import Magnetic from '@/components/effects/Magnetic';
-import Tilt3D from '@/components/effects/Tilt3D';
 import ParticleField from '@/components/effects/ParticleField';
 import InkReveal from '@/components/ui/ink-reveal';
 
@@ -19,7 +18,7 @@ const rise = {
   hidden: { opacity: 0, y: 48, filter: 'blur(12px)' },
   show: {
     opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] as const },
   },
 };
 
@@ -39,13 +38,11 @@ export default function HistoriaIntro() {
   });
 
   // Float in from below + settle, hold, then drift up on the way out (parallax).
-  const envY     = useTransform(scrollYProgress, [0, 0.2, 0.62, 1], [24, 0, 0, -120]);
+  const envY     = useTransform(scrollYProgress, [0, 0.2, 0.75, 1], [24, 0, 0, -80]);
   // Subtle depth — eases in, then recedes slightly as it leaves.
-  const envScale = useTransform(scrollYProgress, [0, 0.2, 0.62, 1], [0.99, 1, 1, 0.97]);
-  // Opacity is owned by the exit only (the entry fade belongs to the cascade).
-  const envOpacity = useTransform(scrollYProgress, [0.7, 0.95], [1, 0]);
-  // Soft defocus as the block exits the top of the viewport.
-  const envBlur  = useTransform(scrollYProgress, [0.72, 0.97], ['blur(0px)', 'blur(6px)']);
+  const envScale = useTransform(scrollYProgress, [0, 0.2, 0.75, 1], [0.99, 1, 1, 0.98]);
+  // Opacity is owned by the exit only, and only once the block is truly leaving.
+  const envOpacity = useTransform(scrollYProgress, [0.88, 1], [1, 0]);
 
   return (
     <section
@@ -82,7 +79,7 @@ export default function HistoriaIntro() {
       {/* static measure wrapper (keeps the centering/max-width + stacking) */}
       <div ref={contentRef} className="relative mx-auto max-w-6xl z-10">
       {/* scroll-linked entry/exit envelope */}
-      <motion.div style={{ y: envY, scale: envScale, opacity: envOpacity, filter: envBlur }} className="origin-center">
+      <motion.div style={{ y: envY, scale: envScale, opacity: envOpacity }} className="origin-center">
       <motion.div
         variants={stagger}
         initial="hidden"
@@ -91,9 +88,10 @@ export default function HistoriaIntro() {
       >
         {/* kicker */}
         <motion.div variants={rise} className="flex items-center gap-4 mb-14">
+          <span className="font-display text-sm leading-none text-[#2f6bff]">01</span>
           <span className="h-px w-10 bg-[#2f6bff]" />
-          <span className="font-code text-xs uppercase tracking-[0.35em] text-white/50">
-            01 — Trajetória
+          <span className="font-code text-[11px] uppercase tracking-[0.35em] text-white/50">
+            Trajetória
           </span>
         </motion.div>
 
@@ -173,40 +171,33 @@ export default function HistoriaIntro() {
             </motion.div>
           </div>
 
-          {/* ── RIGHT: stats — each card unmasks with a clip-path curtain ── */}
-          <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
+          {/* ── RIGHT: stats — a hairline ledger; each cell unmasks with a clip-path curtain ── */}
+          <div className="grid grid-cols-2 border-l border-t rule lg:grid-cols-1">
             {STATS.map((s, i) => (
-              <Tilt3D
+              <ScrollReveal
                 key={s.value}
-                max={8}
-                scale={1.02}
-                className="relative self-start rounded-2xl"
+                direction="up"
+                duration={1}
+                lift={24}
+                start={`top ${90 - i * 2}%`}
+                className="border-b border-r rule"
               >
-                <ScrollReveal
-                  direction="up"
-                  duration={1}
-                  lift={28}
-                  start={`top ${88 - i * 2}%`}
-                  className="rounded-2xl"
-                >
-                  {/* base border/bg moved to Tailwind classes (identical values)
-                      so the hover glow can override them */}
-                  <div className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.025)] px-6 py-5 transition-colors duration-300 hover:border-[rgba(47,107,255,0.45)] hover:bg-white/[0.05]">
-                    <div
-                      className="font-display leading-none mb-1.5"
-                      style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.75rem)', color: '#e9edf7' }}
-                    >
-                      {s.value}
-                    </div>
-                    <div className="font-code text-[11px] tracking-[0.18em] uppercase text-white/50 mb-0.5">
-                      {s.label}
-                    </div>
-                    <div className="font-code text-[10px] tracking-widest text-white/25">
-                      {s.sub}
-                    </div>
+                <div className="index-row group relative px-5 py-6 lg:px-7 lg:py-7">
+                  <span className="font-code text-[10px] tracking-[0.3em] text-white/30">0{i + 1}</span>
+                  <div
+                    className="mt-3 font-display leading-[1.05] text-[#e9edf7] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1"
+                    style={{ fontSize: 'clamp(1.15rem, 4.2vw, 1.9rem)' }}
+                  >
+                    {s.value}
                   </div>
-                </ScrollReveal>
-              </Tilt3D>
+                  <div className="mt-2 font-code text-[10px] uppercase tracking-[0.18em] text-white/55">
+                    {s.label}
+                  </div>
+                  <div className="mt-1 font-code text-[10px] tracking-widest text-white/28">
+                    {s.sub}
+                  </div>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>

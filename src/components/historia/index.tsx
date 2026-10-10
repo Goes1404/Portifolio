@@ -52,7 +52,7 @@ const CHAPTERS = [
 // Mobile floor kept low (1.85rem) so wide 10-char words like AUTODIDATA/CONSTRUTOR
 // fit on a 320–375px screen without the whitespace-nowrap line clipping.
 const KW_FS = 'clamp(1.5rem, 6.2vw, 6.8rem)';
-const KW_H  = 'clamp(1.7rem, 6.9vw, 7.5rem)'; // 1.1 × KW_FS
+const KW_H  = 'clamp(1.95rem, 7.6vw, 7.5rem)'; // ≈1.2 × KW_FS — room for descenders on phones
 
 const EASE_IN  = [0.16, 1, 0.3, 1]    as const;
 const EASE_OUT = [0.4,  0, 0.6, 1]    as const;
@@ -248,7 +248,7 @@ export default function HistoriaSection() {
           </div>
 
           {/* Body row: chapter text (cycles) sits beside the portrait (persistent) */}
-          <div className="flex flex-row items-center gap-4 sm:gap-7 md:gap-12 lg:gap-16">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-12 lg:gap-16">
 
             {/* ── Left: body text + tags + code — re-animates each chapter ── */}
             <div className="min-w-0 flex-1">
@@ -260,7 +260,7 @@ export default function HistoriaSection() {
                   exit={{ opacity: 0, y: -14, filter: 'blur(8px)', transition: { duration: 0.3 } }}
                   className="flex flex-col gap-5 md:gap-6"
                 >
-                  <p className="max-w-xl font-editorial text-base italic leading-snug text-white/[0.60] sm:text-xl md:text-[1.35rem]">
+                  <p className="max-w-xl font-editorial text-[15px] italic leading-snug text-white/[0.60] sm:text-xl md:text-[1.35rem]">
                     {ch.body}
                   </p>
                   {/* Skill / trait tags — coloridas, sobem em cascata ao aparecer */}
@@ -268,8 +268,7 @@ export default function HistoriaSection() {
                     className="flex flex-wrap gap-2"
                     variants={TAGS_STAGGER}
                     initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, margin: '0px 0px -10% 0px' }}
+                    animate="show"
                   >
                     {ch.tags.map((tag) => {
                       const c = TAG_COLORS[tag] ?? ch.accent;
@@ -303,14 +302,15 @@ export default function HistoriaSection() {
             {/* Mobile: a compact column beside the text. md+: sized by available
                 viewport HEIGHT (not width) so it grows on tall screens yet never
                 clips inside the pinned 100vh frame on short laptops. */}
-            <figure className="m-0 w-[48%] max-w-[210px] shrink-0 sm:max-w-[250px] md:w-[min(420px,48vh)] md:max-w-none">
+            <figure className="m-0 w-[min(200px,22vh)] shrink-0 self-end sm:w-[min(240px,26vh)] md:w-[min(420px,48vh)] md:self-auto">
               <RevealSpotlight
                 bwSrc={FOTO_PB}
                 colorSrc={FOTO_COLOR}
                 alt="Matheus Goes da Silva"
-                hint="passe o mouse · arraste o dedo"
+                hint="passe o mouse"
+                touchHint="toque e arraste"
               />
-              <figcaption className="mt-3 font-code text-[10px] uppercase tracking-[0.3em] text-white/30">
+              <figcaption className="mt-3 hidden font-code text-[10px] uppercase tracking-[0.3em] text-white/30 md:block">
                 preto &amp; branco&nbsp;&nbsp;⇄&nbsp;&nbsp;cor
               </figcaption>
             </figure>
@@ -321,7 +321,7 @@ export default function HistoriaSection() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { delay: 1.1, duration: 0.7 } }}
-              className="absolute bottom-10 left-6 md:bottom-12 md:left-24 font-code text-[10px] uppercase tracking-[0.45em] text-white/[0.22]"
+              className="absolute bottom-5 left-6 md:bottom-12 md:left-24 font-code text-[10px] uppercase tracking-[0.45em] text-white/[0.22]"
             >
               role para continuar
             </motion.p>

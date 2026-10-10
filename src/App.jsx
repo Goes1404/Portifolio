@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState, Suspense, lazy } from 'react'
-import { motion, useScroll, AnimatePresence } from 'framer-motion'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { motion, useScroll } from 'framer-motion'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from '@studio-freight/lenis'
-import { ArrowDown, ArrowUpRight, Code2, Globe, Mail, MessageCircle, Menu, X } from 'lucide-react'
+import { ArrowDown, ArrowUpRight, Code2, Globe, Mail, MessageCircle } from 'lucide-react'
 import {
   CustomCursor,
   ParticleField,
@@ -11,15 +11,21 @@ import {
   SplitReveal,
   ScrollVelocity,
   LiquidText,
-  SectionTransition,
+  ScrambleText,
 } from '@/components/effects'
+import Preloader from '@/components/shell/Preloader'
+import { shouldPreload } from '@/components/shell/preload'
+import Header from '@/components/shell/Header'
+import SectionNav from '@/components/shell/SectionNav'
+import LocalClock from '@/components/shell/LocalClock'
+import useActiveSection from '@/hooks/useActiveSection'
 import SkillsShowcase from '@/components/skills'
 import HeroScrollDemo from '@/components/efeito-4-container-scroll/demo'
 import ProjetosHeroScrub from '@/components/efeito-7-projetos/demo'
 import HistoriaSection from '@/components/historia'
 import HistoriaIntro from '@/components/historia/intro'
 import ExperienciaSection from '@/components/experiencia'
-import OrbitCarousel from '@/components/ui/orbiting-carousel-with-animated-icons'
+import ParceirosSection from '@/components/parceiros'
 import { ShaderBackground } from '@/components/ui/animated-shader-hero'
 
 const NAV = [
@@ -29,6 +35,7 @@ const NAV = [
   { num: '04', label: 'Skills', href: '#skills' },
   { num: '05', label: 'Contato', href: '#contato' },
 ]
+const SECTION_IDS = ['top', 'historia', 'experiencia', 'projetos', 'skills', 'contato']
 
 const STACK = [
   'HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Next.js',
@@ -47,30 +54,28 @@ const CV_URL = '/cv.pdf' // arquivo em public/cv.pdf
 
 gsap.registerPlugin(ScrollTrigger)
 
-const WebGLHero = lazy(() => import('@/components/webgl-hero'))
+const EASE = [0.16, 1, 0.3, 1]
 
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
 }
 
 // Surge: element rises from below + resolves out of blur + subtle zoom.
-// Used both for initial page-load entry and whileInView reveals.
 const rise = {
   hidden: { opacity: 0, y: 64, filter: 'blur(16px)', scale: 0.97 },
   show: {
     opacity: 1, y: 0, filter: 'blur(0px)', scale: 1,
-    transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1.1, ease: EASE },
   },
 }
 
-// Word-level stagger: each word is a rise child, parent staggers them in.
-const wordStagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08 } },
+// Hero name lines rise out of a mask — cleaner than a blur for giant type.
+const lineMask = {
+  hidden: { y: '110%', rotate: 2 },
+  show: { y: '0%', rotate: 0, transition: { duration: 1.2, ease: EASE } },
 }
 
-// Parent that staggers its `rise` children as the block scrolls into view.
 const riseGroup = {
   hidden: {},
   show: { transition: { staggerChildren: 0.13 } },
@@ -86,7 +91,7 @@ function Marquee() {
         {row.map((tech, i) => (
           <span key={i} className="flex items-center gap-8 font-code text-sm tracking-wide text-white/40">
             {tech}
-            <span className="text-brand">/</span>
+            <span className="text-[#2f6bff]">/</span>
           </span>
         ))}
       </div>
@@ -94,56 +99,35 @@ function Marquee() {
   )
 }
 
-// Magazine-style section header — title splits into words, each surges in independently.
-function SectionMarker({ id, num, kicker, title, lead }) {
+// Giant outlined/filled alternating marquee used before the footer.
+function BigMarquee({ words }) {
+  const row = [...words, ...words]
   return (
-    <div id={id} className="relative scroll-mt-24 overflow-hidden border-t rule bg-[#05070f] px-6 py-20 md:py-32">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -right-4 -top-10 select-none font-display text-[34vw] leading-none text-white/[0.035] md:text-[22vw]"
-      >
-        {num}
-      </span>
-      <motion.div
-        variants={riseGroup}
-        initial="hidden"
-        whileInView="show"
-        viewport={inView}
-        className="relative mx-auto max-w-6xl"
-      >
-        <motion.div variants={rise} className="flex items-center gap-4">
-          <span className="h-px w-10 bg-brand" />
-          <span className="font-code text-xs uppercase tracking-[0.35em] text-white/50">{kicker}</span>
-        </motion.div>
-
-        {/* Each word surges up on its own — staggered by wordStagger */}
-        <motion.h2
-          variants={wordStagger}
-          className="mt-7 font-display text-[12vw] leading-none text-[#e9edf7] sm:text-6xl md:text-7xl"
-          aria-label={title}
-        >
-          {title.split(' ').map((word, i) => (
-            <motion.span key={i} variants={rise} className="mr-[0.22em] inline-block last:mr-0">
-              {word}
-            </motion.span>
-          ))}
-        </motion.h2>
-
-        {lead && (
-          <motion.p variants={rise} className="mt-7 max-w-xl font-editorial text-2xl italic leading-snug text-white/55 md:text-3xl">
-            {lead}
-          </motion.p>
-        )}
-      </motion.div>
+    <div className="marquee-mask relative overflow-hidden border-y rule py-6 md:py-8" aria-hidden>
+      <div className="animate-marquee-slow flex w-max items-center gap-10 whitespace-nowrap">
+        {row.map((w, i) => (
+          <span
+            key={i}
+            className={`font-display leading-none ${i % 2 ? 'text-outline' : 'text-[#e9edf7]'}`}
+            style={{ fontSize: 'clamp(3rem, 9vw, 8rem)' }}
+          >
+            {w}
+            <span className="ml-10 inline-block h-[0.25em] w-[0.25em] rounded-full bg-[#2f6bff] align-middle" />
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
 
 function App() {
   const { scrollYProgress } = useScroll()
-  const lenisRef    = useRef(null)
-  const heroTrackRef = useRef(null) // the 280vh outer section
-  const [menuOpen, setMenuOpen] = useState(false)
+  const lenisRef = useRef(null)
+  const heroTrackRef = useRef(null)
+  const [preloading, setPreloading] = useState(() => shouldPreload())
+  const ready = !preloading
+  const activeId = useActiveSection(SECTION_IDS)
+  const onPreloaded = useCallback(() => setPreloading(false), [])
 
   // Global Lenis smooth-scroll, synced with GSAP ticker
   useEffect(() => {
@@ -160,55 +144,47 @@ function App() {
     return () => { gsap.ticker.remove(raf); lenis.destroy(); lenisRef.current = null }
   }, [])
 
-  // Hero depth-parallax: each [data-hero-layer] wrapper moves at its own velocity
-  // as the 280vh track scrolls. GSAP owns the wrapper's y; framer-motion owns the
-  // inner element's entry animation y — different DOM nodes, zero conflict.
+  // Hold the page still while the preloader plays
+  useEffect(() => {
+    const lenis = lenisRef.current
+    if (preloading) { lenis?.stop(); window.scrollTo(0, 0) }
+    else lenis?.start()
+  }, [preloading])
+
+  // Hero depth-parallax: each [data-hero-layer] wrapper moves at its own velocity.
   useEffect(() => {
     const track = heroTrackRef.current
     if (!track) return
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia()
+    // Desktop: deep parallax — each line on its own plane.
+    // Phones: the lines stay grouped (a tall viewport pulls them apart otherwise)
+    // and the whole block drifts up a little while the veil clears.
+    mm.add({ desktop: '(min-width: 768px)', phone: '(max-width: 767px)' }, (c) => {
+      const d = c.conditions.desktop
       const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: track,
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: 1.5,
-        },
+        scrollTrigger: { trigger: track, start: 'top top', end: 'bottom bottom', scrub: 1.5 },
       })
-      // Depth velocities: Silva exits the viewport ~5× faster than the meta line.
-      // The "Goes da" line also drifts right, as if on a different lateral plane.
-      tl.to('[data-hero-layer="meta"]',    { y: '-90vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line1"]',   { y: '-75vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line2"]',   { y: '-55vh', x: '2.5vw', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="line3"]',   { y: '-35vh', ease: 'none' }, 0)
-      tl.to('[data-hero-layer="tagline"]', { y: '-15vh', ease: 'none' }, 0)
-      // Veil fades to reveal more of the WebGL blob as the parallax deepens
+      tl.to('[data-hero-layer="meta"]',    { y: d ? '-90vh' : '-34vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line1"]',   { y: d ? '-75vh' : '-30vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line2"]',   { y: d ? '-55vh' : '-27vh', x: d ? '2.5vw' : '1.5vw', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="line3"]',   { y: d ? '-35vh' : '-24vh', ease: 'none' }, 0)
+      tl.to('[data-hero-layer="tagline"]', { y: d ? '-15vh' : '-18vh', ease: 'none' }, 0)
       tl.to('[data-hero-layer="veil"]',    { opacity: 0.55, ease: 'none' }, 0)
-    }, track)
-    return () => ctx.revert()
+      tl.to('[data-hero-layer="cue"]',     { opacity: 0, ease: 'none', duration: 0.25 }, 0)
+    })
+    return () => mm.revert()
   }, [])
 
-  const handleNav = (e, href) => {
+  const handleNav = useCallback((e, href) => {
     e.preventDefault()
-    setMenuOpen(false)
-    // Wait a tick so the overlay starts closing before we hand control to Lenis
     requestAnimationFrame(() => lenisRef.current?.scrollTo(href, { offset: -72 }))
-  }
-
-  // Freeze background scroll while the mobile menu is open
-  useEffect(() => {
-    const lenis = lenisRef.current
-    if (menuOpen) lenis?.stop()
-    else lenis?.start()
-  }, [menuOpen])
+  }, [])
 
   return (
     <div className="relative min-h-screen bg-[#05070f] text-[#e9edf7] selection:bg-[#2f6bff] selection:text-white">
-      {/* Custom magnetic cursor (desktop / fine-pointer only) */}
-      <CustomCursor />
+      {preloading && <Preloader onDone={onPreloaded} />}
 
-      {/* Curtain wipe when a new section reaches the viewport center on scroll */}
-      <SectionTransition />
+      <CustomCursor />
 
       {/* Scroll-progress thread */}
       <motion.div
@@ -219,138 +195,21 @@ function App() {
       {/* Film-grain overlay */}
       <div className="bg-noise pointer-events-none fixed inset-0 z-[100] opacity-[0.07] mix-blend-overlay" />
 
-      {/* Vertical metadata rail */}
-      <div className="fixed left-3 top-1/2 z-40 hidden -translate-y-1/2 lg:block">
-        <span className="vertical-rl font-code text-[10px] tracking-[0.45em] text-white/30">
-          MATHEUS GOES DA SILVA &nbsp;·&nbsp; FULL&nbsp;STACK
-        </span>
-      </div>
+      <SectionNav nav={NAV} activeId={activeId} onNav={handleNav} />
 
-      {/* Header */}
-      <header className="pt-safe sticky top-0 z-50 border-b rule bg-[#05070f]/75 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-6 sm:py-4">
-          <a href="#top" onClick={(e) => handleNav(e, '#top')} className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-sm bg-brand font-display text-sm text-white">M</span>
-            <span className="hidden font-code text-xs tracking-[0.3em] text-[#e9edf7] sm:block">
-              MGS<span className="text-brand">_</span>STUDIO
-            </span>
-          </a>
+      <Header nav={NAV} email={EMAIL} whatsapp={WHATSAPP_URL} onNav={handleNav} activeId={activeId} />
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-3 sm:flex">
-            {NAV.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                onClick={(e) => handleNav(e, item.href)}
-                className="group flex items-baseline gap-1.5 px-2 py-1.5 font-code text-sm text-white/55 transition-colors hover:text-[#e9edf7]"
-              >
-                <span className="text-[10px] text-brand">{item.num}</span>
-                <span className="link-underline">{item.label}</span>
-              </a>
-            ))}
-          </nav>
-
-          {/* Mobile menu trigger */}
-          <button
-            onClick={() => setMenuOpen(true)}
-            aria-label="Abrir menu"
-            aria-expanded={menuOpen}
-            className="flex h-11 w-11 items-center justify-center rounded-full text-[#e9edf7] transition-colors hover:bg-white/5 sm:hidden"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
-
-      {/* Mobile full-screen menu */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="pt-safe fixed inset-0 z-[120] flex flex-col bg-[#05070f]/97 backdrop-blur-xl sm:hidden"
-          >
-            {/* Top bar inside the overlay */}
-            <div className="flex items-center justify-between px-5 py-3.5">
-              <span className="font-code text-xs tracking-[0.3em] text-[#e9edf7]">
-                MGS<span className="text-brand">_</span>STUDIO
-              </span>
-              <button
-                onClick={() => setMenuOpen(false)}
-                aria-label="Fechar menu"
-                className="flex h-11 w-11 items-center justify-center rounded-full text-[#e9edf7] transition-colors hover:bg-white/5"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Links — big editorial type, staggered in */}
-            <nav className="flex flex-1 flex-col justify-center gap-2 overflow-y-auto px-7 py-8">
-              {NAV.map((item, i) => (
-                <motion.a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => handleNav(e, item.href)}
-                  initial={{ opacity: 0, x: -24 }}
-                  animate={{ opacity: 1, x: 0, transition: { delay: 0.08 + i * 0.06, duration: 0.5, ease: [0.16, 1, 0.3, 1] } }}
-                  className="group flex items-center gap-4 border-b rule py-4"
-                >
-                  <span className="font-code text-xs text-brand">{item.num}</span>
-                  <span className="font-display leading-none text-[#e9edf7] transition-colors group-hover:text-brand" style={{ fontSize: 'clamp(1.75rem, 7vw, 2.5rem)' }}>
-                    {item.label}
-                  </span>
-                  <ArrowUpRight className="ml-auto h-5 w-5 shrink-0 text-white/30 transition-colors group-hover:text-brand" />
-                </motion.a>
-              ))}
-            </nav>
-
-            {/* Footer of the menu */}
-            <div className="flex flex-col gap-3 px-7 pb-[calc(env(safe-area-inset-bottom)_+_2rem)]">
-              <a
-                href={`mailto:${EMAIL}`}
-                className="font-code text-xs tracking-widest text-white/50"
-              >
-                {EMAIL}
-              </a>
-              <a
-                href={WHATSAPP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-code text-xs tracking-widest text-white/50"
-              >
-                <MessageCircle className="h-4 w-4" />
-                WhatsApp · (11) 95008-5875
-              </a>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ── HERO: 280vh sticky scroll track ─────────────────── */}
-      {/* The outer section is 280vh tall — the scroll "engine" for the parallax.
-          The sticky inner div stays pinned to the viewport while the user scrolls
-          through the full track, giving the illusion of cinematic depth. */}
+      {/* ── HERO: sticky scroll track ───────────────────────── */}
       <main
         id="top"
         ref={heroTrackRef}
-        className="relative bg-grain bg-[#05070f]"
-        style={{ height: '280vh' }}
+        className="relative h-[170vh] bg-grain bg-[#05070f] md:h-[240vh]"
       >
-        {/* Sticky viewport — pinned, always fills the screen */}
         <div className="sticky top-0 h-screen overflow-hidden">
-
-          {/* WebGL animated shader background layer (z-0) */}
           <ShaderBackground className="pointer-events-none absolute inset-0 z-0" />
-
-          {/* Interactive particle constellation (z-[1]) — drifts, links nearby
-              nodes and is repelled by the pointer (light physics). Sits below the
-              readability veil so it never cuts contrast under the headline. */}
           <ParticleField className="pointer-events-none absolute inset-0 z-[1]" />
 
-          {/* Readability veil (z-2) — also fades via GSAP as you scroll in */}
+          {/* Readability veil (z-2) — fades via GSAP as you scroll in */}
           <div
             data-hero-layer="veil"
             aria-hidden
@@ -361,62 +220,49 @@ function App() {
             }}
           />
 
-          {/* Text layers (z-10) — each wrapper is the GSAP parallax target;
-              the inner motion element handles only its entry animation */}
           <motion.div
             variants={stagger}
             initial="hidden"
-            animate="show"
-            className="relative z-10 mx-auto flex h-full max-w-6xl flex-col justify-center gap-2 md:gap-4 px-6"
+            animate={ready ? 'show' : 'hidden'}
+            className="relative z-10 mx-auto flex h-full max-w-[88rem] flex-col justify-center gap-1 px-6 pb-20 pt-16 sm:px-8 md:gap-2"
           >
-            {/* Status meta line — slowest layer */}
             <div data-hero-layer="meta" className="will-change-transform">
-              <motion.div variants={rise} className="flex flex-wrap items-center gap-x-6 gap-y-2 font-code text-xs tracking-[0.3em] text-white/45">
+              <motion.div variants={rise} className="flex flex-wrap items-center gap-x-6 gap-y-2 font-code text-[11px] tracking-[0.3em] text-white/45 sm:text-xs">
                 <span className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
-                  ABERTO A ESTÁGIO · VAGAS JÚNIOR
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#38e0ff] shadow-[0_0_10px_#38e0ff]" />
+                  <ScrambleText playOnMount={ready} duration={900}>ABERTO A ESTÁGIO · VAGAS JÚNIOR</ScrambleText>
                 </span>
                 <span className="hidden sm:inline">·</span>
-                <span>SÃO PAULO · BR</span>
+                <span><ScrambleText playOnMount={ready} duration={900}>SÃO PAULO · BR</ScrambleText></span>
                 <span className="hidden sm:inline">·</span>
-                <span>PORTFÓLIO — ED. 2026</span>
+                <span><ScrambleText playOnMount={ready} duration={900}>PORTFÓLIO — ED. 2026</ScrambleText></span>
               </motion.div>
             </div>
 
-            {/* "Matheus" — second-slowest, anchors the name visually */}
             <div data-hero-layer="line1" className="will-change-transform">
-              <motion.h1
-                variants={rise}
-                className="mt-5 font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7]"
-              >
-                Matheus
-              </motion.h1>
+              <h1 className="mt-5 overflow-hidden pb-[0.06em] font-display text-[clamp(2.4rem,9.2vw,7.6rem)] leading-[0.92] tracking-[-0.025em] text-[#e9edf7]">
+                <motion.span variants={lineMask} className="block origin-left">Matheus</motion.span>
+              </h1>
             </div>
 
-            {/* "Goes da" — mid-speed + lateral drift, feels on a different plane */}
             <div data-hero-layer="line2" className="will-change-transform">
-              <motion.h1
-                variants={rise}
-                className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7] md:ml-[16%]"
-              >
-                Goes <span className="text-gradient-anim">da</span>
-              </motion.h1>
+              <h1 className="overflow-hidden pb-[0.06em] font-display text-[clamp(2.4rem,9.2vw,7.6rem)] leading-[0.92] tracking-[-0.025em] text-[#e9edf7] md:ml-[16%]">
+                <motion.span variants={lineMask} className="block origin-left">
+                  Goes <span className="text-gradient-anim">da</span>
+                </motion.span>
+              </h1>
             </div>
 
-            {/* "Silva" — fastest, rockets upward first, most dramatic depth */}
             <div data-hero-layer="line3" className="will-change-transform">
-              <motion.h1
-                variants={rise}
-                className="font-display text-[clamp(2.5rem,11vw,9.5rem)] leading-[0.95] text-[#e9edf7] md:ml-[5%]"
-              >
-                {/* Hover to ripple the type with an SVG liquid-distortion filter */}
-                <LiquidText data-cursor="liquid">Silva</LiquidText>
-              </motion.h1>
+              <h1 className="overflow-hidden pb-[0.06em] font-display text-[clamp(2.4rem,9.2vw,7.6rem)] leading-[0.92] tracking-[-0.025em] text-[#e9edf7] md:ml-[5%]">
+                <motion.span variants={lineMask} className="block origin-left">
+                  <LiquidText data-cursor="liquid">Silva</LiquidText>
+                </motion.span>
+              </h1>
             </div>
 
-            {/* Tagline — sits at a mid-depth between meta and name */}
             <div data-hero-layer="tagline" className="will-change-transform">
-              <motion.div variants={rise} className="mt-7 flex flex-col gap-4 sm:mt-10 sm:gap-5 md:ml-auto md:max-w-md md:text-right">
+              <motion.div variants={rise} className="mt-6 flex flex-col gap-4 sm:mt-8 sm:gap-5 md:ml-auto md:max-w-md md:text-right">
                 <p className="font-editorial text-lg italic leading-snug text-white/65 sm:text-2xl md:text-3xl">
                   Desenvolvedor Full Stack — transformo ideias em produtos
                   digitais que as pessoas gostam de usar.
@@ -426,7 +272,7 @@ function App() {
                     href="#historia"
                     onClick={(e) => handleNav(e, '#historia')}
                     data-cursor="rolar"
-                    className="group cta-press inline-flex items-center justify-start gap-2 font-code text-sm tracking-widest text-brand md:justify-end"
+                    className="group cta-press inline-flex items-center justify-start gap-2 font-code text-sm tracking-widest text-[#2f6bff] md:justify-end"
                   >
                     <span className="link-underline">CONHEÇA A HISTÓRIA</span>
                     <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-1" />
@@ -436,96 +282,52 @@ function App() {
             </div>
           </motion.div>
 
-          {/* Marquee pinned at the bottom of the sticky viewport.
-              ScrollVelocity shears it proportionally to scroll speed. */}
+          {/* Scroll cue — bottom-left, fades out as the parallax begins */}
+          <motion.div
+            data-hero-layer="cue"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: ready ? 1 : 0, transition: { delay: 1.4, duration: 0.8 } }}
+            className="absolute bottom-24 left-6 z-20 hidden items-center gap-3 sm:flex sm:left-8"
+            aria-hidden
+          >
+            <span className="relative block h-12 w-px overflow-hidden bg-white/15">
+              <span className="scroll-cue absolute left-0 top-0 h-6 w-px bg-[#38e0ff]" />
+            </span>
+            <span className="font-code text-[10px] uppercase tracking-[0.4em] text-white/40">Scroll</span>
+          </motion.div>
+
           <div className="absolute bottom-0 left-0 right-0 z-20">
             <ScrollVelocity maxSkew={9}>
               <Marquee />
             </ScrollVelocity>
           </div>
-          {/* Bottom-edge fade — blends the hero into the next section */}
-          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-36 z-[19] bg-gradient-to-t from-[#05070f] to-transparent" />
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-[19] h-36 bg-gradient-to-t from-[#05070f] to-transparent" />
         </div>
       </main>
 
       {/* ── 01 · HISTÓRIA ────────────────────────────────────── */}
-      {/* O retrato com revelação P&B → cor agora vive DENTRO da História,
-          ao lado dos textos dos capítulos (ver src/components/historia). */}
       <HistoriaIntro />
       <HistoriaSection />
 
       {/* ── 02 · EXPERIÊNCIA ─────────────────────────────────── */}
       <ExperienciaSection />
 
-      {/* ── Parceiros & Clientes ───────────────────────────────────
-          Blob WebGL ambiente, calmado por um véu radial para o conteúdo
-          ficar nítido; grão + selo na linguagem das outras seções. */}
-      <section id="parceiros" className="relative overflow-hidden border-t rule bg-[#05070f] py-20 md:py-28">
-        <Suspense fallback={null}>
-          <WebGLHero className="pointer-events-none absolute inset-0 z-0 opacity-40" />
-        </Suspense>
-
-        {/* Readability veil — calms the blob behind the heading + orbit */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-[1]"
-          style={{
-            background:
-              'radial-gradient(78% 62% at 50% 44%, rgba(5,7,15,0.84) 0%, rgba(5,7,15,0.38) 56%, rgba(5,7,15,0) 82%)',
-          }}
-        />
-        {/* Film grain for cohesion with the rest of the site */}
-        <div className="bg-noise pointer-events-none absolute inset-0 z-[1] opacity-[0.05] mix-blend-overlay" />
-
-        {/* Heading */}
-        <div className="relative z-10 flex flex-col items-center px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center"
-          >
-            <span className="flex items-center gap-3 font-code text-[11px] uppercase tracking-[0.4em] text-white/40">
-              <span className="h-px w-8 bg-brand/60" />
-              ecossistema de projetos e marcas
-              <span className="h-px w-8 bg-brand/60" />
-            </span>
-            <h3 className="mt-4 bg-gradient-to-b from-white to-white/55 bg-clip-text font-display text-3xl leading-[1.05] text-transparent sm:text-4xl md:text-5xl">
-              Parceiros &amp; Clientes
-            </h3>
-            <p className="mt-4 max-w-md font-editorial text-lg italic leading-snug text-white/45 md:text-xl">
-              As marcas e os times com quem construí, codei e entreguei.
-            </p>
-          </motion.div>
-        </div>
-
-        {/* Orbit carousel */}
-        <div className="relative z-10 mt-8 md:mt-12">
-          <OrbitCarousel />
-        </div>
-      </section>
+      {/* ── Parceiros & Clientes ───────────────────────────────── */}
+      <ParceirosSection />
 
       {/* ── 03 · PROJETOS ────────────────────────────────────── */}
-      {/* E4: clean scroll expand — suspense build-up before projects.
-          Carries the #projetos anchor now that the section header is gone. */}
       <div id="projetos" className="scroll-mt-24">
         <HeroScrollDemo />
+        <ProjetosHeroScrub />
       </div>
-      <ProjetosHeroScrub />
 
       {/* ── 04 · SKILLS ──────────────────────────────────────── */}
-      <SectionMarker
-        id="skills"
-        num="04"
-        kicker="Stack & Ferramentas"
-        title="Como eu construo"
-        lead="O ecossistema de tecnologias com que trabalho no dia a dia."
-      />
       <SkillsShowcase />
 
       {/* ── 05 · CONTATO ─────────────────────────────────────── */}
-      <footer id="contato" className="bg-grain relative overflow-hidden border-t rule px-6 py-24 scroll-mt-24 md:py-40">
+      <BigMarquee words={['Vamos construir algo juntos', 'Aberto a estágio & júnior', 'Full Stack · São Paulo']} />
+
+      <footer id="contato" className="bg-grain relative overflow-hidden px-6 py-24 scroll-mt-24 sm:px-8 md:py-36">
         <span
           aria-hidden
           className="pointer-events-none absolute -left-4 bottom-0 select-none font-display text-[30vw] leading-none text-white/[0.03] md:text-[18vw]"
@@ -539,18 +341,21 @@ function App() {
           viewport={inView}
           className="relative mx-auto max-w-6xl"
         >
-          <motion.div variants={rise} className="flex items-center gap-4">
-            <span className="h-px w-10 bg-brand" />
-            <span className="font-code text-xs uppercase tracking-[0.35em] text-white/50">05 — Contato</span>
+          <motion.div variants={rise} className="flex flex-wrap items-center justify-between gap-4">
+            <span className="flex items-center gap-4">
+              <span className="font-display text-sm leading-none text-[#2f6bff]">05</span>
+              <span className="h-px w-10 bg-[#2f6bff]" />
+              <span className="font-code text-[11px] uppercase tracking-[0.35em] text-white/50">Contato</span>
+            </span>
+            <LocalClock />
           </motion.div>
 
-          {/* Footer heading — GSAP per-character mask reveal (SplitReveal) */}
           <h2
-            className="mt-8 font-display text-[13vw] leading-none text-[#e9edf7] sm:text-6xl md:text-8xl"
+            className="mt-8 font-display text-[13vw] leading-[1.2] text-[#e9edf7] sm:text-6xl sm:leading-[1.04] md:text-8xl"
             aria-label="Vamos construir algo juntos?"
           >
             <SplitReveal as="span" className="block">Vamos construir</SplitReveal>
-            <SplitReveal as="span" className="block text-brand" start="top 90%">algo juntos?</SplitReveal>
+            <SplitReveal as="span" className="block text-[#2f6bff]" start="top 90%">algo juntos?</SplitReveal>
           </h2>
 
           <motion.div variants={rise} className="mt-14 flex flex-col items-start justify-between gap-10 md:flex-row md:items-end">
@@ -558,10 +363,10 @@ function App() {
               <a
                 href={`mailto:${EMAIL}`}
                 data-cursor="escrever"
-                className="group inline-flex max-w-full items-center gap-2 border-b-2 border-[#2f6bff] pb-2 font-editorial text-lg italic text-[#e9edf7] transition-colors hover:text-brand sm:gap-3 sm:text-2xl md:text-4xl"
+                className="group inline-flex max-w-full items-center gap-2 border-b-2 border-[#2f6bff] pb-2 font-editorial text-lg italic text-[#e9edf7] transition-colors hover:text-[#2f6bff] sm:gap-3 sm:text-2xl md:text-4xl"
               >
                 <LiquidText as="span" className="break-words">{EMAIL}</LiquidText>
-                <ArrowUpRight className="h-5 w-5 shrink-0 text-brand transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-6 sm:w-6" />
+                <ArrowUpRight className="h-5 w-5 shrink-0 text-[#2f6bff] transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 sm:h-6 sm:w-6" />
               </a>
             </Magnetic>
 
@@ -577,6 +382,8 @@ function App() {
                     href={href}
                     aria-label={label}
                     data-cursor={label}
+                    target={href.startsWith('http') ? '_blank' : undefined}
+                    rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
                     className="icon-fill cta-press flex h-12 w-12 items-center justify-center rounded-full border rule text-white/60 transition-colors hover:border-[#2f6bff] hover:text-white"
                   >
                     <Icon className="h-5 w-5" />
@@ -586,9 +393,8 @@ function App() {
             </div>
           </motion.div>
 
-          {/* Baixar CV — só aparece quando CV_URL está preenchido */}
           {CV_URL && (
-            <motion.div variants={rise} className="mt-10">
+            <motion.div variants={rise} className="mt-10 flex flex-wrap items-center gap-6">
               <Magnetic strength={0.4}>
                 <a
                   href={CV_URL}
@@ -600,6 +406,10 @@ function App() {
                   <ArrowDown className="h-4 w-4 transition-transform group-hover:translate-y-0.5" />
                 </a>
               </Magnetic>
+              <span className="flex items-center gap-2 font-code text-[11px] tracking-[0.25em] text-white/40">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#38e0ff]" />
+                RESPONDO EM ATÉ 24H
+              </span>
             </motion.div>
           )}
 
@@ -610,7 +420,7 @@ function App() {
               target="_blank"
               rel="noopener noreferrer"
               data-cursor="ver código"
-              className="inline-flex items-center gap-1.5 transition-colors hover:text-brand"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-[#2f6bff]"
             >
               CÓDIGO-FONTE DESTE SITE
               <ArrowUpRight className="h-3.5 w-3.5" />

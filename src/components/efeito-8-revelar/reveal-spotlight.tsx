@@ -16,8 +16,10 @@ export interface RevealSpotlightProps {
   colorSrc: string;
   /** Texto alternativo (descreve a foto colorida, que é o conteúdo real). */
   alt?: string;
-  /** Rótulo de ajuda mostrado no estado de repouso. */
+  /** Rótulo de ajuda mostrado no estado de repouso (ponteiro fino). */
   hint?: string;
+  /** Rótulo para telas de toque. */
+  touchHint?: string;
   className?: string;
 }
 
@@ -36,7 +38,8 @@ export default function RevealSpotlight({
   bwSrc,
   colorSrc,
   alt = "",
-  hint = "passe o mouse · arraste o dedo",
+  hint = "passe o mouse",
+  touchHint = "toque e arraste",
   className,
 }: RevealSpotlightProps) {
   const prefersReduced = useReducedMotion();
@@ -94,6 +97,7 @@ export default function RevealSpotlight({
         className={className}
         active={active}
         hint={hint}
+        touchHint={touchHint}
         onPointerEnter={() => setActive(true)}
         onPointerLeave={() => setActive(false)}
         onPointerDown={() => setActive(true)}
@@ -117,6 +121,7 @@ export default function RevealSpotlight({
       className={className}
       active={active}
       hint={hint}
+      touchHint={touchHint}
       onPointerEnter={open}
       onPointerMove={(e) => {
         track(e);
@@ -167,6 +172,7 @@ interface FrameProps {
   className?: string;
   active: boolean;
   hint: string;
+  touchHint: string;
   children: React.ReactNode;
   onPointerEnter?: (e: PointerEvent<HTMLDivElement>) => void;
   onPointerMove?: (e: PointerEvent<HTMLDivElement>) => void;
@@ -176,7 +182,7 @@ interface FrameProps {
   onPointerCancel?: (e: PointerEvent<HTMLDivElement>) => void;
 }
 
-const Frame = ({ ref, className, active, hint, children, ...handlers }: FrameProps & { ref: React.Ref<HTMLDivElement> }) => (
+const Frame = ({ ref, className, active, hint, touchHint, children, ...handlers }: FrameProps & { ref: React.Ref<HTMLDivElement> }) => (
   <div
     ref={ref}
     data-cursor="revelar"
@@ -217,7 +223,8 @@ const Frame = ({ ref, className, active, hint, children, ...handlers }: FramePro
         <span className="thread-dot h-2 w-2 rounded-full bg-brand" />
       </span>
       <span className="relative max-w-[82%] rounded-full border border-white/15 bg-[#05070f]/55 px-3 py-1.5 text-center font-code text-[9px] uppercase leading-tight tracking-[0.26em] text-white/85 backdrop-blur-sm">
-        {hint}
+        <span className="[@media(pointer:coarse)]:hidden">{hint}</span>
+        <span className="hidden [@media(pointer:coarse)]:inline">{touchHint}</span>
       </span>
     </div>
 

@@ -1,14 +1,19 @@
-import { motion } from 'framer-motion';
-import Tilt3D from '@/components/effects/Tilt3D';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus } from 'lucide-react';
+import SectionHead from '@/components/ui/section-head';
+import CursorPreview from '@/components/effects/CursorPreview';
 
 const EXPERIENCES = [
   {
     id: 1,
-    period: '2024 — presente',
+    period: '2024 — hoje',
     status: 'Projeto principal',
-    role: 'Desenvolvedor Full Stack · à frente do projeto',
-    company: 'Compromisso (EdTech)',
-    type: 'Preparatório ENEM & ETEC · IA',
+    role: 'Desenvolvedor Full Stack',
+    company: 'Compromisso',
+    type: 'EdTech · ENEM & ETEC · IA',
+    preview: '/projects/compromisso.jpg',
+    previewFit: 'cover',
     description:
       'Meu principal projeto. Desenvolvi a Compromisso — plataforma de preparação para ENEM e ETEC com IA — ao lado de um único parceiro, à frente de todo o desenvolvimento, da concepção à entrega. Foi onde mais cresci como dev: assumir um produto inteiro, de ponta a ponta.',
     highlights: [
@@ -22,11 +27,13 @@ const EXPERIENCES = [
   },
   {
     id: 2,
-    period: '2025 — presente',
+    period: '2025 — hoje',
     status: 'Atual',
     role: 'Analista de Tráfego & Dev Front-end',
     company: 'Next Home',
     type: 'Imobiliário · Performance & Web',
+    preview: '/projects/next-home.jpg',
+    previewFit: 'cover',
     description:
       'Uno desenvolvimento e dados: crio e mantenho sites e landing pages do setor imobiliário enquanto gerencio campanhas de tráfego pago e analiso a performance para gerar mais leads para o negócio.',
     highlights: [
@@ -40,11 +47,13 @@ const EXPERIENCES = [
   },
   {
     id: 3,
-    period: '2023 — presente',
+    period: '2023 — hoje',
     status: 'Ativo',
-    role: 'Freelancer · Desenvolvedor Web & IoT',
-    company: 'Autônomo · Clientes Reais',
+    role: 'Freelancer · Web & IoT',
+    company: 'Autônomo',
     type: 'Front-end · Imobiliário & Automação',
+    preview: '/projects/jr-acessorios.jpg',
+    previewFit: 'cover',
     description:
       'Desenvolvo landing pages e sites de alta conversão para clientes reais nos setores imobiliário e comercial — alguns já no ar com domínio próprio — e também aplicações para automação residencial (IoT). Foco em UI/UX, responsividade e resultado.',
     highlights: [
@@ -60,9 +69,11 @@ const EXPERIENCES = [
     id: 4,
     period: '2023 — 2024',
     status: null,
-    role: 'Jovem Aprendiz — Infraestrutura de TI',
+    role: 'Jovem Aprendiz · Infraestrutura de TI',
     company: 'Thales Group',
     type: 'Multinacional · Redes & Sistemas',
+    preview: '/thales.png',
+    previewFit: 'contain',
     description:
       'Início da carreira em uma multinacional de tecnologia. Trabalhei diretamente com redes, sistemas e suporte — uma base sólida que hoje informa como penso infraestrutura e confiabilidade.',
     highlights: [
@@ -74,165 +85,183 @@ const EXPERIENCES = [
     tags: ['Infraestrutura', 'Redes', 'Help Desk', 'Suporte TI'],
     accent: '#2f6bff',
   },
-];
+] as const;
 
-const inView  = { once: true, margin: '-8% 0px -8% 0px' };
-const ease    = [0.16, 1, 0.3, 1] as const;
+type Exp = (typeof EXPERIENCES)[number];
 
-const rise = {
-  hidden: { opacity: 0, y: 40, filter: 'blur(10px)' },
-  show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease } },
-};
+const EASE = [0.16, 1, 0.3, 1] as const;
 
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.13, delayChildren: 0.05 } },
-};
-
-export default function ExperienciaSection() {
+function Row({ exp, index, open, onToggle, onHover }: {
+  exp: Exp; index: number; open: boolean;
+  onToggle: () => void; onHover: (src: string | null) => void;
+}) {
+  const num = String(index + 1).padStart(2, '0');
   return (
-    <section
-      id="experiencia"
-      className="relative scroll-mt-20 bg-[#05070f] px-6 py-24 md:py-36"
+    <motion.li
+      initial={{ opacity: 0, y: 28 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-8% 0px' }}
+      transition={{ duration: 0.8, ease: EASE, delay: index * 0.06 }}
+      className="index-row border-t rule"
+      data-open={open}
+      onPointerEnter={() => onHover(exp.preview)}
+      onPointerLeave={() => onHover(null)}
     >
-      <div className="relative mx-auto max-w-5xl">
-        {/* Kicker */}
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="show"
-          viewport={inView}
-          className="mb-16"
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        aria-controls={`exp-${exp.id}`}
+        data-cursor={open ? 'fechar' : 'abrir'}
+        className="group grid w-full grid-cols-[auto_1fr_auto] items-center gap-x-4 px-2 py-6 text-left sm:gap-x-8 sm:px-4 md:grid-cols-[4rem_1fr_minmax(0,16rem)_auto] md:py-8"
+      >
+        <span
+          className="font-display text-sm leading-none transition-colors duration-500 md:text-base"
+          style={{ color: open ? exp.accent : 'rgba(233,237,247,0.35)' }}
         >
-          <motion.div variants={rise} className="flex items-center gap-4 mb-10">
-            <span className="h-px w-10 shrink-0 bg-[#2f6bff]" />
-            <span className="font-code text-xs uppercase tracking-[0.35em] text-white/50">
-              02 — Experiência Profissional
-            </span>
-          </motion.div>
+          {num}
+        </span>
 
-          <motion.h2
-            variants={rise}
-            className="font-display leading-none text-[#e9edf7]"
-            style={{ fontSize: 'clamp(2.8rem, 7vw, 5.5rem)' }}
-          >
-            Onde <span style={{ color: '#2f6bff' }}>trabalhei</span>
-          </motion.h2>
-        </motion.div>
-
-        {/* Experience entries */}
-        <div className="flex flex-col">
-          {EXPERIENCES.map((exp, i) => (
-            <motion.div
-              key={exp.id}
-              variants={rise}
-              initial="hidden"
-              whileInView="show"
-              viewport={inView}
-              className="group relative"
-            >
-              {/* Entry card — 3D tilt on pointer with moving specular glare */}
-              <Tilt3D
-                max={6}
-                scale={1.01}
-                className="relative rounded-2xl border px-5 py-7 md:px-10 md:py-9"
-                style={{
-                  borderColor: 'rgba(255,255,255,0.07)',
-                  background: 'rgba(255,255,255,0.018)',
-                }}
+        <span className="min-w-0">
+          <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span className="font-code text-[10px] tracking-[0.35em] text-white/40 tabular-nums">{exp.period}</span>
+            {exp.status && (
+              <span
+                className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 font-code text-[9px] uppercase tracking-[0.2em]"
+                style={{ color: exp.accent, borderColor: `${exp.accent}40`, background: `${exp.accent}12` }}
               >
-                {/* Hover glow */}
-                <div
-                  className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                  style={{
-                    background: `radial-gradient(60% 60% at 0% 0%, ${exp.accent}10 0%, transparent 60%)`,
-                  }}
-                />
+                <span className="h-1 w-1 rounded-full" style={{ background: exp.accent }} />
+                {exp.status}
+              </span>
+            )}
+          </span>
+          <span
+            className="mt-2 block font-display leading-[1.12] text-[#e9edf7] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2"
+            style={{ fontSize: 'clamp(1.2rem, 3.2vw, 2.4rem)' }}
+          >
+            {exp.role}
+          </span>
+          <span className="mt-2 block font-code text-[11px] tracking-widest text-white/45 md:hidden">
+            {exp.company} <span className="text-white/20">·</span> {exp.type}
+          </span>
+        </span>
 
-                {/* Left accent bar */}
-                <div
-                  className="absolute left-0 top-6 bottom-6 w-[2px] rounded-full"
-                  style={{ background: exp.accent, opacity: 0.5 }}
-                />
+        <span className="hidden min-w-0 md:block">
+          <span className="block truncate font-code text-[12px] tracking-widest text-white/70">{exp.company}</span>
+          <span className="mt-1 block truncate font-code text-[10px] tracking-widest text-white/30">{exp.type}</span>
+        </span>
 
-                {/* Top row: period + status on one side, company on the other.
-                    Stacks left-aligned on mobile, splits to a row from sm up. */}
-                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className="font-code text-[11px] tracking-[0.4em] text-white/35 tabular-nums">
-                      {exp.period}
-                    </span>
-                    {exp.status && (
-                      <span
-                        className="inline-flex items-center gap-1.5 font-code text-[10px] tracking-widest uppercase px-2.5 py-1 rounded-full"
-                        style={{
-                          color: exp.accent,
-                          background: `${exp.accent}18`,
-                          border: `1px solid ${exp.accent}30`,
-                        }}
-                      >
-                        <span className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ background: exp.accent }} />
-                        {exp.status}
-                      </span>
-                    )}
-                  </div>
-                  <div className="sm:text-right">
-                    <div className="font-code text-[11px] tracking-widest text-white/55">{exp.company}</div>
-                    <div className="font-code text-[10px] tracking-widest text-white/25 mt-0.5">{exp.type}</div>
-                  </div>
-                </div>
+        <span
+          className="flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-500"
+          style={{
+            borderColor: open ? exp.accent : 'rgba(233,237,247,0.15)',
+            background: open ? `${exp.accent}1a` : 'transparent',
+          }}
+        >
+          <Plus
+            className="h-4 w-4 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            style={{ transform: open ? 'rotate(45deg)' : 'rotate(0deg)', color: open ? exp.accent : 'rgba(233,237,247,0.6)' }}
+          />
+        </span>
+      </button>
 
-                {/* Role — editorial display */}
-                <h3
-                  className="font-display text-[#e9edf7] leading-tight mb-5"
-                  style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)' }}
-                >
-                  {exp.role}
-                </h3>
-
-                {/* Description */}
-                <p className="font-editorial text-lg italic leading-snug text-white/55 max-w-2xl mb-6 md:text-[1.15rem]">
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            id={`exp-${exp.id}`}
+            key="body"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.7, ease: EASE }}
+            className="overflow-hidden"
+          >
+            <div className="grid grid-cols-1 gap-8 px-2 pb-10 sm:px-4 md:grid-cols-[4rem_1fr_minmax(0,16rem)_auto] md:gap-x-8">
+              <span className="hidden md:block" />
+              <div className="max-w-2xl">
+                <p className="font-editorial text-lg italic leading-snug text-white/60 md:text-[1.2rem]">
                   {exp.description}
                 </p>
-
-                {/* Highlights */}
-                <ul className="flex flex-col gap-2 mb-7">
-                  {exp.highlights.map((h) => (
-                    <li key={h} className="flex items-start gap-3">
-                      <span className="mt-[0.35em] h-1 w-4 shrink-0 rounded-full" style={{ background: exp.accent, opacity: 0.7 }} />
-                      <span className="font-code text-xs tracking-wide text-white/45">{h}</span>
-                    </li>
+                <ul className="mt-6 flex flex-col gap-2.5">
+                  {exp.highlights.map((h, i) => (
+                    <motion.li
+                      key={h}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0, transition: { delay: 0.15 + i * 0.06, duration: 0.5, ease: EASE } }}
+                      className="flex items-start gap-3"
+                    >
+                      <span className="mt-[0.45em] h-px w-4 shrink-0" style={{ background: exp.accent }} />
+                      <span className="font-code text-xs leading-relaxed tracking-wide text-white/50">{h}</span>
+                    </motion.li>
                   ))}
                 </ul>
+              </div>
+              <div className="flex flex-wrap content-start gap-2 md:col-span-2">
+                {exp.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border px-3 py-1.5 font-code text-[10px] uppercase tracking-[0.22em]"
+                    style={{ color: `${exp.accent}cc`, borderColor: `${exp.accent}26`, background: `${exp.accent}0a` }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.li>
+  );
+}
 
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2">
-                  {exp.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="font-code text-[10px] tracking-[0.25em] uppercase px-3 py-1.5 rounded-full border"
-                      style={{
-                        color: `${exp.accent}cc`,
-                        borderColor: `${exp.accent}20`,
-                        background: `${exp.accent}08`,
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </Tilt3D>
+/**
+ * Experiência — an editorial index. Each row is a numbered entry that opens
+ * in place; hovering a row floats a preview (logo / product shot) under the
+ * cursor. Reads like a table of contents, not a stack of cards.
+ */
+export default function ExperienciaSection() {
+  const [openId, setOpenId] = useState<number | null>(EXPERIENCES[0].id);
+  const [preview, setPreview] = useState<string | null>(null);
+  const current = EXPERIENCES.find((e) => e.preview === preview);
 
-              {/* Connector line between entries */}
-              {i < EXPERIENCES.length - 1 && (
-                <div className="flex justify-center py-4">
-                  <div className="w-px h-8 bg-gradient-to-b from-white/10 to-transparent" />
-                </div>
-              )}
-            </motion.div>
+  return (
+    <section id="experiencia" className="relative scroll-mt-20 overflow-hidden bg-[#05070f] px-6 py-24 sm:px-8 md:py-36">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-6 top-6 select-none font-display text-[30vw] leading-none text-white/[0.03] md:text-[18vw]"
+      >
+        02
+      </span>
+
+      <div className="relative mx-auto max-w-6xl">
+        <SectionHead
+          num="02"
+          kicker="Experiência profissional"
+          title={['Onde', <span key="a" className="text-[#2f6bff]">trabalhei</span>]}
+          aside={
+            <p className="font-code text-[11px] leading-relaxed tracking-[0.2em] text-white/40">
+              {EXPERIENCES.length} POSIÇÕES · 2023 → HOJE<br />
+              CLIQUE PARA EXPANDIR
+            </p>
+          }
+        />
+
+        <ul className="mt-16 border-b rule md:mt-20">
+          {EXPERIENCES.map((exp, i) => (
+            <Row
+              key={exp.id}
+              exp={exp}
+              index={i}
+              open={openId === exp.id}
+              onToggle={() => setOpenId((cur) => (cur === exp.id ? null : exp.id))}
+              onHover={setPreview}
+            />
           ))}
-        </div>
+        </ul>
       </div>
+
+      <CursorPreview src={preview} fit={current?.previewFit ?? 'cover'} width={280} height={190} />
     </section>
   );
 }

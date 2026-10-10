@@ -1,4 +1,4 @@
-import { useRef, useEffect, ReactNode } from 'react';
+import { useRef, useEffect, useState, ReactNode } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
@@ -94,37 +94,56 @@ export default function ScrollExpandMedia({
 
   useEffect(() => {
     if (mediaType !== 'sequence') return;
+    const track = trackRef.current;
+    if (!track) return;
 
     let active = true;
+    let started = false;
     const loadedImages: HTMLImageElement[] = [];
-    let loadedCount = 0;
-
-    FRAMES.forEach((frame, index) => {
-      const img = new Image();
-      img.src = `/0611_frames/${frame}`;
-      img.onload = () => {
-        if (!active) return;
-        loadedCount++;
-        if (loadedCount === FRAMES.length) {
-          const currentProgress = rawProgress.get();
-          drawFrame(currentProgress);
-        }
-      };
-      loadedImages[index] = img;
-    });
-
     imagesRef.current = loadedImages;
 
-    requestAnimationFrame(() => {
-      if (active) {
-        const currentProgress = rawProgress.get();
-        drawFrame(currentProgress);
+    // Frames are ~18MB in total — never fetch them on page load. Start only
+    // when the section is within one viewport, first frame first, then in
+    // small batches so the main thread and the network stay responsive.
+    const loadBatch = (from: number, to: number) => {
+      for (let index = from; index < to && index < FRAMES.length; index++) {
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = `/0611_frames/${FRAMES[index]}`;
+        img.onload = () => {
+          if (!active) return;
+          // Repaint as soon as the frame under the current progress is ready
+          drawFrame(rawProgress.get());
+        };
+        loadedImages[index] = img;
       }
-    });
+    };
+
+    const start = () => {
+      if (started) return;
+      started = true;
+      loadBatch(0, 1);
+      let cursor = 1;
+      const step = () => {
+        if (!active || cursor >= FRAMES.length) return;
+        loadBatch(cursor, cursor + 12);
+        cursor += 12;
+        setTimeout(step, 60);
+      };
+      setTimeout(step, 50);
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => { if (entries.some((e) => e.isIntersecting)) { start(); io.disconnect(); } },
+      { rootMargin: '100% 0px' },
+    );
+    io.observe(track);
 
     return () => {
       active = false;
+      io.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaType, rawProgress]);
 
   useEffect(() => {
@@ -160,8 +179,16 @@ export default function ScrollExpandMedia({
 
   // All visual values derived as MotionValues — zero React re-renders on scroll.
   // mediaW/H use px only (same unit = smooth framer-motion interpolation).
-  const mediaW      = useTransform(p, [0, 1], ['300px', '1540px']);
-  const mediaH      = useTransform(p, [0, 1], ['370px', '840px']);
+  const [small, setSmall] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 640px)');
+    const update = () => setSmall(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  const mediaW      = useTransform(p, [0, 1], [small ? '200px' : '300px', '1540px']);
+  const mediaH      = useTransform(p, [0, 1], [small ? '200px' : '370px', '840px']);
   const bgOpacity   = useTransform(p, [0, 1], [1, 0]);
   const veilOpacity = useTransform(p, [0, 1], [0.6, 0.1]);
   const boxShadow   = useTransform(p, [0, 1], [
@@ -191,7 +218,7 @@ export default function ScrollExpandMedia({
   return (
     // No overflow-x here — that breaks position:sticky in Chromium.
     // The sticky inner div has overflow:hidden which handles clipping.
-    <div ref={trackRef} className="relative bg-[#05070f]" style={{ height: '480vh' }}>
+    <div ref={trackRef} className="relative h-[320vh] bg-[#05070f] md:h-[480vh]">
 
       {/* ── Pinned viewport ─────────────────────────────────── */}
       <div className="sticky top-0 h-screen overflow-hidden">
@@ -203,7 +230,7 @@ export default function ScrollExpandMedia({
           {/* Blurred, darkened still — composited once, then cached by the GPU */}
           <div
             aria-hidden
-            className="absolute inset-0 scale-110 bg-cover bg-center"
+            className="keep-blur absolute inset-0 scale-110 bg-cover bg-center"
             style={{
               backgroundImage: `url(${bgImageSrc})`,
               filter: 'blur(28px) brightness(0.42) saturate(1.15)',
@@ -239,7 +266,8 @@ export default function ScrollExpandMedia({
             width:     mediaW,
             height:    mediaH,
             maxWidth:  '96vw',
-            maxHeight: '88vh',
+            // Phones: keep the frame near 16:9 so the wordmark is never cropped
+            maxHeight: small ? '58vw' : '88vh',
             boxShadow,
             y:         exitY,
             scale:     exitScale,
@@ -285,7 +313,7 @@ export default function ScrollExpandMedia({
             </motion.p>
           )}
 
-          <h2 className="fx-title font-display leading-[1.1] tracking-tight" style={{ fontSize: 'clamp(2.2rem, 6.5vw, 5.2rem)' }}>
+          <h2 className="fx-title font-display leading-[1.1] tracking-tight" style={{ fontSize: 'clamp(2rem, 6.5vw, 5.2rem)' }}>
             {topLine && (
               <motion.span
                 style={{ x: xLeft }}

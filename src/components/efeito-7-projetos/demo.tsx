@@ -1,6 +1,9 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { X, ExternalLink, Code2, Play, FileText } from "lucide-react";
+import { X, ExternalLink, Code2, Play, FileText, ArrowUpRight } from "lucide-react";
+import SectionHead from "@/components/ui/section-head";
+import CursorPreview from "@/components/effects/CursorPreview";
+import BrowserFrame from "@/components/ui/browser-frame";
 
 // ── Project data ─────────────────────────────────────────────────────────────
 interface Project {
@@ -16,9 +19,8 @@ interface Project {
   codeUrl?: string;
   docUrl?: string;
   demo?: { role: string; user: string; pass: string }[];
-  scrubTitle: { top: string; bottom: string };
-  frameCount: number;
-  frameUrl: (i: number) => string;
+  year: string;
+  kind: string;
 }
 
 const PROJECTS: Project[] = [
@@ -31,6 +33,8 @@ const PROJECTS: Project[] = [
     cover: "/projects/compromisso.jpg",
     tags: ["Next.js", "React", "Node.js", "TypeScript", "PostgreSQL"],
     accentHex: "#2f6bff",
+    year: "2024 — hoje",
+    kind: "Produto próprio",
     featured: true,
     liveUrl: "https://compromissose.com",
     demo: [
@@ -39,10 +43,50 @@ const PROJECTS: Project[] = [
       { role: "Admin",     user: "admin@compromisso.com",     pass: "compromisso2026@" },
       { role: "Staff",     user: "staff@compromisso.com",     pass: "compromisso2026@" },
     ],
-    scrubTitle: { top: "Compromisso", bottom: "EdTech" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
+  },
+  {
+    id: 12,
+    title: "Astro Soluções",
+    subtitle: "Agência · Sites, sistemas e automações sob medida",
+    description:
+      "Site institucional da Astro Soluções, que constrói sites, sistemas web, robôs de WhatsApp, cobrança automática e painéis em tempo real para empresas que precisam sair do manual. Hero em órbita com foguete e Terra, seções de serviços, processo e agendamento de diagnóstico — pensado para converter.",
+    cover: "/projects/astro-solucoes.jpg",
+    tags: ["React", "TypeScript", "Tailwind", "Motion", "Landing page", "Netlify"],
+    accentHex: "#6f97ff",
+    year: "2026",
+    kind: "Cliente real",
+    featured: true,
+    liveUrl: "https://astrosolucoes.netlify.app",
+  },
+  {
+    id: 10,
+    title: "Next Home",
+    subtitle: "Imobiliária · Alphaville, Barueri e região",
+    description:
+      "Site da Next Home, imobiliária onde atuo como analista de tráfego e dev front-end. Catálogo com dezenas de imóveis filtrável por tipo, cidade e faixa de preço, páginas de lançamentos, simulador de financiamento e atendimento direto no WhatsApp — pensado para converter o tráfego pago das campanhas em leads.",
+    cover: "/projects/next-home.jpg",
+    tags: ["Next.js", "React", "TypeScript", "Tailwind", "SEO", "Imobiliário"],
+    accentHex: "#38e0ff",
+    year: "2025 — hoje",
+    kind: "Cliente real",
+    featured: true,
+    liveUrl: "https://next-home-drab.vercel.app",
+    codeUrl: "https://github.com/Goes1404/next-home",
+  },
+  {
+    id: 11,
+    title: "Dalí",
+    subtitle: "Escola SaaS · Ensino e gestão escolar · ENEM & ETEC",
+    description:
+      "Plataforma SaaS de estudo e gestão escolar: cinco perfis (aluno, professor, secretaria, responsável e direção) sobre uma única base de dados. Simulados no padrão real, redação corrigida em minutos, gamificação com XP, ofensiva e mascote, flashcards com repetição espaçada, financeiro de mensalidades e chamada por código.",
+    cover: "/projects/escolasaas.jpg",
+    tags: ["Next.js", "React", "TypeScript", "Node.js", "PostgreSQL", "SaaS"],
+    accentHex: "#6f97ff",
+    year: "2026",
+    kind: "Produto próprio",
+    featured: true,
+    liveUrl: "https://escolasaas.vercel.app",
+    codeUrl: "https://github.com/Goes1404/escolasaas",
   },
   {
     id: 2,
@@ -53,15 +97,12 @@ const PROJECTS: Project[] = [
     cover: "/projects/nexus.jpg",
     tags: ["Next.js", "React 19", "Fastify", "Python", "PostgreSQL", "Redis", "Pydantic AI", "TOTVS"],
     accentHex: "#38e0ff",
-    featured: true,
+    year: "2026",
+    kind: "Hackathon · FIAP × TOTVS",
     liveUrl: "https://frontend-seven-mauve-95.vercel.app/login",
     demo: [
       { role: "Demo", user: "joao.silva@totvs.com.br", pass: "nexus2026" },
     ],
-    scrubTitle: { top: "NEXUS", bottom: "TOTVS × IA" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
     id: 3,
@@ -72,13 +113,10 @@ const PROJECTS: Project[] = [
     cover: "/projects/jr-acessorios.jpg",
     tags: ["React", "Next.js", "Node.js", "E-commerce"],
     accentHex: "#2f6bff",
-    featured: true,
+    year: "2025",
+    kind: "Cliente real",
     liveUrl: "https://www.jracessorios.com",
     codeUrl: "https://github.com/Goes1404/jota-r-craft-connect",
-    scrubTitle: { top: "JR", bottom: "Acessórios" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
     id: 4,
@@ -89,11 +127,9 @@ const PROJECTS: Project[] = [
     cover: "/projects/corretora-cristal.jpg",
     tags: ["Lovable", "Next.js", "React", "Imobiliário"],
     accentHex: "#38e0ff",
+    year: "2025",
+    kind: "Cliente real",
     liveUrl: "https://cristal-nexthome.lovable.app/",
-    scrubTitle: { top: "Cristal", bottom: "Imóveis" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
     id: 5,
@@ -104,11 +140,9 @@ const PROJECTS: Project[] = [
     cover: "/projects/spy26der.jpg",
     tags: ["Python", "Machine Learning", "Data Science", "Redes", "AR/VR", "SQL"],
     accentHex: "#6f97ff",
+    year: "2026",
+    kind: "Global Solution · FIAP",
     docUrl: "https://docs.google.com/document/d/1DtKBkq6CwijJIqOuluMZie4ZT17tEN1fkA3H_LZdEM0/edit?usp=drivesdk",
-    scrubTitle: { top: "SPY26DER", bottom: "Space GS" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
     id: 6,
@@ -119,12 +153,10 @@ const PROJECTS: Project[] = [
     cover: "/projects/vinheria-agnello.jpg",
     tags: ["HTML", "CSS", "GitHub Pages", "FIAP"],
     accentHex: "#6f97ff",
+    year: "2024",
+    kind: "Checkpoint · FIAP",
     liveUrl: "https://mariaeduardaacyole.github.io/Checkpoint-Site-da-Vinheria-Agnello/src/pages/produtos.html",
     codeUrl: "https://github.com/Goes1404/Checkpoint-Site-da-Vinheria-Agnello",
-    scrubTitle: { top: "Vinheria", bottom: "Agnello" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
     id: 7,
@@ -135,12 +167,10 @@ const PROJECTS: Project[] = [
     cover: "/projects/glowcare.jpg",
     tags: ["HTML", "CSS", "GitHub Pages", "FIAP"],
     accentHex: "#6f97ff",
+    year: "2024",
+    kind: "Checkpoint · FIAP",
     liveUrl: "https://goes1404.github.io/Glowcare/",
     codeUrl: "https://github.com/Goes1404/Glowcare",
-    scrubTitle: { top: "Glow", bottom: "Care" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
     id: 8,
@@ -151,12 +181,10 @@ const PROJECTS: Project[] = [
     cover: "/projects/melodia.jpg",
     tags: ["HTML5", "CSS3", "JavaScript", "FIAP"],
     accentHex: "#6f97ff",
+    year: "2025",
+    kind: "Checkpoint · FIAP",
     liveUrl: "https://maykesantos98.github.io/Front-end-CP5/",
     codeUrl: "https://github.com/Maykesantos98/Front-end-CP5",
-    scrubTitle: { top: "Melodia", bottom: "Streaming" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
   {
     id: 9,
@@ -167,12 +195,10 @@ const PROJECTS: Project[] = [
     cover: "/projects/ecotrend.jpg",
     tags: ["HTML5", "CSS3", "Bootstrap", "JavaScript", "FIAP"],
     accentHex: "#6f97ff",
+    year: "2025",
+    kind: "Checkpoint · FIAP",
     liveUrl: "https://mariaeduardaacyole.github.io/EcoTrend---CP4/",
     codeUrl: "https://github.com/mariaeduardaacyole/EcoTrend---CP4",
-    scrubTitle: { top: "Eco", bottom: "Trend" },
-    frameCount: 300,
-    frameUrl: (i) =>
-      `https://raw.githubusercontent.com/duthiljean/ferrari-hero-demo/main/${String(i + 1).padStart(4, "0")}.webp`,
   },
 ];
 
@@ -241,6 +267,9 @@ function ExpandedProjectCard({
       {/* Container Principal Expandido com Layout Compartilhado */}
       <motion.div
         layoutId={`card-container-${project.id}`}
+        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 16, scale: 0.98 }}
         className="relative w-full max-w-4xl bg-[#0a0e1c] border border-white/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh] z-10"
         transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
       >
@@ -250,7 +279,7 @@ function ExpandedProjectCard({
             layoutId={`card-image-${project.id}`}
             src={project.cover}
             alt={project.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           />
           {/* Degradê cinematográfico para fundir com o fundo preto */}
@@ -432,170 +461,182 @@ function ExpandedProjectCard({
   );
 }
 
-// ── Card Compacto ─────────────────────────────────────────────────────────────
-function ProjectCard({
+// ── Featured case row ─────────────────────────────────────────────────────
+// Large editorial row: image on one side (alternating), big type on the
+// other. The image drifts with scroll (parallax) and zooms on hover; the
+// title slides. Shares layoutIds with the modal for a seamless open.
+function FeaturedCase({
   project,
-  onClick,
+  index,
+  onOpen,
 }: {
   project: Project;
-  onClick: () => void;
+  index: number;
+  onOpen: () => void;
 }) {
-  // Scroll-driven entrance: the card grows + fades in as it rises into view.
-  // Lives on a WRAPPER (not the layoutId article) so the expand projection
-  // never fights the scroll transform.
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: wrapRef,
-    offset: ["start end", "center 62%"],
-  });
-  const scale = useTransform(scrollYProgress, [0, 1], [0.84, 1]);
-  const opacity = useTransform(scrollYProgress, [0, 1], [0.25, 1]);
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const imgY = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
+  const flip = index % 2 === 1;
+  const num = String(index + 1).padStart(2, "0");
 
   return (
-    <motion.div ref={wrapRef} style={{ scale, opacity }} className="will-change-transform">
     <motion.article
+      ref={ref}
       layoutId={`card-container-${project.id}`}
-      className={`group relative overflow-hidden rounded-2xl cursor-pointer bg-[#0a0e1c] border ${
-        project.featured ? "border-[#2f6bff]/40" : "border-white/[0.07]"
-      }`}
-      onClick={onClick}
+      initial={{ opacity: 0, y: 48 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-10% 0px" }}
+      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+      className="group grid cursor-pointer grid-cols-1 items-center gap-6 border-t rule py-10 md:grid-cols-12 md:gap-10 md:py-16"
+      onClick={onOpen}
       role="button"
       tabIndex={0}
-      onKeyDown={(e) => e.key === "Enter" && onClick()}
+      onKeyDown={(e) => e.key === "Enter" && onOpen()}
       aria-label={`Abrir projeto ${project.title}`}
+      data-cursor="ver case"
     >
-      {/* Imagem de Capa */}
-      <div className="relative h-64 overflow-hidden">
-        <motion.img
-          layoutId={`card-image-${project.id}`}
-          src={project.cover}
-          alt={project.title}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0e1c] via-[#0a0e1c]/20 to-transparent" />
-
-        {/* Selo de destaque — só nos melhores projetos */}
-        {project.featured && (
-          <div
-            className="absolute left-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 font-code text-[10px] uppercase tracking-[0.18em] backdrop-blur-md"
-            style={{
-              color: "#bcd2ff",
-              borderColor: `${project.accentHex}55`,
-              background: `${project.accentHex}1f`,
-            }}
+      {/* Image */}
+      <div className={`relative md:col-span-6 ${flip ? "md:order-2" : ""}`}>
+        <motion.div style={{ y: imgY }}>
+          <BrowserFrame
+            src={project.cover}
+            alt={project.title}
+            url={project.liveUrl ?? project.docUrl}
+            layoutId={`card-image-${project.id}`}
+            accentHex={project.accentHex}
           >
-            <span className="h-1.5 w-1.5 rounded-full" style={{ background: project.accentHex }} />
-            Destaque
-          </div>
-        )}
-        
-        {/* Glow temático no hover */}
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500 pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at center, ${project.accentHex} 0%, transparent 70%)` }}
-        />
-
-        {/* Ícone de Play centralizado */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div
-            className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0a0e1c]/70 backdrop-blur-md border border-white/10 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100"
-          >
-            <Play className="h-5 w-5 fill-white ml-0.5" />
-          </div>
-        </div>
+            <div
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-30"
+              style={{ background: `radial-gradient(60% 60% at 50% 100%, ${project.accentHex}, transparent 70%)` }}
+            />
+            <span className="absolute bottom-4 right-4 inline-flex translate-y-2 items-center gap-2 rounded-full border border-white/15 bg-[#05070f]/70 px-3.5 py-2 font-code text-[10px] uppercase tracking-[0.25em] text-white opacity-0 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+              Ver case <ArrowUpRight className="h-3.5 w-3.5" />
+            </span>
+          </BrowserFrame>
+        </motion.div>
       </div>
 
-      {/* Corpo do Card */}
-      <div className="relative p-5">
-        {/* Detalhe superior colorido */}
-        <div
-          className="absolute top-0 left-0 right-0 h-px"
-          style={{ background: `linear-gradient(90deg, transparent, ${project.accentHex}66, transparent)` }}
-        />
-
-        <div className="flex items-start justify-between gap-3 mb-3">
-          <div>
-            <motion.h3 
-              layoutId={`card-title-${project.id}`}
-              className="text-lg font-bold text-white leading-tight"
-            >
-              {project.title}
-            </motion.h3>
-            <motion.p 
-              layoutId={`card-subtitle-${project.id}`}
-              className="text-xs text-[#6f97ff] font-code mt-0.5"
-            >
-              {project.subtitle}
-            </motion.p>
-          </div>
-          <div className="flex gap-2 shrink-0 mt-0.5">
-            {project.codeUrl && (
-              <a
-                href={project.codeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10"
-                onClick={(e) => e.stopPropagation()}
-                aria-label="Ver código"
-              >
-                <Code2 className="h-3.5 w-3.5" />
-              </a>
-            )}
-            {project.liveUrl && (
-              <a
-                href={project.liveUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10"
-                onClick={(e) => e.stopPropagation()}
-                aria-label="Ver site ao vivo"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-              </a>
-            )}
-            {project.docUrl && (
-              <a
-                href={project.docUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-1.5 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-white/50 hover:text-white transition-colors border border-white/10"
-                onClick={(e) => e.stopPropagation()}
-                aria-label="Ver documento do projeto"
-              >
-                <FileText className="h-3.5 w-3.5" />
-              </a>
-            )}
-          </div>
+      {/* Copy */}
+      <div className={`relative md:col-span-6 ${flip ? "md:order-1 md:pr-6" : "md:pl-6"}`}>
+        <div className="flex items-center gap-4">
+          <span className="font-display text-sm leading-none" style={{ color: project.accentHex }}>{num}</span>
+          <span className="h-px w-8 bg-white/15" />
+          <span className="font-code text-[10px] uppercase tracking-[0.3em] text-white/45">{project.kind}</span>
+          <span className="hidden h-px w-4 bg-white/15 sm:block" />
+          <span className="hidden font-code text-[10px] tracking-[0.3em] text-white/30 tabular-nums sm:block">{project.year}</span>
         </div>
-
-        {/* Resumo/Descrição */}
-        <p className="text-xs text-white/50 leading-relaxed mb-4 line-clamp-2">
+        <motion.h3
+          layoutId={`card-title-${project.id}`}
+          className="mt-5 font-display leading-[1.02] text-[#e9edf7] transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2"
+          style={{ fontSize: "clamp(1.8rem, 3.1vw, 3.1rem)" }}
+        >
+          {project.title}
+        </motion.h3>
+        <motion.p layoutId={`card-subtitle-${project.id}`} className="mt-3 font-code text-xs tracking-wide text-[#6f97ff]">
+          {project.subtitle}
+        </motion.p>
+        <p className="mt-5 max-w-md font-editorial text-lg italic leading-snug text-white/55 line-clamp-3 md:text-xl">
           {project.description}
         </p>
-
-        {/* Tags */}
-        <motion.div 
-          layoutId={`card-tags-${project.id}`}
-          className="flex flex-wrap gap-1.5 mb-4"
-        >
-          {project.tags.map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-0.5 rounded-full text-[10px] font-code border border-white/10 text-white/50 bg-white/[0.03]"
-            >
+        <motion.div layoutId={`card-tags-${project.id}`} className="mt-6 flex flex-wrap gap-2">
+          {project.tags.slice(0, 5).map((tag) => (
+            <span key={tag} className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 font-code text-[10px] text-white/55">
               {tag}
             </span>
           ))}
         </motion.div>
-
-        <div className="flex items-center gap-2 text-[10px] text-white/40 group-hover:text-[#6f97ff] transition-colors duration-300 font-code">
-          <Play className="h-2.5 w-2.5" />
-          <span>Ver detalhes do projeto</span>
+        <div className="mt-7 flex items-center gap-3">
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              data-cursor="abrir"
+              className="link-underline font-code text-[11px] tracking-[0.25em] text-[#e9edf7]"
+            >
+              AO VIVO ↗
+            </a>
+          )}
+          {project.codeUrl && (
+            <a
+              href={project.codeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              data-cursor="código"
+              className="link-underline font-code text-[11px] tracking-[0.25em] text-white/50 hover:text-[#e9edf7]"
+            >
+              GITHUB ↗
+            </a>
+          )}
+          {project.docUrl && (
+            <a
+              href={project.docUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              data-cursor="ler"
+              className="link-underline font-code text-[11px] tracking-[0.25em] text-white/50 hover:text-[#e9edf7]"
+            >
+              DOCUMENTO ↗
+            </a>
+          )}
         </div>
       </div>
     </motion.article>
-    </motion.div>
+  );
+}
+
+// ── Index row (secondary projects) ────────────────────────────────────────
+function IndexRow({
+  project,
+  index,
+  onOpen,
+  onHover,
+}: {
+  project: Project;
+  index: number;
+  onOpen: () => void;
+  onHover: (src: string | null) => void;
+}) {
+  const num = String(index + 1).padStart(2, "0");
+  return (
+    <motion.li
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-6% 0px" }}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: (index % 6) * 0.05 }}
+      className="index-row border-t rule"
+      onPointerEnter={() => onHover(project.cover)}
+      onPointerLeave={() => onHover(null)}
+    >
+      <button
+        type="button"
+        onClick={onOpen}
+        data-cursor="ver"
+        className="group grid w-full grid-cols-[2.5rem_1fr_auto] items-center gap-x-4 px-2 py-5 text-left sm:px-4 md:grid-cols-[4rem_1fr_minmax(0,14rem)_6rem_auto] md:gap-x-8 md:py-6"
+      >
+        <span className="font-display text-sm leading-none text-white/35 transition-colors group-hover:text-[#38e0ff]">{num}</span>
+        <span className="min-w-0">
+          <span
+            className="block font-display leading-tight text-[#e9edf7] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2 md:truncate"
+            style={{ fontSize: "clamp(1.25rem, 2.6vw, 2rem)" }}
+          >
+            {project.title}
+          </span>
+          <span className="mt-1 block truncate font-code text-[10px] tracking-widest text-white/40 md:hidden">
+            {project.kind} · {project.year}
+          </span>
+        </span>
+        <span className="hidden truncate font-code text-[11px] tracking-widest text-white/50 md:block">{project.kind}</span>
+        <span className="hidden font-code text-[11px] tracking-widest text-white/35 tabular-nums md:block">{project.year}</span>
+        <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 text-white/60 transition-all duration-500 group-hover:border-[#2f6bff] group-hover:bg-[#2f6bff]/15 group-hover:text-white">
+          <ArrowUpRight className="h-4 w-4 transition-transform duration-500 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+        </span>
+      </button>
+    </motion.li>
   );
 }
 
@@ -604,6 +645,7 @@ export default function ProjetosHeroScrub() {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [transitionProject, setTransitionProject] = useState<Project | null>(null);
   const [fallbackProject, setFallbackProject] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
 
   const handleClose = useCallback(() => {
     setActiveProject(null);
@@ -613,36 +655,38 @@ export default function ProjetosHeroScrub() {
   // flourish while the live site opens in a NEW TAB, so the recruiter keeps the
   // portfolio open and can actually browse the project.
   const handlePlay = (project: Project) => {
-    // Live site when there is one; otherwise the project document (e.g. the GS).
     const url = project.liveUrl ?? project.docUrl;
     if (!url) {
-      // Nothing public to open yet → graceful note instead.
       setFallbackProject(project.title);
       return;
     }
-    // window.open runs INSIDE the click gesture → never popup-blocked.
     const win = window.open(url, "_blank", "noopener,noreferrer");
-    setTransitionProject(project); // brief cinematic flourish
+    setTransitionProject(project);
     if (!win) {
-      // If a browser still blocks the popup, fall back to a same-tab redirect
-      // so the user always reaches the project.
       setTimeout(() => {
         window.location.href = url;
       }, 900);
     }
   };
 
-  // The overlay dismisses itself once its reveal finishes (the tab is already
-  // open). No next/router here — this is a Vite SPA and the live project is an
-  // external URL, so we open it directly instead of routing to an internal page.
   const endTransition = () => {
     setTransitionProject(null);
     setActiveProject(null);
   };
 
+  const featured = PROJECTS.filter((p) => p.featured);
+  const others = PROJECTS.filter((p) => !p.featured);
+
   return (
-    <section className="w-full bg-[#05070f] px-5 py-16 sm:px-6 sm:py-20">
-      {/* Notificador de Transição de Rota (Simulação local) */}
+    <section className="relative w-full overflow-hidden bg-[#05070f] px-6 py-20 sm:px-8 sm:py-28">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-6 top-10 select-none font-display text-[30vw] leading-none text-white/[0.03] md:text-[18vw]"
+      >
+        03
+      </span>
+
+      {/* Notificador — demo ainda não disponível */}
       <AnimatePresence>
         {fallbackProject && (
           <motion.div
@@ -658,9 +702,6 @@ export default function ProjetosHeroScrub() {
             <p className="text-white text-sm font-medium mt-1">
               O demo de <span className="font-code text-[#38e0ff]">{fallbackProject}</span> ainda está sendo preparado.
             </p>
-            <p className="text-white/50 text-[11px] leading-normal mt-1">
-              Enquanto isso, role o card aberto para ver os detalhes técnicos do projeto.
-            </p>
             <button
               onClick={() => setFallbackProject(null)}
               className="mt-3 text-left text-xs text-white/40 hover:text-white transition-colors underline font-code w-fit"
@@ -671,38 +712,31 @@ export default function ProjetosHeroScrub() {
         )}
       </AnimatePresence>
 
-      {/* Overlay de Transição Cinematográfica Fullscreen */}
+      {/* Overlay de transição ao abrir um projeto ao vivo */}
       <AnimatePresence>
         {transitionProject && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.7, ease: "easeInOut" }}
-            className="fixed inset-0 z-[100000] bg-black flex flex-col items-center justify-center overflow-hidden"
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="fixed inset-0 z-[100000] bg-[#05070f] flex flex-col items-center justify-center overflow-hidden"
           >
-            {/* Efeito Zoom e Blur no conteúdo de transição */}
             <motion.div
-              initial={{ scale: 0.8, opacity: 0, filter: "blur(20px)" }}
+              initial={{ scale: 0.86, opacity: 0, filter: "blur(16px)" }}
               animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-              transition={{ delay: 0.15, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              // ⬇️ The reveal finishing IS the cue to navigate — this is the
-              // "await the animation, then route" handoff (no setTimeout guess).
+              transition={{ delay: 0.1, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
               onAnimationComplete={endTransition}
               className="text-center px-6 z-10"
             >
-              <span className="font-code text-xs uppercase tracking-[0.45em] text-[#6f97ff] block mb-4 animate-pulse">
+              <span className="font-code text-xs uppercase tracking-[0.45em] text-[#6f97ff] block mb-4">
                 {transitionProject.liveUrl ? "Abrindo projeto ao vivo" : "Abrindo documento do projeto"}
               </span>
               <h1 className="font-display text-4xl md:text-6xl text-white tracking-tight mb-2">
                 {transitionProject.title}
               </h1>
-              <p className="text-white/50 font-code text-sm max-w-md mx-auto">
-                {transitionProject.subtitle}
-              </p>
-
-              {/* Barra de progresso linear ambientada */}
-              <div className="w-48 h-[1px] bg-white/10 mx-auto mt-8 relative overflow-hidden rounded-full border border-white/10">
+              <p className="text-white/50 font-code text-sm max-w-md mx-auto">{transitionProject.subtitle}</p>
+              <div className="w-48 h-px bg-white/10 mx-auto mt-8 relative overflow-hidden rounded-full">
                 <motion.div
                   initial={{ left: "-100%" }}
                   animate={{ left: "100%" }}
@@ -711,79 +745,58 @@ export default function ProjetosHeroScrub() {
                 />
               </div>
             </motion.div>
-
-            {/* Grid de linhas cinemáticas e Glow focal */}
-            <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:100%_4px] pointer-events-none" />
             <div
               className="absolute inset-0 opacity-20 pointer-events-none"
-              style={{
-                background: `radial-gradient(circle at center, ${transitionProject.accentHex} 0%, transparent 60%)`,
-              }}
+              style={{ background: `radial-gradient(circle at center, ${transitionProject.accentHex} 0%, transparent 60%)` }}
             />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Headline cinemática — fica FIXA no topo da seção enquanto os cards
-          deslizam por trás (sticky + backdrop-blur). */}
-      <div className="relative z-20 mx-auto mb-12 max-w-5xl">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="rounded-2xl border border-white/[0.06] bg-[#05070f]/80 px-5 py-5 backdrop-blur-md sm:px-7 sm:py-6"
-        >
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#2f6bff]/25 bg-[#2f6bff]/10 px-3 py-1 font-code text-[11px] text-[#6f97ff]">
-            <Play className="h-3 w-3 fill-none" />
-            Casos selecionados
+      <div className="relative mx-auto max-w-6xl">
+        <SectionHead
+          num="03"
+          kicker="Trabalho selecionado"
+          title={["Projetos reais —", <span key="b" className="text-[#38e0ff]">de clientes a desafios</span>]}
+          aside={
+            <p className="font-code text-[11px] leading-relaxed tracking-[0.2em] text-white/40">
+              {PROJECTS.length} PROJETOS · {featured.length} EM DESTAQUE<br />
+              CLIQUE PARA VER O CASE
+            </p>
+          }
+        />
+
+        {/* Featured — large editorial rows */}
+        <div className="mt-16 border-b rule md:mt-20">
+          {featured.map((project, i) => (
+            <FeaturedCase key={project.id} project={project} index={i} onOpen={() => setActiveProject(project)} />
+          ))}
+        </div>
+
+        {/* Index — the rest, as a table of contents with a cursor preview */}
+        <div className="mt-24 md:mt-32">
+          <div className="mb-8 flex items-center justify-between gap-6">
+            <span className="flex items-center gap-4">
+              <span className="h-px w-8 bg-white/25" />
+              <span className="font-code text-[11px] uppercase tracking-[0.3em] text-white/50">Mais projetos — clientes & FIAP</span>
+            </span>
+            <span className="hidden font-code text-[10px] tracking-[0.3em] text-white/30 md:block">PASSE O MOUSE PARA PRÉ-VISUALIZAR</span>
           </div>
-          <h2
-            className="font-display tracking-tight text-white"
-            style={{ fontSize: "clamp(1.35rem, 4.6vw, 2.5rem)", lineHeight: 1.06 }}
-          >
-            Projetos reais — de clientes{" "}
-            <span className="text-[#38e0ff]">a desafios da faculdade.</span>
-          </h2>
-        </motion.div>
-      </div>
-
-      {/* Grade de Projetos — destaques primeiro, depois os demais */}
-      <div className="max-w-5xl mx-auto">
-        {/* Em destaque */}
-        <div className="mb-4 flex items-center gap-3">
-          <span className="h-px w-8 bg-[#2f6bff]" />
-          <span className="font-code text-[11px] uppercase tracking-[0.3em] text-[#6f97ff]">
-            Em destaque
-          </span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PROJECTS.filter((p) => p.featured).map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onClick={() => setActiveProject(project)}
-            />
-          ))}
-        </div>
-
-        {/* Mais projetos */}
-        <div className="mt-16 mb-4 flex items-center gap-3">
-          <span className="h-px w-8 bg-white/20" />
-          <span className="font-code text-[11px] uppercase tracking-[0.3em] text-white/45">
-            Mais projetos — clientes & FIAP
-          </span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PROJECTS.filter((p) => !p.featured).map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onClick={() => setActiveProject(project)}
-            />
-          ))}
+          <ul className="border-b rule">
+            {others.map((project, i) => (
+              <IndexRow
+                key={project.id}
+                project={project}
+                index={featured.length + i}
+                onOpen={() => setActiveProject(project)}
+                onHover={setPreview}
+              />
+            ))}
+          </ul>
         </div>
       </div>
+
+      <CursorPreview src={preview} width={320} height={200} />
 
       {/* Detalhes Expandidos (Modal com Shared Layout) */}
       <AnimatePresence>

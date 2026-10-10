@@ -1,16 +1,37 @@
-# React + Vite
+# Matheus Goes da Silva — Portfólio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site pessoal (React 19 + Vite 8 + Tailwind) com narrativa editorial e motion:
+preloader cinematográfico, hero com parallax em camadas sobre shader WebGL,
+História pinada por capítulos, Experiência e Projetos em formato de índice
+editorial com pré-visualização que segue o cursor, sequência de frames
+scrubbada por scroll, e rodapé com marquee tipográfico.
 
-Currently, two official plugins are available:
+## Rodar
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev      # desenvolvimento
+npm run build    # produção → dist/
+npm run preview  # serve o build
+npm run lint
+```
 
-## React Compiler
+## Estrutura
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/App.jsx` — shell da página (hero, parceiros, contato) e ordem das seções
+- `src/components/shell/` — Preloader, Header (esconde ao rolar, relógio SP, seção ativa), SectionNav
+- `src/components/effects/` — CustomCursor, ParticleField, Magnetic, SplitReveal, ScrambleText, CursorPreview…
+- `src/components/historia/` — intro + capítulos pinados com retrato P&B → cor
+- `src/components/experiencia/` — índice expansível
+- `src/components/parceiros/` — faixa editorial de parceiros
+- `src/components/ui/browser-frame.tsx` — mockup único usado em todas as capas
+- `src/components/efeito-7-projetos/` — cases em destaque + índice + modal
+- `src/components/skills/` — ledger de ferramentas
+- `public/0611_frames/` — 144 frames `.webp` da sequência da marca (campo de linhas → wordmark MGS), carregados sob demanda
+- `public/projects/` — capturas reais dos projetos (1440×900). Para atualizar: abra o site, capture a dobra e salve com o mesmo nome
 
-## Expanding the ESLint configuration
+## Conteúdo
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Links, e-mail e CV ficam no topo de `src/App.jsx`. Projetos em
+`src/components/efeito-7-projetos/demo.tsx`, experiências em
+`src/components/experiencia/index.tsx`, capítulos em `src/components/historia/index.tsx`.
