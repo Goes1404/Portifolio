@@ -3,6 +3,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { X, ExternalLink, Code2, Play, FileText, ArrowUpRight } from "lucide-react";
 import SectionHead from "@/components/ui/section-head";
 import CursorPreview from "@/components/effects/CursorPreview";
+import BrowserFrame from "@/components/ui/browser-frame";
 
 // ── Project data ─────────────────────────────────────────────────────────────
 interface Project {
@@ -236,7 +237,7 @@ function ExpandedProjectCard({
             layoutId={`card-image-${project.id}`}
             src={project.cover}
             alt={project.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-top"
             transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
           />
           {/* Degradê cinematográfico para fundir com o fundo preto */}
@@ -433,7 +434,7 @@ function FeaturedCase({
 }) {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const imgY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+  const imgY = useTransform(scrollYProgress, [0, 1], ["6%", "-6%"]);
   const flip = index % 2 === 1;
   const num = String(index + 1).padStart(2, "0");
 
@@ -455,32 +456,23 @@ function FeaturedCase({
     >
       {/* Image */}
       <div className={`relative md:col-span-6 ${flip ? "md:order-2" : ""}`}>
-        <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/[0.06] bg-[#0a0e1c]">
-          <motion.div style={{ y: imgY }} className="absolute -inset-y-[12%] inset-x-0">
-            <motion.img
-              layoutId={`card-image-${project.id}`}
-              src={project.cover}
-              alt={project.title}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]"
-              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
-            />
-          </motion.div>
-          {/* Tint + grain so the shot sits in the site's atmosphere */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070f]/70 via-transparent to-transparent" />
-          <div className="bg-noise pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay" />
-          <div
-            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-30"
-            style={{ background: `radial-gradient(60% 60% at 50% 100%, ${project.accentHex}, transparent 70%)` }}
-          />
-          {/* Corner meta */}
-          <span className="absolute left-4 top-4 font-code text-[10px] tracking-[0.3em] text-white/60">{project.year}</span>
-          <span
-            className="absolute bottom-4 right-4 inline-flex translate-y-2 items-center gap-2 rounded-full border border-white/15 bg-[#05070f]/70 px-3.5 py-2 font-code text-[10px] uppercase tracking-[0.25em] text-white opacity-0 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100"
+        <motion.div style={{ y: imgY }}>
+          <BrowserFrame
+            src={project.cover}
+            alt={project.title}
+            url={project.liveUrl ?? project.docUrl}
+            layoutId={`card-image-${project.id}`}
+            accentHex={project.accentHex}
           >
-            Ver case <ArrowUpRight className="h-3.5 w-3.5" />
-          </span>
-        </div>
+            <div
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-30"
+              style={{ background: `radial-gradient(60% 60% at 50% 100%, ${project.accentHex}, transparent 70%)` }}
+            />
+            <span className="absolute bottom-4 right-4 inline-flex translate-y-2 items-center gap-2 rounded-full border border-white/15 bg-[#05070f]/70 px-3.5 py-2 font-code text-[10px] uppercase tracking-[0.25em] text-white opacity-0 backdrop-blur-md transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+              Ver case <ArrowUpRight className="h-3.5 w-3.5" />
+            </span>
+          </BrowserFrame>
+        </motion.div>
       </div>
 
       {/* Copy */}
@@ -489,6 +481,8 @@ function FeaturedCase({
           <span className="font-display text-sm leading-none" style={{ color: project.accentHex }}>{num}</span>
           <span className="h-px w-8 bg-white/15" />
           <span className="font-code text-[10px] uppercase tracking-[0.3em] text-white/45">{project.kind}</span>
+          <span className="hidden h-px w-4 bg-white/15 sm:block" />
+          <span className="hidden font-code text-[10px] tracking-[0.3em] text-white/30 tabular-nums sm:block">{project.year}</span>
         </div>
         <motion.h3
           layoutId={`card-title-${project.id}`}

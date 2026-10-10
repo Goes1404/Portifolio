@@ -187,8 +187,8 @@ export default function ScrollExpandMedia({
     mq.addEventListener('change', update);
     return () => mq.removeEventListener('change', update);
   }, []);
-  const mediaW      = useTransform(p, [0, 1], [small ? '220px' : '300px', '1540px']);
-  const mediaH      = useTransform(p, [0, 1], [small ? '280px' : '370px', '840px']);
+  const mediaW      = useTransform(p, [0, 1], [small ? '200px' : '300px', '1540px']);
+  const mediaH      = useTransform(p, [0, 1], [small ? '200px' : '370px', '840px']);
   const bgOpacity   = useTransform(p, [0, 1], [1, 0]);
   const veilOpacity = useTransform(p, [0, 1], [0.6, 0.1]);
   const boxShadow   = useTransform(p, [0, 1], [
@@ -266,7 +266,8 @@ export default function ScrollExpandMedia({
             width:     mediaW,
             height:    mediaH,
             maxWidth:  '96vw',
-            maxHeight: '88vh',
+            // Phones: keep the frame near 16:9 so the wordmark is never cropped
+            maxHeight: small ? '58vw' : '88vh',
             boxShadow,
             y:         exitY,
             scale:     exitScale,

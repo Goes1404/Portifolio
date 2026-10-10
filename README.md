@@ -23,9 +23,12 @@ npm run lint
 - `src/components/effects/` — CustomCursor, ParticleField, Magnetic, SplitReveal, ScrambleText, CursorPreview…
 - `src/components/historia/` — intro + capítulos pinados com retrato P&B → cor
 - `src/components/experiencia/` — índice expansível
+- `src/components/parceiros/` — faixa editorial de parceiros
+- `src/components/ui/browser-frame.tsx` — mockup único usado em todas as capas
 - `src/components/efeito-7-projetos/` — cases em destaque + índice + modal
 - `src/components/skills/` — ledger de ferramentas
-- `public/0611_frames/` — 144 frames `.webp` da sequência do hero de Projetos (carregados sob demanda)
+- `public/0611_frames/` — 144 frames `.webp` da sequência da marca (campo de linhas → wordmark MGS), carregados sob demanda
+- `public/projects/` — capturas reais dos projetos (1440×900). Para atualizar: abra o site, capture a dobra e salve com o mesmo nome
 
 ## Conteúdo
 

@@ -49,7 +49,7 @@ export default function CursorPreview({ src, alt = '', fit = 'cover', width = 30
               src={src}
               alt={alt}
               draggable={false}
-              className={fit === 'contain' ? 'h-full w-full bg-white object-contain p-8' : 'h-full w-full object-cover'}
+              className={fit === 'contain' ? 'h-full w-full bg-white object-contain p-8' : 'h-full w-full object-cover object-top'}
             />
             <span className="bg-noise pointer-events-none absolute inset-0 opacity-[0.08] mix-blend-overlay" />
           </motion.div>

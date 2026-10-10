@@ -19,14 +19,13 @@ import Header from '@/components/shell/Header'
 import SectionNav from '@/components/shell/SectionNav'
 import LocalClock from '@/components/shell/LocalClock'
 import useActiveSection from '@/hooks/useActiveSection'
-import SectionHead from '@/components/ui/section-head'
 import SkillsShowcase from '@/components/skills'
 import HeroScrollDemo from '@/components/efeito-4-container-scroll/demo'
 import ProjetosHeroScrub from '@/components/efeito-7-projetos/demo'
 import HistoriaSection from '@/components/historia'
 import HistoriaIntro from '@/components/historia/intro'
 import ExperienciaSection from '@/components/experiencia'
-import OrbitCarousel from '@/components/ui/orbiting-carousel-with-animated-icons'
+import ParceirosSection from '@/components/parceiros'
 import { ShaderBackground } from '@/components/ui/animated-shader-hero'
 
 const NAV = [
@@ -237,13 +236,13 @@ function App() {
             </div>
 
             <div data-hero-layer="line1" className="will-change-transform">
-              <h1 className="mt-5 overflow-hidden pb-[0.06em] font-display text-[clamp(2.6rem,10.5vw,8.75rem)] leading-[0.95] text-[#e9edf7]">
+              <h1 className="mt-5 overflow-hidden pb-[0.06em] font-display text-[clamp(2.4rem,9.2vw,7.6rem)] leading-[0.92] tracking-[-0.025em] text-[#e9edf7]">
                 <motion.span variants={lineMask} className="block origin-left">Matheus</motion.span>
               </h1>
             </div>
 
             <div data-hero-layer="line2" className="will-change-transform">
-              <h1 className="overflow-hidden pb-[0.06em] font-display text-[clamp(2.6rem,10.5vw,8.75rem)] leading-[0.95] text-[#e9edf7] md:ml-[16%]">
+              <h1 className="overflow-hidden pb-[0.06em] font-display text-[clamp(2.4rem,9.2vw,7.6rem)] leading-[0.92] tracking-[-0.025em] text-[#e9edf7] md:ml-[16%]">
                 <motion.span variants={lineMask} className="block origin-left">
                   Goes <span className="text-gradient-anim">da</span>
                 </motion.span>
@@ -251,7 +250,7 @@ function App() {
             </div>
 
             <div data-hero-layer="line3" className="will-change-transform">
-              <h1 className="overflow-hidden pb-[0.06em] font-display text-[clamp(2.6rem,10.5vw,8.75rem)] leading-[0.95] text-[#e9edf7] md:ml-[5%]">
+              <h1 className="overflow-hidden pb-[0.06em] font-display text-[clamp(2.4rem,9.2vw,7.6rem)] leading-[0.92] tracking-[-0.025em] text-[#e9edf7] md:ml-[5%]">
                 <motion.span variants={lineMask} className="block origin-left">
                   <LiquidText data-cursor="liquid">Silva</LiquidText>
                 </motion.span>
@@ -310,30 +309,7 @@ function App() {
       <ExperienciaSection />
 
       {/* ── Parceiros & Clientes ───────────────────────────────── */}
-      <section id="parceiros" className="relative overflow-hidden border-t rule bg-[#05070f] py-24 md:py-32">
-        {/* Animated CSS aurora — replaces the heavy WebGL blob at a fraction of the cost */}
-        <div aria-hidden className="aurora pointer-events-none absolute inset-0 z-0"><i /></div>
-        <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 z-0 opacity-40 [mask-image:radial-gradient(60%_60%_at_50%_50%,#000,transparent)]" />
-        <div className="bg-noise pointer-events-none absolute inset-0 z-[1] opacity-[0.05] mix-blend-overlay" />
-
-        <div className="relative z-10 mx-auto max-w-6xl px-6 sm:px-8">
-          <SectionHead
-            num="—"
-            kicker="Ecossistema"
-            size="md"
-            title={['Parceiros &', <span key="c" className="text-[#38e0ff]">Clientes</span>]}
-            aside={
-              <p className="font-editorial text-lg italic leading-snug text-white/50 md:text-xl">
-                As marcas e os times com quem construí, codei e entreguei.
-              </p>
-            }
-          />
-        </div>
-
-        <div className="relative z-10 mt-10 md:mt-14">
-          <OrbitCarousel />
-        </div>
-      </section>
+      <ParceirosSection />
 
       {/* ── 03 · PROJETOS ────────────────────────────────────── */}
       <div id="projetos" className="scroll-mt-24">
