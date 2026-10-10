@@ -32,8 +32,8 @@ const EXPERIENCES = [
     role: 'Analista de Tráfego & Dev Front-end',
     company: 'Next Home',
     type: 'Imobiliário · Performance & Web',
-    preview: '/nexthome.png',
-    previewFit: 'contain',
+    preview: '/projects/next-home.jpg',
+    previewFit: 'cover',
     description:
       'Uno desenvolvimento e dados: crio e mantenho sites e landing pages do setor imobiliário enquanto gerencio campanhas de tráfego pago e analiso a performance para gerar mais leads para o negócio.',
     highlights: [
